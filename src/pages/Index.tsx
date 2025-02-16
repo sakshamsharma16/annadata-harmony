@@ -1,8 +1,16 @@
 
-import WelcomePage from "@/components/WelcomePage";
+import Hero from "@/components/Hero";
+import HowItWorks from "@/components/HowItWorks";
+import Navbar from "@/components/Navbar";
 
 const Index = () => {
-  return <WelcomePage />;
+  return (
+    <main className="min-h-screen">
+      <Navbar />
+      <Hero />
+      <HowItWorks />
+    </main>
+  );
 };
 
 export default Index;
