@@ -26,11 +26,11 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#FF9933",
+          DEFAULT: "#FF7722",
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#138808",
+          DEFAULT: "#34D399",
           foreground: "#FFFFFF",
         },
         accent: {
@@ -45,6 +45,41 @@ export default {
       fontFamily: {
         sans: ["Poppins", "sans-serif"],
         hindi: ["Mukta", "sans-serif"],
+      },
+      keyframes: {
+        "fade-up": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(10px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "fade-in": {
+          "0%": {
+            opacity: "0",
+          },
+          "100%": {
+            opacity: "1",
+          },
+        },
+        "scale-up": {
+          "0%": {
+            transform: "scale(0.95)",
+            opacity: "0",
+          },
+          "100%": {
+            transform: "scale(1)",
+            opacity: "1",
+          },
+        },
+      },
+      animation: {
+        "fade-up": "fade-up 0.5s ease-out",
+        "fade-in": "fade-in 0.5s ease-out",
+        "scale-up": "scale-up 0.5s ease-out",
       },
     },
   },
