@@ -20,34 +20,35 @@
 }
 
 @layer components {
-  .hero-gradient {
-    @apply bg-gradient-to-b from-orange-50 to-white;
+  .gradient-background {
+    @apply bg-gradient-to-b from-[#FF9933] via-white to-[#138808];
   }
   
-  .glass-card {
-    @apply backdrop-blur-lg bg-white/80 border border-white/20 shadow-lg;
+  .input-field {
+    @apply w-full px-4 py-3 rounded-full bg-[#E2EAF7] text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary;
   }
   
   .btn-primary {
-    @apply px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors duration-200;
+    @apply px-6 py-3 bg-[#138808] text-white rounded-full font-semibold hover:bg-[#138808]/90 transition-colors duration-200 w-full;
   }
   
-  .btn-secondary {
-    @apply px-6 py-3 bg-secondary text-white rounded-lg font-semibold hover:bg-secondary/90 transition-colors duration-200;
+  .glass-card {
+    @apply backdrop-blur-lg bg-white/80 border border-white/20 rounded-[2rem] shadow-lg;
+  }
+  
+  .language-toggle {
+    @apply text-sm font-medium text-gray-600 hover:text-primary transition-colors;
   }
 }
 
-.slide-up {
-  animation: slideUp 0.5s ease-out;
+.circle-gradient {
+  background: radial-gradient(circle at center, #E7FFE7 0%, #FFFFFF 100%);
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.annadata-logo {
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+}
+
+.need-help-button {
+  @apply fixed bottom-4 right-4 flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg text-sm font-medium text-gray-700;
 }
