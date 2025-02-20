@@ -1,5 +1,6 @@
 
 import { ArrowRight, Users, Store, ShoppingCart, LineChart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const dashboards = [
   {
@@ -7,24 +8,28 @@ const dashboards = [
     description: "Manage your products, track sales, and connect with buyers directly.",
     icon: Users,
     color: "bg-green-500",
+    link: "/dashboard/farmer",
   },
   {
     title: "Vendor Dashboard",
     description: "Access inventory management and order processing tools.",
     icon: Store,
     color: "bg-orange-500",
+    link: "/dashboard/vendor",
   },
   {
     title: "Consumer Dashboard",
     description: "Browse products, track orders, and manage your preferences.",
     icon: ShoppingCart,
     color: "bg-blue-500",
+    link: "/dashboard/consumer",
   },
   {
     title: "Market Analytics",
     description: "View market trends, price analytics, and demand forecasts.",
     icon: LineChart,
     color: "bg-purple-500",
+    link: "/dashboard/analytics",
   },
 ];
 
@@ -41,7 +46,8 @@ const Dashboards = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {dashboards.map((dashboard, index) => (
-            <div
+            <Link
+              to={dashboard.link}
               key={index}
               className="glass-card p-6 hover:shadow-xl transition-shadow animate-fade-up"
               style={{ animationDelay: `${0.2 * (index + 1)}s` }}
@@ -51,10 +57,10 @@ const Dashboards = () => {
               </div>
               <h3 className="text-xl font-semibold mb-2">{dashboard.title}</h3>
               <p className="text-gray-600 mb-4">{dashboard.description}</p>
-              <button className="text-primary flex items-center justify-center gap-2 w-full hover:gap-3 transition-all">
-                Learn More <ArrowRight size={16} />
-              </button>
-            </div>
+              <div className="text-primary flex items-center justify-center gap-2 w-full hover:gap-3 transition-all">
+                Enter Dashboard <ArrowRight size={16} />
+              </div>
+            </Link>
           ))}
         </div>
       </div>
