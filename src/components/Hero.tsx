@@ -51,17 +51,21 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="pt-20 pb-16 gradient-background relative overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden gradient-background">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           {/* Left Content */}
-          <div className="flex-1 text-center lg:text-left space-y-6 z-10">
+          <div className="flex-1 text-center lg:text-left space-y-6 z-10 relative">
             {heroSlides.map((slide, index) => (
               <div
                 key={index}
-                className={`transition-opacity duration-500 absolute inset-0 flex flex-col justify-center items-center lg:items-start ${
-                  currentSlide === index ? "opacity-100" : "opacity-0 pointer-events-none"
+                className={`transition-opacity duration-500 ${
+                  currentSlide === index ? "opacity-100" : "opacity-0 pointer-events-none absolute top-0 left-0 right-0"
                 }`}
+                style={{ 
+                  position: currentSlide === index ? 'relative' : 'absolute',
+                  height: currentSlide === index ? 'auto' : '0'
+                }}
               >
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight animate-fade-up">
                   {slide.title}
@@ -84,7 +88,7 @@ const Hero = () => {
           </div>
 
           {/* Right Image */}
-          <div className="flex-1 animate-fade-up relative" style={{ animationDelay: "0.2s" }}>
+          <div className="flex-1 animate-fade-up relative mt-8 lg:mt-0" style={{ animationDelay: "0.2s" }}>
             <div className="carousel-container relative">
               {heroSlides.map((slide, index) => (
                 <div
@@ -128,7 +132,7 @@ const Hero = () => {
               key={index}
               onClick={() => setCurrentSlide(index)}
               className={`w-3 h-3 mx-1 rounded-full transition-colors ${
-                currentSlide === index ? "bg-primary" : "bg-gray-300"
+                currentSlide === index ? "bg-[#138808]" : "bg-gray-300"
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
@@ -139,7 +143,7 @@ const Hero = () => {
       {/* Scroll Down Indicator */}
       <a 
         href="#features" 
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center text-gray-600 hover:text-primary transition-colors animate-bounce"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center text-gray-600 hover:text-[#138808] transition-colors animate-bounce"
       >
         <span className="text-sm font-medium mb-2">Scroll Down</span>
         <ArrowRightCircle className="w-5 h-5 transform rotate-90" />

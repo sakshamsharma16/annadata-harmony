@@ -71,7 +71,7 @@ const Features = () => {
   }, []);
 
   return (
-    <section id="features" className="py-16 bg-gray-50">
+    <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-12 animate-fade-up">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">Why Choose Annadata</h2>
@@ -88,7 +88,7 @@ const Features = () => {
             <div
               key={index}
               className="feature-card glass-card p-6 transition-all duration-300 hover:shadow-xl opacity-0"
-              style={{ transitionDelay: `${index * 100}ms` }}
+              style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="flex flex-col items-center text-center">
                 <div className="mb-4 p-3 rounded-full bg-white shadow-md">

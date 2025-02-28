@@ -56,25 +56,38 @@ const Index = () => {
   };
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-white">
       <Navbar />
-      <div id="home">
+      
+      {/* Wrap each section in a full-width container */}
+      <section id="home" className="w-full">
         <Hero />
-      </div>
-      <Features />
-      <HowItWorks />
-      <div id="services" className="reveal reveal-up">
+      </section>
+      
+      <section id="features" className="w-full">
+        <Features />
+      </section>
+      
+      <section id="how-it-works" className="w-full">
+        <HowItWorks />
+      </section>
+      
+      <section id="services" className="w-full reveal reveal-up">
         <Dashboards />
-      </div>
-      <div id="market" className="reveal reveal-up">
+      </section>
+      
+      <section id="market" className="w-full reveal reveal-up">
         <MarketPrices />
-      </div>
-      <div id="testimonials" className="reveal reveal-up">
+      </section>
+      
+      <section id="testimonials" className="w-full reveal reveal-up">
         <Reviews />
-      </div>
-      <div id="contact" className="reveal reveal-up">
+      </section>
+      
+      <section id="contact" className="w-full reveal reveal-up">
         <Contact />
-      </div>
+      </section>
+      
       <Footer />
       
       {/* Back to top button */}
