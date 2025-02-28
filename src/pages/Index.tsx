@@ -9,6 +9,7 @@ import Reviews from "@/components/Reviews";
 import Features from "@/components/Features";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import ProductShowcase from "@/components/ProductShowcase";
 import { ArrowUp } from "lucide-react";
 
 const Index = () => {
@@ -67,6 +68,10 @@ const Index = () => {
         
         <section id="features" className="w-full">
           <Features />
+        </section>
+        
+        <section id="products" className="w-full reveal">
+          <ProductShowcase />
         </section>
         
         <section id="how-it-works" className="w-full">
