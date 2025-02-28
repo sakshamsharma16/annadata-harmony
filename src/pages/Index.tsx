@@ -56,39 +56,41 @@ const Index = () => {
   };
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white overflow-x-hidden">
       <Navbar />
       
-      {/* Wrap each section in a full-width container */}
-      <section id="home" className="w-full">
-        <Hero />
-      </section>
-      
-      <section id="features" className="w-full">
-        <Features />
-      </section>
-      
-      <section id="how-it-works" className="w-full">
-        <HowItWorks />
-      </section>
-      
-      <section id="services" className="w-full reveal reveal-up">
-        <Dashboards />
-      </section>
-      
-      <section id="market" className="w-full reveal reveal-up">
-        <MarketPrices />
-      </section>
-      
-      <section id="testimonials" className="w-full reveal reveal-up">
-        <Reviews />
-      </section>
-      
-      <section id="contact" className="w-full reveal reveal-up">
-        <Contact />
-      </section>
-      
-      <Footer />
+      {/* Section wrapper with full width and consistent spacing */}
+      <div className="flex flex-col w-full">
+        <section id="home" className="w-full">
+          <Hero />
+        </section>
+        
+        <section id="features" className="w-full">
+          <Features />
+        </section>
+        
+        <section id="how-it-works" className="w-full">
+          <HowItWorks />
+        </section>
+        
+        <section id="services" className="w-full reveal">
+          <Dashboards />
+        </section>
+        
+        <section id="market" className="w-full reveal">
+          <MarketPrices />
+        </section>
+        
+        <section id="testimonials" className="w-full reveal">
+          <Reviews />
+        </section>
+        
+        <section id="contact" className="w-full reveal">
+          <Contact />
+        </section>
+        
+        <Footer />
+      </div>
       
       {/* Back to top button */}
       <button

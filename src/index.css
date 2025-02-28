@@ -26,7 +26,7 @@
   }
   
   .glass-card {
-    @apply backdrop-blur-lg bg-white/80 border border-white/20 rounded-[2rem] shadow-lg hover:shadow-xl transition-shadow duration-300;
+    @apply backdrop-blur-lg bg-white/80 border border-white/20 rounded-[1.5rem] shadow-lg hover:shadow-xl transition-shadow duration-300;
   }
   
   .btn-primary {
@@ -120,13 +120,14 @@
 
 /* Scroll reveal animations */
 .reveal {
+  position: relative;
   opacity: 0;
-  transition: all 0.5s ease-in-out;
+  transition: all 0.8s ease-in-out;
 }
 
 .reveal.active {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) !important;
 }
 
 .reveal-left {
@@ -144,4 +145,26 @@
 /* Navbar scroll effect */
 .navbar-scrolled {
   @apply shadow-md bg-white/90 backdrop-blur-lg;
+}
+
+/* Card hover effects */
+.feature-card:hover, 
+.step-card:hover, 
+.review-card:hover, 
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Fix image display issues */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.carousel-container img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
 }

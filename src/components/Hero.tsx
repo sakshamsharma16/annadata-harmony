@@ -1,24 +1,24 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowRight, ArrowLeft, ArrowRightCircle } from "lucide-react";
 
 const heroSlides = [
   {
     title: "Empowering Farmers, Enriching Communities",
     description: "Connect directly with farmers, eliminate middlemen, and ensure fair pricing for all. Join the agricultural revolution today.",
-    image: "https://images.unsplash.com/photo-1517022812141-23620dba5c23",
+    image: "https://images.unsplash.com/photo-1517022812141-23620dba5c23?auto=format&fit=crop&w=1400&q=80",
     alt: "Farmers in field"
   },
   {
     title: "Fresh Produce, Fair Prices",
     description: "Get access to farm-fresh produce at transparent prices while supporting local farmers and sustainable agriculture.",
-    image: "https://images.unsplash.com/photo-1523741543316-beb7fc7023d8",
+    image: "https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?auto=format&fit=crop&w=1400&q=80",
     alt: "Fresh produce at market"
   },
   {
     title: "Technology Meets Agriculture",
     description: "Our innovative platform uses technology to bridge the gap between farmers and consumers for a more sustainable food ecosystem.",
-    image: "https://images.unsplash.com/photo-1601689640364-bc95642014b1",
+    image: "https://images.unsplash.com/photo-1601689640364-bc95642014b1?auto=format&fit=crop&w=1400&q=80",
     alt: "Technology in agriculture"
   }
 ];
@@ -26,6 +26,7 @@ const heroSlides = [
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   const nextSlide = () => {
     if (!isAnimating) {
@@ -50,17 +51,25 @@ const Hero = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    // Preload images for smoother transitions
+    heroSlides.forEach(slide => {
+      const img = new Image();
+      img.src = slide.image;
+    });
+  }, []);
+
   return (
-    <section className="relative overflow-hidden gradient-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <section className="relative overflow-hidden gradient-background min-h-[600px] flex items-center">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 z-10">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           {/* Left Content */}
-          <div className="flex-1 text-center lg:text-left space-y-6 z-10 relative">
+          <div className="flex-1 text-center lg:text-left space-y-6 z-10">
             {heroSlides.map((slide, index) => (
               <div
                 key={index}
-                className={`transition-opacity duration-500 ${
-                  currentSlide === index ? "opacity-100" : "opacity-0 pointer-events-none absolute top-0 left-0 right-0"
+                className={`transition-all duration-500 ${
+                  currentSlide === index ? "opacity-100 transform-none" : "opacity-0 pointer-events-none absolute top-0 left-0 right-0"
                 }`}
                 style={{ 
                   position: currentSlide === index ? 'relative' : 'absolute',
@@ -70,15 +79,15 @@ const Hero = () => {
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight animate-fade-up">
                   {slide.title}
                 </h1>
-                <p className="text-lg sm:text-xl text-gray-700 max-w-2xl mt-4 animate-fade-up" style={{ animationDelay: "0.2s" }}>
+                <p className="text-lg sm:text-xl text-gray-700 lg:max-w-xl mt-4 animate-fade-up" style={{ animationDelay: "0.2s" }}>
                   {slide.description}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-6 animate-fade-up" style={{ animationDelay: "0.3s" }}>
-                  <button className="btn-primary flex items-center justify-center gap-2">
+                  <button className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
                     Join as Farmer
                     <ArrowRight className="w-5 h-5" />
                   </button>
-                  <button className="btn-secondary flex items-center justify-center gap-2">
+                  <button className="btn-secondary flex items-center justify-center gap-2 w-full sm:w-auto">
                     Join as Consumer
                     <ArrowRight className="w-5 h-5" />
                   </button>
@@ -89,7 +98,7 @@ const Hero = () => {
 
           {/* Right Image */}
           <div className="flex-1 animate-fade-up relative mt-8 lg:mt-0" style={{ animationDelay: "0.2s" }}>
-            <div className="carousel-container relative">
+            <div ref={carouselRef} className="carousel-container relative h-[400px] w-full">
               {heroSlides.map((slide, index) => (
                 <div
                   key={index}
@@ -101,7 +110,8 @@ const Hero = () => {
                   <img
                     src={slide.image}
                     alt={slide.alt}
-                    className="w-full h-[400px] object-cover rounded-[2rem] shadow-xl"
+                    className="w-full h-full object-cover rounded-[2rem] shadow-xl"
+                    loading="lazy"
                   />
                 </div>
               ))}
