@@ -10,6 +10,10 @@ import FarmerDashboard from "./pages/dashboards/FarmerDashboard";
 import VendorDashboard from "./pages/dashboards/VendorDashboard";
 import ConsumerDashboard from "./pages/dashboards/ConsumerDashboard";
 import MarketAnalytics from "./pages/dashboards/MarketAnalytics";
+import ManageProducts from "./pages/farmer/ManageProducts";
+import Marketplace from "./pages/vendor/Marketplace";
+import NearbyVendors from "./pages/consumer/NearbyVendors";
+import Checkout from "./pages/checkout/Checkout";
 
 const queryClient = new QueryClient();
 
@@ -21,10 +25,19 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          
+          {/* Dashboards */}
           <Route path="/dashboard/farmer" element={<FarmerDashboard />} />
           <Route path="/dashboard/vendor" element={<VendorDashboard />} />
           <Route path="/dashboard/consumer" element={<ConsumerDashboard />} />
           <Route path="/dashboard/analytics" element={<MarketAnalytics />} />
+          
+          {/* E-commerce pages */}
+          <Route path="/farmer/products" element={<ManageProducts />} />
+          <Route path="/vendor/marketplace" element={<Marketplace />} />
+          <Route path="/consumer/nearby-vendors" element={<NearbyVendors />} />
+          <Route path="/checkout" element={<Checkout />} />
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
