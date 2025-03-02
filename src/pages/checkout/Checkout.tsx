@@ -5,28 +5,34 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
-import { ShoppingCart, Check, ArrowLeft } from "lucide-react";
+import { ShoppingCart, Check, ArrowLeft, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-// Mock cart items
+// Enhanced mock cart items with more details
 const mockCartItems = [
   {
     id: "1",
     name: "Premium Organic Rice",
     price: 120,
     quantity: 5,
+    image: "https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?q=80&w=2070&auto=format&fit=crop",
+    vendor: "Green Earth Farms"
   },
   {
     id: "2",
     name: "Fresh Seasonal Vegetables",
     price: 80,
     quantity: 2,
+    image: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?q=80&w=2069&auto=format&fit=crop",
+    vendor: "Local Harvest Co-op"
   },
   {
     id: "3",
     name: "Organic Wheat Flour",
     price: 65,
     quantity: 3,
+    image: "https://images.unsplash.com/photo-1568718247028-46f14cfb7533?q=80&w=2070&auto=format&fit=crop",
+    vendor: "Heritage Grain Suppliers"
   },
 ];
 
@@ -104,11 +110,21 @@ const Checkout = () => {
                     key={item.id} 
                     className="flex items-center justify-between p-4 border rounded-lg"
                   >
-                    <div>
-                      <h3 className="font-medium">{item.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        ₹{item.price} x {item.quantity}
-                      </p>
+                    <div className="flex items-center gap-4">
+                      <img 
+                        src={item.image} 
+                        alt={item.name} 
+                        className="w-16 h-16 object-cover rounded-md"
+                      />
+                      <div>
+                        <h3 className="font-medium">{item.name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Vendor: {item.vendor}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          ₹{item.price} x {item.quantity}
+                        </p>
+                      </div>
                     </div>
                     <p className="font-medium">₹{item.price * item.quantity}</p>
                   </div>
@@ -195,27 +211,6 @@ const Checkout = () => {
         </TabsContent>
       </Tabs>
     </div>
-  );
-};
-
-// Add missing CreditCard component
-const CreditCard = (props: React.SVGProps<SVGSVGElement>) => {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="20" height="14" x="2" y="5" rx="2" />
-      <line x1="2" x2="22" y1="10" y2="10" />
-    </svg>
   );
 };
 

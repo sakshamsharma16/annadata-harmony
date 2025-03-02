@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { CreditCard, MapPin, Truck, Check, Loader2 } from "lucide-react";
+import { CreditCard, MapPin, Truck, Check, Loader2, AlertCircle } from "lucide-react";
 
 type CheckoutFormProps = {
   cartItems?: Array<{
@@ -15,6 +16,8 @@ type CheckoutFormProps = {
     name: string;
     price: number;
     quantity: number;
+    image?: string;
+    vendor?: string;
   }>;
   onSuccess?: () => void;
 };
@@ -25,17 +28,21 @@ const CheckoutForm = ({
 }: CheckoutFormProps) => {
   const [paymentMethod, setPaymentMethod] = useState("upi");
   const [processing, setProcessing] = useState(false);
+  const [deliveryOption, setDeliveryOption] = useState("standard");
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     address: "",
+    city: "",
+    pincode: "",
     upiId: "",
     cardNumber: "",
     cardExpiry: "",
     cardCvv: "",
+    notes: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -45,7 +52,8 @@ const CheckoutForm = ({
   };
 
   const calculateDeliveryFee = () => {
-    return cartItems.length > 0 ? 40 : 0;
+    if (cartItems.length === 0) return 0;
+    return deliveryOption === "express" ? 80 : 40;
   };
 
   const calculateTotal = () => {
@@ -56,7 +64,21 @@ const CheckoutForm = ({
     e.preventDefault();
     setProcessing(true);
 
-    // Validate form
+    // Form validation
+    const requiredFields = ['name', 'phone', 'address', 'city', 'pincode'];
+    const emptyFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
+    
+    if (emptyFields.length > 0) {
+      toast({
+        title: "Missing Information",
+        description: `Please fill in the following: ${emptyFields.join(', ')}`,
+        variant: "destructive",
+      });
+      setProcessing(false);
+      return;
+    }
+
+    // Payment method validation
     if (paymentMethod === "upi" && !formData.upiId) {
       toast({
         title: "Missing UPI ID",
@@ -138,10 +160,47 @@ const CheckoutForm = ({
                 <Input
                   id="address"
                   name="address"
-                  placeholder="Enter your full address"
+                  placeholder="Enter your street address"
                   value={formData.address}
                   onChange={handleChange}
                   required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="city">City</Label>
+                  <Input
+                    id="city"
+                    name="city"
+                    placeholder="Enter your city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="pincode">PIN Code</Label>
+                  <Input
+                    id="pincode"
+                    name="pincode"
+                    placeholder="Enter your PIN code"
+                    value={formData.pincode}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="notes">Order Notes (Optional)</Label>
+                <Textarea
+                  id="notes"
+                  name="notes"
+                  placeholder="Special instructions for delivery"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  className="min-h-[80px]"
                 />
               </div>
 
@@ -166,6 +225,46 @@ const CheckoutForm = ({
                 </Button>
               </div>
             </form>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Delivery Options</CardTitle>
+            <CardDescription>Choose your preferred delivery method</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RadioGroup 
+              value={deliveryOption} 
+              onValueChange={setDeliveryOption}
+              className="space-y-4"
+            >
+              <div className={`flex items-center justify-between rounded-lg border p-4 ${deliveryOption === "standard" ? "border-[#138808] bg-[#138808]/5" : ""}`}>
+                <div className="flex items-center space-x-4">
+                  <RadioGroupItem value="standard" id="standard" />
+                  <Label htmlFor="standard" className="flex flex-col">
+                    <span className="font-medium">Standard Delivery</span>
+                    <span className="text-sm text-muted-foreground">Delivered within 24-48 hours</span>
+                  </Label>
+                </div>
+                <div className="text-right">
+                  <p className="font-medium">₹40</p>
+                </div>
+              </div>
+
+              <div className={`flex items-center justify-between rounded-lg border p-4 ${deliveryOption === "express" ? "border-[#138808] bg-[#138808]/5" : ""}`}>
+                <div className="flex items-center space-x-4">
+                  <RadioGroupItem value="express" id="express" />
+                  <Label htmlFor="express" className="flex flex-col">
+                    <span className="font-medium">Express Delivery</span>
+                    <span className="text-sm text-muted-foreground">Delivered within 12 hours</span>
+                  </Label>
+                </div>
+                <div className="text-right">
+                  <p className="font-medium">₹80</p>
+                </div>
+              </div>
+            </RadioGroup>
           </CardContent>
         </Card>
 
@@ -294,12 +393,26 @@ const CheckoutForm = ({
                 </div>
               ) : (
                 cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between">
-                    <div>
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        ₹{item.price} x {item.quantity}
-                      </p>
+                  <div key={item.id} className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      {item.image && (
+                        <img 
+                          src={item.image} 
+                          alt={item.name} 
+                          className="w-16 h-16 object-cover rounded-md"
+                        />
+                      )}
+                      <div>
+                        <p className="font-medium">{item.name}</p>
+                        {item.vendor && (
+                          <p className="text-xs text-muted-foreground">
+                            Sold by: {item.vendor}
+                          </p>
+                        )}
+                        <p className="text-sm text-muted-foreground">
+                          ₹{item.price} x {item.quantity}
+                        </p>
+                      </div>
                     </div>
                     <p className="font-medium">₹{item.price * item.quantity}</p>
                   </div>
@@ -332,11 +445,28 @@ const CheckoutForm = ({
                   <div>
                     <p className="font-medium">Estimated Delivery</p>
                     <p className="text-sm text-muted-foreground">
-                      {new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString()} (within 24 hours)
+                      {deliveryOption === "express" 
+                        ? new Date(Date.now() + 12 * 60 * 60 * 1000).toLocaleDateString() + " (within 12 hours)"
+                        : new Date(Date.now() + 36 * 60 * 60 * 1000).toLocaleDateString() + " (within 24-48 hours)"
+                      }
                     </p>
                   </div>
                 </div>
               </div>
+
+              {cartItems.length > 0 && (
+                <div className="rounded-lg bg-amber-50 p-4">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-amber-700">Order Notification</p>
+                      <p className="text-sm text-amber-600">
+                        By placing this order, you'll receive notifications when the vendor is near your location for delivery.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
           <CardFooter>
