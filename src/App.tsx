@@ -14,6 +14,8 @@ import ManageProducts from "./pages/farmer/ManageProducts";
 import Marketplace from "./pages/vendor/Marketplace";
 import NearbyVendors from "./pages/consumer/NearbyVendors";
 import Checkout from "./pages/checkout/Checkout";
+import ProductShowcase from "./components/ProductShowcase";
+import FeaturedProducts from "./components/FeaturedProducts";
 
 const queryClient = new QueryClient();
 

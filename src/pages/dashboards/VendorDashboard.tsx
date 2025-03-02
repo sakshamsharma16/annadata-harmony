@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { consumers } from "@/data/mockData";
-import { Package, MapPin, Bell, TrendingUp, ShoppingBag, Users, ArrowUpRight } from "lucide-react";
+import { Package, MapPin, Bell, TrendingUp, ShoppingBag, Users, ArrowUpRight, Plus, Edit, Trash2, Check, AlertTriangle } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const salesData = [
@@ -29,11 +29,16 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const VendorDashboard = () => {
   const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [inventory] = useState([
-    { id: 1, product: "Rice", quantity: 1000, price: 38, status: "In Stock" },
-    { id: 2, product: "Wheat", quantity: 800, price: 30, status: "Low Stock" },
-    { id: 3, product: "Potatoes", quantity: 500, price: 20, status: "In Stock" },
+  const [inventory, setInventory] = useState([
+    { id: 1, product: "Rice", quantity: 1000, price: 38, status: "In Stock", threshold: 200 },
+    { id: 2, product: "Wheat", quantity: 180, price: 30, status: "Low Stock", threshold: 200 },
+    { id: 3, product: "Potatoes", quantity: 500, price: 20, status: "In Stock", threshold: 100 },
+    { id: 4, product: "Tomatoes", quantity: 80, price: 22, status: "Low Stock", threshold: 100 },
+    { id: 5, product: "Onions", quantity: 450, price: 18, status: "In Stock", threshold: 100 },
   ]);
+
+  const [viewMode, setViewMode] = useState("grid");
+  const [showLowStock, setShowLowStock] = useState(false);
 
   useEffect(() => {
     if ("geolocation" in navigator) {
@@ -64,6 +69,39 @@ const VendorDashboard = () => {
       });
     });
   };
+
+  const handleRestockProduct = (id: number) => {
+    setInventory(prev => prev.map(item => {
+      if (item.id === id) {
+        const newQuantity = item.quantity + 500;
+        return {
+          ...item,
+          quantity: newQuantity,
+          status: newQuantity < item.threshold ? "Low Stock" : "In Stock"
+        };
+      }
+      return item;
+    }));
+
+    toast({
+      title: "Product Restocked",
+      description: "New inventory has been added to your stock.",
+    });
+  };
+
+  const handleDeleteProduct = (id: number) => {
+    setInventory(prev => prev.filter(item => item.id !== id));
+    toast({
+      title: "Product Removed",
+      description: "The product has been removed from inventory.",
+    });
+  };
+
+  const filteredInventory = showLowStock 
+    ? inventory.filter(item => item.status === "Low Stock") 
+    : inventory;
+
+  const lowStockCount = inventory.filter(item => item.status === "Low Stock").length;
 
   return (
     <div className="p-8 bg-gray-50">
@@ -179,40 +217,143 @@ const VendorDashboard = () => {
                 <CardTitle>Inventory Management</CardTitle>
                 <CardDescription>Current stock levels and pricing</CardDescription>
               </div>
-              <Button variant="outline" size="sm">
-                <Package className="w-4 h-4 mr-2" />
-                Add Product
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  variant={lowStockCount > 0 ? "destructive" : "outline"} 
+                  size="sm"
+                  onClick={() => setShowLowStock(!showLowStock)}
+                >
+                  <AlertTriangle className="w-4 h-4 mr-2" />
+                  {showLowStock ? "Show All" : `Low Stock (${lowStockCount})`}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setViewMode(viewMode === "grid" ? "table" : "grid")}
+                >
+                  {viewMode === "grid" ? "Table View" : "Grid View"}
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Package className="w-4 h-4 mr-2" />
+                  Add Product
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4">
-              {inventory.map((item) => (
-                <div 
-                  key={item.id} 
-                  className="p-4 rounded-lg border bg-gradient-to-r from-white to-gray-50"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold">{item.product}</h4>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      item.status === 'In Stock' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {item.status}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="text-gray-500">Quantity</p>
-                      <p className="font-medium">{item.quantity} kg</p>
+            {viewMode === "grid" ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredInventory.map((item) => (
+                  <div 
+                    key={item.id} 
+                    className={`p-4 rounded-lg border ${
+                      item.status === "Low Stock" 
+                        ? "bg-gradient-to-r from-red-50 to-red-100 border-red-200" 
+                        : "bg-gradient-to-r from-white to-gray-50"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold">{item.product}</h4>
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        item.status === 'In Stock' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {item.status}
+                      </span>
                     </div>
-                    <div>
-                      <p className="text-gray-500">Price/kg</p>
-                      <p className="font-medium">₹{item.price}</p>
+                    <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+                      <div>
+                        <p className="text-gray-500">Quantity</p>
+                        <p className="font-medium">{item.quantity} kg</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">Price/kg</p>
+                        <p className="font-medium">₹{item.price}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap justify-end gap-2">
+                      {item.status === "Low Stock" && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100"
+                          onClick={() => handleRestockProduct(item.id)}
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          Restock
+                        </Button>
+                      )}
+                      <Button variant="outline" size="sm">
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={() => handleDeleteProduct(item.id)}
+                      >
+                        <Trash2 className="h-3 w-3 mr-1" />
+                        Delete
+                      </Button>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Quantity (kg)</TableHead>
+                    <TableHead>Price (₹/kg)</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredInventory.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.product}</TableCell>
+                      <TableCell>{item.quantity}</TableCell>
+                      <TableCell>₹{item.price}</TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          item.status === 'In Stock' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {item.status}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          {item.status === "Low Stock" && (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100"
+                              onClick={() => handleRestockProduct(item.id)}
+                            >
+                              <Plus className="h-3 w-3 mr-1" />
+                              Restock
+                            </Button>
+                          )}
+                          <Button variant="outline" size="sm">
+                            <Edit className="h-3 w-3 mr-1" />
+                            Edit
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => handleDeleteProduct(item.id)}
+                          >
+                            <Trash2 className="h-3 w-3 mr-1" />
+                            Delete
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -221,4 +362,3 @@ const VendorDashboard = () => {
 };
 
 export default VendorDashboard;
-
