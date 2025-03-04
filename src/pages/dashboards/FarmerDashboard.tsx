@@ -5,8 +5,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { cropPrices } from "@/data/mockData";
 import { BarChart as BarGraph, LineChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Line } from 'recharts';
-import { Leaf, TrendingUp, Users, ShoppingCart, ArrowUpRight, ArrowDownRight, Plus, Edit, Trash2, Activity, HeartPulse, Thermometer, Sprout } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Leaf, TrendingUp, Users, ShoppingCart, ArrowUpRight, ArrowDownRight, Plus, Edit, Trash2, Activity, HeartPulse, Thermometer, Sprout, ExternalLink } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import StatusCard from "@/components/consumer/StatusCard";
 
@@ -28,6 +28,7 @@ const cropHealthData = {
 };
 
 const FarmerDashboard = () => {
+  const navigate = useNavigate();
   const [activeProducts, setActiveProducts] = useState([
     { id: 1, name: "Rice", quantity: 500, price: 35, trend: "up", change: "+2.5%" },
     { id: 2, name: "Wheat", quantity: 300, price: 28, trend: "down", change: "-1.2%" },
@@ -45,10 +46,14 @@ const FarmerDashboard = () => {
     });
   };
 
+  const handleNavigateToCropHealth = () => {
+    navigate("/agriculture/crop-health");
+  };
+
   return (
     <div className="p-6 lg:p-8 bg-gray-50">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <h1 className="text-3xl font-bold">Farmer Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Farmer Dashboard</h1>
         <div className="text-sm text-muted-foreground">
           Last updated: {new Date().toLocaleDateString()}
         </div>
@@ -81,33 +86,43 @@ const FarmerDashboard = () => {
           icon={Leaf}
           iconColor="text-purple-600"
           bgGradient="bg-gradient-to-br from-purple-50 to-purple-100"
+          linkTo="/agriculture/crop-health"
         />
 
-        <Link to="/agriculture/crop-health" className="block">
-          <StatusCard 
-            title="Manage Crop Health"
-            value="View Details"
-            description="Monitor soil, water & pests"
-            icon={Sprout}
-            iconColor="text-emerald-600"
-            bgGradient="bg-gradient-to-br from-emerald-50 to-emerald-100"
-          />
-        </Link>
+        <StatusCard 
+          title="Manage Crop Health"
+          value="View Details"
+          description="Monitor soil, water & pests"
+          icon={Sprout}
+          iconColor="text-emerald-600"
+          bgGradient="bg-gradient-to-br from-emerald-50 to-emerald-100"
+          linkTo="/agriculture/crop-health"
+        />
       </div>
 
       {/* Crop Health Index Card */}
       <div className="mb-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <HeartPulse className="h-5 w-5 text-green-600" /> 
-              Crop Health Index
-            </CardTitle>
-            <CardDescription>
-              Real-time monitoring of your crop's overall health and vitality
-            </CardDescription>
+        <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <CardHeader className="border-b bg-gray-50">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <HeartPulse className="h-5 w-5 text-green-600" /> 
+                  Crop Health Index
+                </CardTitle>
+                <CardDescription>
+                  Real-time monitoring of your crop's overall health and vitality
+                </CardDescription>
+              </div>
+              <Link to="/agriculture/crop-health">
+                <Button variant="outline" className="gap-2 text-green-700 border-green-200 hover:bg-green-50">
+                  <ExternalLink className="h-4 w-4" />
+                  View Detailed Analysis
+                </Button>
+              </Link>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
                 <div className="relative h-32 w-32 flex items-center justify-center mb-3">
@@ -171,7 +186,7 @@ const FarmerDashboard = () => {
             
             <div className="mt-6 flex justify-end">
               <Link to="/agriculture/crop-health">
-                <Button className="bg-[#138808] hover:bg-[#138808]/90">
+                <Button className="bg-[#138808] hover:bg-[#138808]/90 shadow-sm hover:shadow-md transition-all">
                   View Detailed Analysis
                 </Button>
               </Link>
@@ -181,19 +196,25 @@ const FarmerDashboard = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 mb-6">
-        <Card>
-          <CardHeader>
+        <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <CardHeader className="border-b bg-gray-50">
             <CardTitle>Sales Trend</CardTitle>
             <CardDescription>Monthly revenue analysis</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={salesData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="month" stroke="#888" tickLine={false} axisLine={false} />
+                  <YAxis stroke="#888" tickLine={false} axisLine={false} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      borderRadius: '8px', 
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)', 
+                      border: 'none' 
+                    }} 
+                  />
                   <Legend />
                   <Line 
                     type="monotone" 
@@ -210,19 +231,25 @@ const FarmerDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
+        <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <CardHeader className="border-b bg-gray-50">
             <CardTitle>Market Prices</CardTitle>
             <CardDescription>Current market rates for various crops</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarGraph data={cropPrices}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="name" stroke="#888" tickLine={false} axisLine={false} />
+                  <YAxis stroke="#888" tickLine={false} axisLine={false} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      borderRadius: '8px', 
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)', 
+                      border: 'none' 
+                    }} 
+                  />
                   <Legend />
                   <Bar 
                     dataKey="price" 
@@ -237,8 +264,8 @@ const FarmerDashboard = () => {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
+      <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+        <CardHeader className="border-b bg-gray-50">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <CardTitle>Inventory Management</CardTitle>
@@ -260,11 +287,11 @@ const FarmerDashboard = () => {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {inventoryView === "grid" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {activeProducts.map((product) => (
-                <div key={product.id} className="p-4 rounded-lg bg-gradient-to-r from-white to-gray-50 border">
+                <div key={product.id} className="p-4 rounded-lg bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-semibold">{product.name}</h4>
                     <span className={`flex items-center ${

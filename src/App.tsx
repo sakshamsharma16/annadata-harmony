@@ -34,7 +34,9 @@ const App = () => (
           <Route path="/dashboard/vendor" element={<VendorDashboard />} />
           <Route path="/dashboard/consumer" element={<ConsumerDashboard />} />
           <Route path="/dashboard/analytics" element={<MarketAnalytics />} />
-          <Route path="/dashboard/crop-health" element={<CropHealthDashboard />} />
+          
+          {/* Agriculture */}
+          <Route path="/agriculture/crop-health" element={<CropHealthDashboard />} />
           
           {/* E-commerce pages */}
           <Route path="/farmer/products" element={<ManageProducts />} />
