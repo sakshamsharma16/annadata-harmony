@@ -16,6 +16,7 @@ import NearbyVendors from "./pages/consumer/NearbyVendors";
 import Checkout from "./pages/checkout/Checkout";
 import ProductShowcase from "./components/ProductShowcase";
 import FeaturedProducts from "./components/FeaturedProducts";
+import CropHealthDashboard from "./pages/agriculture/CropHealthDashboard";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/dashboard/vendor" element={<VendorDashboard />} />
           <Route path="/dashboard/consumer" element={<ConsumerDashboard />} />
           <Route path="/dashboard/analytics" element={<MarketAnalytics />} />
+          <Route path="/dashboard/crop-health" element={<CropHealthDashboard />} />
           
           {/* E-commerce pages */}
           <Route path="/farmer/products" element={<ManageProducts />} />
