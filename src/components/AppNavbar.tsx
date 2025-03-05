@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -86,7 +87,7 @@ const AppNavbar = () => {
   return (
     <header
       className={`sticky top-0 z-40 w-full transition-all duration-200 ${
-        scrolled ? "bg-white/95 backdrop-blur-sm shadow-sm" : "bg-transparent"
+        scrolled ? "bg-white/95 backdrop-blur-sm shadow-sm" : "bg-[#F2FCE2]"
       }`}
     >
       <div className="container mx-auto px-4">
@@ -94,7 +95,7 @@ const AppNavbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2">
               <Leaf className="h-6 w-6 text-[#138808]" />
-              <span className="font-bold text-xl">Annadata Harmony</span>
+              <span className="font-bold text-xl">ANNADATA</span>
             </Link>
             
             <div className="hidden md:flex ml-10">

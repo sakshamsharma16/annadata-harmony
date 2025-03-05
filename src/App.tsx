@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import AppNavbar from "./components/AppNavbar";
 import EnhancedFooter from "./components/EnhancedFooter";
+import KrishiMitra from "./components/KrishiMitra";
 
 // Lazy load pages to improve initial load time
 const Index = lazy(() => import("./pages/Index"));
@@ -51,7 +52,7 @@ const AppLayout = () => {
   }
   
   return (
-    <>
+    <div className="bg-[#F2FCE2] min-h-screen">
       {!isAuthRoute && <AppNavbar />}
       <main>
         <Suspense fallback={<LoadingSpinner />}>
@@ -73,7 +74,8 @@ const AppLayout = () => {
         </Suspense>
       </main>
       {!isAuthRoute && <EnhancedFooter />}
-    </>
+      <KrishiMitra />
+    </div>
   );
 };
 

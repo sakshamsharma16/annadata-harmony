@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,13 +16,13 @@ import {
 
 const EnhancedFooter = () => {
   return (
-    <footer className="bg-gray-50 border-t">
+    <footer className="bg-[#F2FCE2] border-t">
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <Leaf className="h-6 w-6 text-[#138808]" />
-              <span className="font-bold text-xl">Annadata Harmony</span>
+              <span className="font-bold text-xl">ANNADATA</span>
             </Link>
             <p className="text-gray-600 mb-6 max-w-md">
               An integrated digital platform that seamlessly connects farmers, vendors, and consumers,
@@ -130,7 +129,7 @@ const EnhancedFooter = () => {
         
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-600 text-sm mb-4 md:mb-0">
-            © {new Date().getFullYear()} Annadata Harmony. All rights reserved.
+            © {new Date().getFullYear()} ANNADATA. All rights reserved.
           </p>
           
           <div className="flex flex-wrap gap-4 text-sm text-gray-600">
