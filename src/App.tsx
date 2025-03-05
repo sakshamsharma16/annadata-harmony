@@ -36,38 +36,49 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          {({ location }) => (
-            <>
-              {!isAuthRoute(location.pathname) && <AppNavbar />}
-              <main>
-                <Routes>
-                  <Route path="/" element={<Index />} />
+          <Routes>
+            <Route path="*" element={
+              <>
+                {({ location }) => {
+                  const path = location.pathname;
+                  const showNavFooter = !isAuthRoute(path);
                   
-                  {/* Authentication */}
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  
-                  {/* Dashboards */}
-                  <Route path="/dashboard/farmer" element={<FarmerDashboard />} />
-                  <Route path="/dashboard/vendor" element={<VendorDashboard />} />
-                  <Route path="/dashboard/consumer" element={<ConsumerDashboard />} />
-                  <Route path="/dashboard/analytics" element={<MarketAnalytics />} />
-                  
-                  {/* Agriculture */}
-                  <Route path="/agriculture/crop-health" element={<CropHealthDashboard />} />
-                  
-                  {/* E-commerce pages */}
-                  <Route path="/farmer/products" element={<ManageProducts />} />
-                  <Route path="/vendor/marketplace" element={<Marketplace />} />
-                  <Route path="/consumer/nearby-vendors" element={<NearbyVendors />} />
-                  <Route path="/checkout" element={<Checkout />} />
-                  
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </main>
-              {!isAuthRoute(location.pathname) && <EnhancedFooter />}
-            </>
-          )}
+                  return (
+                    <>
+                      {showNavFooter && <AppNavbar />}
+                      <main>
+                        <Routes>
+                          <Route path="/" element={<Index />} />
+                          
+                          {/* Authentication */}
+                          <Route path="/login" element={<Login />} />
+                          <Route path="/register" element={<Register />} />
+                          
+                          {/* Dashboards */}
+                          <Route path="/dashboard/farmer" element={<FarmerDashboard />} />
+                          <Route path="/dashboard/vendor" element={<VendorDashboard />} />
+                          <Route path="/dashboard/consumer" element={<ConsumerDashboard />} />
+                          <Route path="/dashboard/analytics" element={<MarketAnalytics />} />
+                          
+                          {/* Agriculture */}
+                          <Route path="/agriculture/crop-health" element={<CropHealthDashboard />} />
+                          
+                          {/* E-commerce pages */}
+                          <Route path="/farmer/products" element={<ManageProducts />} />
+                          <Route path="/vendor/marketplace" element={<Marketplace />} />
+                          <Route path="/consumer/nearby-vendors" element={<NearbyVendors />} />
+                          <Route path="/checkout" element={<Checkout />} />
+                          
+                          <Route path="*" element={<NotFound />} />
+                        </Routes>
+                      </main>
+                      {showNavFooter && <EnhancedFooter />}
+                    </>
+                  );
+                }}
+              </>
+            } />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

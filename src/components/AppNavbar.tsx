@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -43,7 +42,7 @@ import {
   Users,
   Warehouse,
   BarChart3,
-  Plant,
+  MapPin,
 } from "lucide-react";
 
 const AppNavbar = () => {
@@ -52,9 +51,7 @@ const AppNavbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<"farmer" | "vendor" | "consumer" | null>(null);
   
-  // Mock authentication - in a real app, this would come from your auth system
   useEffect(() => {
-    // Check if user is on a dashboard page to simulate authentication
     if (location.pathname.includes("dashboard")) {
       setIsAuthenticated(true);
       
@@ -71,7 +68,6 @@ const AppNavbar = () => {
     }
   }, [location]);
   
-  // Handle scroll for navbar styling
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -114,7 +110,7 @@ const AppNavbar = () => {
                               to="/dashboard/farmer"
                               className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-green-50 to-green-100 p-6 no-underline outline-none focus:shadow-md"
                             >
-                              <Plant className="h-6 w-6 text-[#138808]" />
+                              <Leaf className="h-6 w-6 text-[#138808]" />
                               <div className="mb-2 mt-4 text-lg font-medium">
                                 Farmer Dashboard
                               </div>
