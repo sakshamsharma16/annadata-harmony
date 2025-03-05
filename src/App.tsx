@@ -1,10 +1,10 @@
 
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import AppNavbar from "./components/AppNavbar";
 import EnhancedFooter from "./components/EnhancedFooter";
 
@@ -30,72 +30,71 @@ const LoadingSpinner = () => (
   </div>
 );
 
+// Layout component to handle logic for showing/hiding navbar and footer
+const AppLayout = () => {
+  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    // Simulate checking if resources are loaded
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+  
+  // Determine if the current route is an auth page to hide navbar/footer
+  const isAuthRoute = location.pathname === "/login" || 
+                     location.pathname === "/register" || 
+                     location.pathname === "/forgot-password";
+  
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+  
+  return (
+    <>
+      {!isAuthRoute && <AppNavbar />}
+      <main>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/dashboard/farmer" element={<FarmerDashboard />} />
+            <Route path="/dashboard/vendor" element={<VendorDashboard />} />
+            <Route path="/dashboard/consumer" element={<ConsumerDashboard />} />
+            <Route path="/dashboard/analytics" element={<MarketAnalytics />} />
+            <Route path="/agriculture/crop-health" element={<CropHealthDashboard />} />
+            <Route path="/farmer/products" element={<ManageProducts />} />
+            <Route path="/vendor/marketplace" element={<Marketplace />} />
+            <Route path="/consumer/nearby-vendors" element={<NearbyVendors />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </main>
+      {!isAuthRoute && <EnhancedFooter />}
+    </>
+  );
+};
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 60 * 1000, // Cache data for 1 minute
       refetchOnWindowFocus: false, // Disable automatic refetch on window focus
+      retry: 1, // Reduce retry attempts
     },
   },
 });
 
 const App = () => {
-  // Determine if the current route is an auth page to hide navbar/footer
-  const isAuthRoute = (pathname: string) => {
-    return pathname === "/login" || pathname === "/register" || pathname === "/forgot-password";
-  };
-  
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="*" element={
-              <>
-                {({ location }) => {
-                  const path = location.pathname;
-                  const showNavFooter = !isAuthRoute(path);
-                  
-                  return (
-                    <>
-                      {showNavFooter && <AppNavbar />}
-                      <main>
-                        <Suspense fallback={<LoadingSpinner />}>
-                          <Routes>
-                            <Route path="/" element={<Index />} />
-                            
-                            {/* Authentication */}
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/register" element={<Register />} />
-                            
-                            {/* Dashboards */}
-                            <Route path="/dashboard/farmer" element={<FarmerDashboard />} />
-                            <Route path="/dashboard/vendor" element={<VendorDashboard />} />
-                            <Route path="/dashboard/consumer" element={<ConsumerDashboard />} />
-                            <Route path="/dashboard/analytics" element={<MarketAnalytics />} />
-                            
-                            {/* Agriculture */}
-                            <Route path="/agriculture/crop-health" element={<CropHealthDashboard />} />
-                            
-                            {/* E-commerce pages */}
-                            <Route path="/farmer/products" element={<ManageProducts />} />
-                            <Route path="/vendor/marketplace" element={<Marketplace />} />
-                            <Route path="/consumer/nearby-vendors" element={<NearbyVendors />} />
-                            <Route path="/checkout" element={<Checkout />} />
-                            
-                            <Route path="*" element={<NotFound />} />
-                          </Routes>
-                        </Suspense>
-                      </main>
-                      {showNavFooter && <EnhancedFooter />}
-                    </>
-                  );
-                }}
-              </>
-            } />
-          </Routes>
+          <AppLayout />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

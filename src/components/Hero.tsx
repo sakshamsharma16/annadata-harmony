@@ -1,31 +1,83 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { ArrowRight, ArrowLeft, ArrowRightCircle } from "lucide-react";
 
 const heroSlides = [
   {
     title: "Empowering Farmers, Enriching Communities",
     description: "Connect directly with farmers, eliminate middlemen, and ensure fair pricing for all. Join the agricultural revolution today.",
-    image: "https://images.unsplash.com/photo-1517022812141-23620dba5c23?auto=format&fit=crop&w=1400&q=80",
+    image: "https://images.unsplash.com/photo-1517022812141-23620dba5c23?auto=format&fit=crop&w=700&q=60",
     alt: "Farmers in field"
   },
   {
     title: "Fresh Produce, Fair Prices",
     description: "Get access to farm-fresh produce at transparent prices while supporting local farmers and sustainable agriculture.",
-    image: "https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?auto=format&fit=crop&w=1400&q=80",
+    image: "https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?auto=format&fit=crop&w=700&q=60",
     alt: "Fresh produce at market"
   },
   {
     title: "Technology Meets Agriculture",
     description: "Our innovative platform uses technology to bridge the gap between farmers and consumers for a more sustainable food ecosystem.",
-    image: "https://images.unsplash.com/photo-1601689640364-bc95642014b1?auto=format&fit=crop&w=1400&q=80",
+    image: "https://images.unsplash.com/photo-1601689640364-bc95642014b1?auto=format&fit=crop&w=700&q=60",
     alt: "Technology in agriculture"
   }
 ];
 
+// Memoize slide content for better performance
+const HeroSlide = memo(({ slide, isActive }: { slide: typeof heroSlides[0], isActive: boolean }) => {
+  if (!isActive) return null;
+  
+  return (
+    <div className="transition-all duration-500 opacity-100 transform-none relative">
+      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight animate-fade-up">
+        {slide.title}
+      </h1>
+      <p className="text-lg sm:text-xl text-gray-700 lg:max-w-xl mt-4 animate-fade-up" style={{ animationDelay: "0.2s" }}>
+        {slide.description}
+      </p>
+      <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-6 animate-fade-up" style={{ animationDelay: "0.3s" }}>
+        <button className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
+          Join as Farmer
+          <ArrowRight className="w-5 h-5" />
+        </button>
+        <button className="btn-secondary flex items-center justify-center gap-2 w-full sm:w-auto">
+          Join as Consumer
+          <ArrowRight className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
+  );
+});
+
+HeroSlide.displayName = "HeroSlide";
+
+// Optimize image loading
+const HeroImage = memo(({ slide, isActive }: { slide: typeof heroSlides[0], isActive: boolean }) => {
+  return (
+    <div
+      className={`absolute inset-0 transition-opacity duration-500 ${
+        isActive ? "opacity-100" : "opacity-0"
+      }`}
+    >
+      <div className="absolute inset-0 bg-gradient-to-tr from-[#FF9933]/20 to-[#138808]/20 rounded-[2rem]"></div>
+      <img
+        src={slide.image}
+        alt={slide.alt}
+        className="w-full h-full object-cover rounded-[2rem] shadow-xl"
+        loading={isActive ? "eager" : "lazy"}
+        width="700"
+        height="400"
+      />
+    </div>
+  );
+});
+
+HeroImage.displayName = "HeroImage";
+
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const nextSlide = () => {
@@ -45,54 +97,49 @@ const Hero = () => {
   };
 
   useEffect(() => {
+    // Only start auto-rotation after images are loaded
+    if (!imagesLoaded) return;
+    
     const interval = setInterval(() => {
       nextSlide();
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [imagesLoaded]);
 
   useEffect(() => {
-    // Preload images for smoother transitions
+    // Preload images with lower priority
+    let loadedCount = 0;
+    
     heroSlides.forEach(slide => {
       const img = new Image();
       img.src = slide.image;
+      img.onload = () => {
+        loadedCount++;
+        if (loadedCount === heroSlides.length) {
+          setImagesLoaded(true);
+        }
+      };
+      img.onerror = () => {
+        loadedCount++;
+        if (loadedCount === heroSlides.length) {
+          setImagesLoaded(true);
+        }
+      };
     });
+    
+    // If images take too long, consider them loaded anyway
+    const timeout = setTimeout(() => setImagesLoaded(true), 3000);
+    return () => clearTimeout(timeout);
   }, []);
 
   return (
-    <section className="relative overflow-hidden gradient-background min-h-[600px] flex items-center">
+    <section className="relative overflow-hidden min-h-[600px] flex items-center">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 z-10">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           {/* Left Content */}
           <div className="flex-1 text-center lg:text-left space-y-6 z-10">
             {heroSlides.map((slide, index) => (
-              <div
-                key={index}
-                className={`transition-all duration-500 ${
-                  currentSlide === index ? "opacity-100 transform-none" : "opacity-0 pointer-events-none absolute top-0 left-0 right-0"
-                }`}
-                style={{ 
-                  position: currentSlide === index ? 'relative' : 'absolute',
-                  height: currentSlide === index ? 'auto' : '0'
-                }}
-              >
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight animate-fade-up">
-                  {slide.title}
-                </h1>
-                <p className="text-lg sm:text-xl text-gray-700 lg:max-w-xl mt-4 animate-fade-up" style={{ animationDelay: "0.2s" }}>
-                  {slide.description}
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-6 animate-fade-up" style={{ animationDelay: "0.3s" }}>
-                  <button className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
-                    Join as Farmer
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
-                  <button className="btn-secondary flex items-center justify-center gap-2 w-full sm:w-auto">
-                    Join as Consumer
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
+              <HeroSlide key={index} slide={slide} isActive={currentSlide === index} />
             ))}
           </div>
 
@@ -100,20 +147,7 @@ const Hero = () => {
           <div className="flex-1 animate-fade-up relative mt-8 lg:mt-0" style={{ animationDelay: "0.2s" }}>
             <div ref={carouselRef} className="carousel-container relative h-[400px] w-full">
               {heroSlides.map((slide, index) => (
-                <div
-                  key={index}
-                  className={`absolute inset-0 transition-opacity duration-500 ${
-                    currentSlide === index ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-tr from-[#FF9933]/20 to-[#138808]/20 rounded-[2rem]"></div>
-                  <img
-                    src={slide.image}
-                    alt={slide.alt}
-                    className="w-full h-full object-cover rounded-[2rem] shadow-xl"
-                    loading="lazy"
-                  />
-                </div>
+                <HeroImage key={index} slide={slide} isActive={currentSlide === index} />
               ))}
               
               {/* Navigation Buttons */}
@@ -162,4 +196,4 @@ const Hero = () => {
   );
 };
 
-export default Hero;
+export default memo(Hero);

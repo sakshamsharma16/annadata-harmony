@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -9,7 +8,7 @@ import { toast } from "@/hooks/use-toast";
 
 // Temporary token for development - in production, this should be handled securely
 // Users will be prompted to enter their own token
-const MAPBOX_TOKEN = "";
+const MAPBOX_TOKEN = "pk.eyJ1IjoiZXhhbXBsZS11c2VyIiwiYSI6ImNrM25neXpxZjE0Z2szY3F0Z2E5bGw0ZnMifQ.7EYOEHVCnQYS0F0-bM2mZQ";
 
 interface Vendor {
   id: number;
