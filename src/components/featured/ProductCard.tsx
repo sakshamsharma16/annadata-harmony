@@ -1,4 +1,5 @@
 
+import { memo } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Star, Eye, Tag, Clock } from "lucide-react";
@@ -10,7 +11,8 @@ interface ProductCardProps {
   addToCart: (productId: number) => void;
 }
 
-const ProductCard = ({ product, addToCart }: ProductCardProps) => {
+// Use memo to prevent unnecessary re-renders
+const ProductCard = memo(({ product, addToCart }: ProductCardProps) => {
   return (
     <Card key={product.id} className="overflow-hidden transition-all hover:shadow-lg">
       <div className="relative h-48 overflow-hidden">
@@ -18,6 +20,7 @@ const ProductCard = ({ product, addToCart }: ProductCardProps) => {
           src={product.image}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+          loading="lazy" // Add lazy loading for images
         />
         {product.discount > 0 && (
           <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
@@ -80,6 +83,8 @@ const ProductCard = ({ product, addToCart }: ProductCardProps) => {
       </CardFooter>
     </Card>
   );
-};
+});
+
+ProductCard.displayName = "ProductCard";
 
 export default ProductCard;

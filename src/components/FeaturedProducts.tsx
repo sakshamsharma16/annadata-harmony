@@ -1,9 +1,21 @@
 
+import { lazy, Suspense } from "react";
 import { featuredProducts } from "./featured/ProductsData";
 import FilterControls from "./featured/FilterControls";
-import ProductGrid from "./featured/ProductGrid";
 import { useProductFiltering } from "./featured/useProductFiltering";
 import { useCart } from "./featured/useCart";
+
+// Lazy load the product grid component
+const ProductGrid = lazy(() => import("./featured/ProductGrid"));
+
+// Simple loading placeholder
+const GridLoading = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    {[...Array(4)].map((_, i) => (
+      <div key={i} className="h-80 animate-pulse bg-gray-200 rounded-md"></div>
+    ))}
+  </div>
+);
 
 const FeaturedProducts = () => {
   const {
@@ -37,12 +49,14 @@ const FeaturedProducts = () => {
           totalCartItems={getTotalItems()}
         />
 
-        <ProductGrid
-          visibleProducts={visibleProducts}
-          displayCount={displayCount}
-          addToCart={addToCart}
-          loadMore={loadMore}
-        />
+        <Suspense fallback={<GridLoading />}>
+          <ProductGrid
+            visibleProducts={visibleProducts}
+            displayCount={displayCount}
+            addToCart={addToCart}
+            loadMore={loadMore}
+          />
+        </Suspense>
       </div>
     </section>
   );

@@ -1,18 +1,29 @@
 
+import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Users, Leaf, ShoppingCart, Truck, LineChart, Shield, Globe, MessageCircle, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import Hero from "@/components/Hero";
-import Features from "@/components/Features";
-import HowItWorks from "@/components/HowItWorks";
-import FeaturedProducts from "@/components/FeaturedProducts";
-import MarketPrices from "@/components/MarketPrices";
-import Reviews from "@/components/Reviews";
-import Contact from "@/components/Contact";
-import Footer from "@/components/Footer";
+
+// Lazy load non-critical components
+const Features = lazy(() => import("@/components/Features"));
+const HowItWorks = lazy(() => import("@/components/HowItWorks"));
+const FeaturedProducts = lazy(() => import("@/components/FeaturedProducts"));
+const MarketPrices = lazy(() => import("@/components/MarketPrices"));
+const Reviews = lazy(() => import("@/components/Reviews"));
+const Contact = lazy(() => import("@/components/Contact"));
+const Footer = lazy(() => import("@/components/Footer"));
+
+// Simple loading component
+const SectionLoading = () => (
+  <div className="py-16">
+    <div className="container mx-auto px-4">
+      <div className="h-60 bg-gray-100 animate-pulse rounded-lg"></div>
+    </div>
+  </div>
+);
 
 const UserRoles = [
   {
@@ -145,7 +156,9 @@ const Index = () => {
         </div>
       </section>
       
-      <Features />
+      <Suspense fallback={<SectionLoading />}>
+        <Features />
+      </Suspense>
       
       <section className="py-20 px-4 md:px-8 bg-white">
         <div className="container mx-auto max-w-6xl">
@@ -180,12 +193,29 @@ const Index = () => {
         </div>
       </section>
       
-      <HowItWorks />
-      <FeaturedProducts />
-      <MarketPrices />
-      <Reviews />
-      <Contact />
-      <Footer />
+      <Suspense fallback={<SectionLoading />}>
+        <HowItWorks />
+      </Suspense>
+      
+      <Suspense fallback={<SectionLoading />}>
+        <FeaturedProducts />
+      </Suspense>
+      
+      <Suspense fallback={<SectionLoading />}>
+        <MarketPrices />
+      </Suspense>
+      
+      <Suspense fallback={<SectionLoading />}>
+        <Reviews />
+      </Suspense>
+      
+      <Suspense fallback={<SectionLoading />}>
+        <Contact />
+      </Suspense>
+      
+      <Suspense fallback={<SectionLoading />}>
+        <Footer />
+      </Suspense>
     </div>
   );
 };
