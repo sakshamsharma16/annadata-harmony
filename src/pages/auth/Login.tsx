@@ -9,13 +9,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Lock, Mail, Smartphone, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, Smartphone, ArrowRight, Leaf, ShoppingCart, Users } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const Login = () => {
   const navigate = useNavigate();
   const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [userType, setUserType] = useState<"farmer" | "vendor" | "consumer">("farmer");
   
   const [formData, setFormData] = useState({
     email: "",
@@ -31,6 +33,10 @@ const Login = () => {
   
   const handleCheckboxChange = (checked: boolean) => {
     setFormData(prev => ({ ...prev, rememberMe: checked }));
+  };
+
+  const handleUserTypeChange = (value: string) => {
+    setUserType(value as "farmer" | "vendor" | "consumer");
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,32 +78,12 @@ const Login = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Determine user type based on email/phone for demonstration
-      // In a real app, this would come from your authentication system
-      let userType: "farmer" | "vendor" | "consumer" = "consumer";
-      
-      if (loginMethod === "email") {
-        if (formData.email.includes("farmer")) {
-          userType = "farmer";
-        } else if (formData.email.includes("vendor")) {
-          userType = "vendor";
-        }
-      } else {
-        // Simple determination based on the last digit
-        const lastDigit = formData.phone.slice(-1);
-        if (["1", "2", "3"].includes(lastDigit)) {
-          userType = "farmer";
-        } else if (["4", "5", "6"].includes(lastDigit)) {
-          userType = "vendor";
-        }
-      }
-      
       toast({
         title: "Login Successful",
         description: "Welcome back to Annadata Harmony!",
       });
       
-      // Redirect based on user type
+      // Redirect based on selected user type
       navigate(`/dashboard/${userType}`);
     } catch (error) {
       toast({
@@ -152,6 +138,40 @@ const Login = () => {
               </TabsList>
               <TabsContent value="login">
                 <form onSubmit={handleSubmit} className="space-y-6 pt-6">
+                  {/* User Type Selection */}
+                  <div className="space-y-3">
+                    <Label>I am a</Label>
+                    <RadioGroup
+                      value={userType}
+                      onValueChange={handleUserTypeChange}
+                      className="grid grid-cols-3 gap-4"
+                    >
+                      <div className={`flex flex-col items-center justify-center border rounded-lg p-4 cursor-pointer transition-colors ${userType === "farmer" ? "border-[#138808] bg-[#138808]/5" : "border-gray-200"}`}>
+                        <RadioGroupItem value="farmer" id="login-farmer" className="sr-only" />
+                        <Label htmlFor="login-farmer" className="cursor-pointer flex flex-col items-center gap-2">
+                          <Leaf className="h-8 w-8 text-[#138808]" />
+                          <span>Farmer</span>
+                        </Label>
+                      </div>
+                      
+                      <div className={`flex flex-col items-center justify-center border rounded-lg p-4 cursor-pointer transition-colors ${userType === "vendor" ? "border-[#FF9933] bg-[#FF9933]/5" : "border-gray-200"}`}>
+                        <RadioGroupItem value="vendor" id="login-vendor" className="sr-only" />
+                        <Label htmlFor="login-vendor" className="cursor-pointer flex flex-col items-center gap-2">
+                          <ShoppingCart className="h-8 w-8 text-[#FF9933]" />
+                          <span>Vendor</span>
+                        </Label>
+                      </div>
+                      
+                      <div className={`flex flex-col items-center justify-center border rounded-lg p-4 cursor-pointer transition-colors ${userType === "consumer" ? "border-[#0000FF] bg-[#0000FF]/5" : "border-gray-200"}`}>
+                        <RadioGroupItem value="consumer" id="login-consumer" className="sr-only" />
+                        <Label htmlFor="login-consumer" className="cursor-pointer flex flex-col items-center gap-2">
+                          <Users className="h-8 w-8 text-[#0000FF]" />
+                          <span>Consumer</span>
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">

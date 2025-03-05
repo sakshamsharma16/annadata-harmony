@@ -7,6 +7,7 @@ import { toast } from "@/hooks/use-toast";
 import { consumers } from "@/data/mockData";
 import { Package, MapPin, Bell, TrendingUp, ShoppingBag, Users, ArrowUpRight, Plus, Edit, Trash2, Check, AlertTriangle } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import NearbyVendorsMap from "@/components/vendor/NearbyVendorsMap";
 
 const salesData = [
   { day: "Mon", sales: 2800 },
@@ -148,6 +149,11 @@ const VendorDashboard = () => {
             <p className="text-xs text-purple-600">Within 1km radius</p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Add the new Nearby Vendors Map section */}
+      <div className="mb-8">
+        <NearbyVendorsMap />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
