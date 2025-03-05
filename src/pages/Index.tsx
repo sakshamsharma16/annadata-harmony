@@ -1,4 +1,3 @@
-
 import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Users, Leaf, ShoppingCart, Truck, LineChart, Shield, Globe, MessageCircle, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import Hero from "@/components/Hero";
+import LanguageSelector from "@/components/LanguageSelector";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Lazy load non-critical components
 const Features = lazy(() => import("@/components/Features"));
@@ -104,17 +105,23 @@ const PlatformFeatures = [
 ];
 
 const Index = () => {
+  const { t } = useLanguage();
+  
   return (
     <div className="flex flex-col min-h-screen">
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSelector />
+      </div>
+      
       <Hero />
       
       <section className="py-20 px-4 md:px-8 bg-gray-50">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
-            <Badge className="mb-2" variant="outline">Choose Your Role</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Join Our Agricultural Ecosystem</h2>
+            <Badge className="mb-2" variant="outline">{t('roles.title')}</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('roles.title')}</h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Select your role to access a tailored experience designed to meet your specific needs in the agricultural value chain.
+              {t('hero.subtitle')}
             </p>
           </div>
           
@@ -124,9 +131,9 @@ const Index = () => {
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
                     {role.icon}
-                    <Badge variant="outline">{role.title}</Badge>
+                    <Badge variant="outline">{t(`roles.${role.title.toLowerCase()}`)}</Badge>
                   </div>
-                  <CardTitle className="text-xl mt-2">{role.title} Portal</CardTitle>
+                  <CardTitle className="text-xl mt-2">{t(`roles.${role.title.toLowerCase()}`)} Portal</CardTitle>
                   <CardDescription>{role.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="pb-6">
@@ -145,7 +152,7 @@ const Index = () => {
                   
                   <Link to={role.path}>
                     <Button className={`w-full ${role.buttonColor}`}>
-                      Enter {role.title} Dashboard
+                      Enter {t(`roles.${role.title.toLowerCase()}`)} Dashboard
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>

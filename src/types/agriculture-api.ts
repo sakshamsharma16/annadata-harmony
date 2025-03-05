@@ -23,9 +23,13 @@ export interface CropHealthScore {
 export interface PestDetectionResult {
   detected: boolean;
   pestName?: string;
+  scientificName?: string;
   confidence?: number;
   affectedArea?: string;
+  description?: string;
   treatment?: string[];
+  organicSolutions?: string[];
+  preventionMethods?: string[];
   imageUrl?: string;
 }
 
