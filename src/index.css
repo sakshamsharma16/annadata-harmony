@@ -18,6 +18,23 @@
     font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
     scroll-behavior: smooth;
   }
+  
+  /* Add font preloading hints */
+  @font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfecg.woff2) format('woff2');
+  }
+  
+  @font-face {
+    font-family: 'Mukta';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(https://fonts.gstatic.com/s/mukta/v14/iJWKBXyXfDDVXbnArXyi0A.woff2) format('woff2');
+  }
 }
 
 @layer components {
@@ -30,23 +47,59 @@
   }
   
   .btn-primary {
-    @apply px-6 py-3 bg-[#138808] text-white rounded-full font-semibold hover:bg-[#138808]/90 transition-colors duration-200 shadow-md hover:shadow-lg;
+    @apply px-6 py-3 bg-[#138808] text-white rounded-full font-semibold hover:bg-[#138808]/90 transition-all duration-200 shadow-md hover:shadow-lg hover:translate-y-[-2px];
   }
   
   .btn-secondary {
-    @apply px-6 py-3 bg-[#FF9933] text-white rounded-full font-semibold hover:bg-[#FF9933]/90 transition-colors duration-200 shadow-md hover:shadow-lg;
+    @apply px-6 py-3 bg-[#FF9933] text-white rounded-full font-semibold hover:bg-[#FF9933]/90 transition-all duration-200 shadow-md hover:shadow-lg hover:translate-y-[-2px];
   }
   
   .input-field {
-    @apply w-full px-4 py-3 rounded-full bg-[#E2EAF7] text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#138808];
+    @apply w-full px-4 py-3 rounded-full bg-[#F2FCE2] text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#138808] transition-all duration-200;
   }
 
   .story-link {
-    @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
+    @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-[#138808] after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
   }
   
   .hover-scale {
     @apply transition-transform duration-200 hover:scale-105;
+  }
+  
+  /* Enhanced button styles */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-full px-4 py-2 font-medium shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .btn-green {
+    @apply bg-[#138808] text-white hover:bg-[#107006] focus:ring-[#138808];
+  }
+  
+  .btn-orange {
+    @apply bg-[#FF9933] text-white hover:bg-[#F78B1F] focus:ring-[#FF9933];
+  }
+  
+  .btn-outline {
+    @apply border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-gray-500;
+  }
+  
+  /* Tab styles */
+  .tab-button {
+    @apply inline-flex items-center justify-center px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors duration-200;
+  }
+  
+  .tab-button-active {
+    @apply border-[#138808] text-[#138808];
+  }
+  
+  /* Card styles */
+  .card {
+    @apply rounded-2xl bg-white p-6 shadow-md hover:shadow-lg transition-shadow duration-200;
+  }
+  
+  /* Form styles */
+  .form-input {
+    @apply w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-[#138808] focus:ring focus:ring-[#138808] focus:ring-opacity-50 transition-colors duration-200;
   }
 }
 
@@ -58,10 +111,20 @@
   @apply fixed bottom-4 right-4 flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors;
 }
 
+/* Language-specific styles */
+.lang-hindi, .lang-punjabi {
+  font-family: 'Mukta', sans-serif;
+}
+
+.lang-english {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Optimized animations */
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(15px);
   }
   to {
     opacity: 1;
@@ -72,7 +135,7 @@
 @keyframes scaleUp {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.97);
   }
   to {
     opacity: 1;
@@ -83,7 +146,7 @@
 @keyframes slideInRight {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(15px);
   }
   to {
     opacity: 1;
@@ -94,7 +157,7 @@
 @keyframes slideInLeft {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-15px);
   }
   to {
     opacity: 1;
@@ -103,26 +166,31 @@
 }
 
 .animate-fade-up {
-  animation: fadeUp 0.5s ease-out forwards;
+  animation: fadeUp 0.4s ease-out forwards;
+  will-change: transform, opacity;
 }
 
 .animate-scale-up {
-  animation: scaleUp 0.5s ease-out forwards;
+  animation: scaleUp 0.4s ease-out forwards;
+  will-change: transform, opacity;
 }
 
 .animate-slide-in-right {
-  animation: slideInRight 0.5s ease-out forwards;
+  animation: slideInRight 0.4s ease-out forwards;
+  will-change: transform, opacity;
 }
 
 .animate-slide-in-left {
-  animation: slideInLeft 0.5s ease-out forwards;
+  animation: slideInLeft 0.4s ease-out forwards;
+  will-change: transform, opacity;
 }
 
 /* Scroll reveal animations */
 .reveal {
   position: relative;
   opacity: 0;
-  transition: all 0.8s ease-in-out;
+  transition: all 0.6s ease-in-out;
+  will-change: transform, opacity;
 }
 
 .reveal.active {
@@ -131,40 +199,89 @@
 }
 
 .reveal-left {
-  transform: translateX(-50px);
+  transform: translateX(-40px);
 }
 
 .reveal-right {
-  transform: translateX(50px);
+  transform: translateX(40px);
 }
 
 .reveal-up {
-  transform: translateY(50px);
+  transform: translateY(40px);
 }
 
-/* Navbar scroll effect */
+/* Navbar scroll effect with improved performance */
 .navbar-scrolled {
-  @apply shadow-md bg-white/90 backdrop-blur-lg;
+  @apply shadow-md bg-white/90 backdrop-blur-md;
+  will-change: background, box-shadow;
 }
 
-/* Card hover effects */
+/* Card hover effects with GPU acceleration */
 .feature-card:hover, 
 .step-card:hover, 
 .review-card:hover, 
 .dashboard-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+  will-change: transform, box-shadow;
 }
 
-/* Fix image display issues */
+/* Optimize image display */
 img {
   max-width: 100%;
   height: auto;
   display: block;
+  object-fit: contain;
+  will-change: transform;
 }
 
 .carousel-container img {
   object-fit: cover;
   width: 100%;
   height: 100%;
+}
+
+/* Optimize UI for the Tabs component */
+.custom-tabs {
+  @apply rounded-xl overflow-hidden border border-green-100 shadow-sm;
+}
+
+.custom-tabs-list {
+  @apply flex bg-[#F2FCE2] p-1;
+}
+
+.custom-tab {
+  @apply px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
+}
+
+.custom-tab-active {
+  @apply bg-white text-[#138808] shadow-sm;
+}
+
+.custom-tab-content {
+  @apply p-4 bg-white;
+}
+
+/* Add loading optimizations */
+.content-placeholder {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  will-change: background-position;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Add performance optimizations */
+.hardware-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }

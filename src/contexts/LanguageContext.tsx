@@ -104,6 +104,133 @@ const translations: Translations = {
     hindi: 'भाषा चुनें',
     punjabi: 'ਭਾਸ਼ਾ ਚੁਣੋ',
   },
+  // Chatbot
+  'krishi.mitra': {
+    english: 'Krishi Mitra',
+    hindi: 'कृषि मित्र',
+    punjabi: 'ਕ੍ਰਿਸ਼ੀ ਮਿੱਤਰ',
+  },
+  'your.agricultural.assistant': {
+    english: 'Your Agricultural Assistant',
+    hindi: 'आपका कृषि सहायक',
+    punjabi: 'ਤੁਹਾਡਾ ਖੇਤੀਬਾੜੀ ਸਹਾਇਕ',
+  },
+  'type.your.message': {
+    english: 'Type your message...',
+    hindi: 'अपना संदेश लिखें...',
+    punjabi: 'ਆਪਣਾ ਸੁਨੇਹਾ ਲਿਖੋ...',
+  },
+  'error': {
+    english: 'Error',
+    hindi: 'त्रुटि',
+    punjabi: 'ਗਲਤੀ',
+  },
+  'message.send.error': {
+    english: 'Could not send message. Please try again.',
+    hindi: 'संदेश नहीं भेज सका। कृपया पुनः प्रयास करें।',
+    punjabi: 'ਸੁਨੇਹਾ ਨਹੀਂ ਭੇਜ ਸਕਿਆ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
+  },
+  'not.supported': {
+    english: 'Not Supported',
+    hindi: 'समर्थित नहीं',
+    punjabi: 'ਸਮਰਥਿਤ ਨਹੀਂ',
+  },
+  'voice.recognition.not.supported': {
+    english: 'Voice recognition is not supported in your browser.',
+    hindi: 'आपके ब्राउज़र में वॉइस रिकग्निशन समर्थित नहीं है।',
+    punjabi: 'ਤੁਹਾਡੇ ਬਰਾਊਜ਼ਰ ਵਿੱਚ ਵੌਇਸ ਰਿਕਗਨੀਸ਼ਨ ਸਮਰਥਿਤ ਨਹੀਂ ਹੈ।',
+  },
+  'listening': {
+    english: 'Listening',
+    hindi: 'सुन रहा है',
+    punjabi: 'ਸੁਣ ਰਿਹਾ ਹੈ',
+  },
+  'speak.now': {
+    english: 'Speak now...',
+    hindi: 'अब बोलें...',
+    punjabi: 'ਹੁਣ ਬੋਲੋ...',
+  },
+  'sorry': {
+    english: 'Sorry',
+    hindi: 'क्षमा करें',
+    punjabi: 'ਮਾਫ਼ ਕਰਨਾ',
+  },
+  'speech.recognition.configuration': {
+    english: 'Speech recognition implementation requires backend configuration.',
+    hindi: 'स्पीच रिकग्निशन कार्यान्वयन के लिए बैकएंड कॉन्फ़िगरेशन की आवश्यकता है।',
+    punjabi: 'ਸਪੀਚ ਰਿਕਗਨੀਸ਼ਨ ਲਾਗੂ ਕਰਨ ਲਈ ਬੈਕਐਂਡ ਕੌਨਫਿਗਰੇਸ਼ਨ ਦੀ ਲੋੜ ਹੈ।',
+  },
+  // Buttons & Common UI
+  'submit': {
+    english: 'Submit',
+    hindi: 'जमा करें',
+    punjabi: 'ਜਮ੍ਹਾਂ ਕਰੋ',
+  },
+  'cancel': {
+    english: 'Cancel',
+    hindi: 'रद्द करें',
+    punjabi: 'ਰੱਦ ਕਰੋ',
+  },
+  'save': {
+    english: 'Save',
+    hindi: 'सहेजें',
+    punjabi: 'ਸੰਭਾਲੋ',
+  },
+  'delete': {
+    english: 'Delete',
+    hindi: 'हटाएं',
+    punjabi: 'ਮਿਟਾਓ',
+  },
+  'edit': {
+    english: 'Edit',
+    hindi: 'संपादित करें',
+    punjabi: 'ਸੰਪਾਦਿਤ ਕਰੋ',
+  },
+  'loading': {
+    english: 'Loading...',
+    hindi: 'लोड हो रहा है...',
+    punjabi: 'ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ...',
+  },
+  'continue': {
+    english: 'Continue',
+    hindi: 'जारी रखें',
+    punjabi: 'ਜਾਰੀ ਰੱਖੋ',
+  },
+  'back': {
+    english: 'Back',
+    hindi: 'वापस',
+    punjabi: 'ਵਾਪਸ',
+  },
+  'search': {
+    english: 'Search',
+    hindi: 'खोजें',
+    punjabi: 'ਖੋਜ',
+  },
+  'filter': {
+    english: 'Filter',
+    hindi: 'फ़िल्टर',
+    punjabi: 'ਫਿਲਟਰ',
+  },
+  'sort': {
+    english: 'Sort',
+    hindi: 'क्रमबद्ध करें',
+    punjabi: 'ਕ੍ਰਮਬੱਧ ਕਰੋ',
+  },
+  'view.details': {
+    english: 'View Details',
+    hindi: 'विवरण देखें',
+    punjabi: 'ਵੇਰਵੇ ਵੇਖੋ',
+  },
+  'learn.more': {
+    english: 'Learn More',
+    hindi: 'और जानें',
+    punjabi: 'ਹੋਰ ਜਾਣੋ',
+  },
+  'get.started': {
+    english: 'Get Started',
+    hindi: 'शुरू करें',
+    punjabi: 'ਸ਼ੁਰੂ ਕਰੋ',
+  },
 };
 
 // Context interface
@@ -123,6 +250,7 @@ const LanguageContext = createContext<LanguageContextType>({
 // Provider component
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>('english');
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // Load saved language preference from localStorage on initial render
   useEffect(() => {
@@ -130,10 +258,13 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     if (savedLanguage && ['english', 'hindi', 'punjabi'].includes(savedLanguage)) {
       setLanguage(savedLanguage);
     }
+    setIsLoaded(true);
   }, []);
 
   // Save language preference to localStorage when it changes
   useEffect(() => {
+    if (!isLoaded) return;
+    
     localStorage.setItem('language', language);
     
     // Update HTML lang attribute
@@ -141,7 +272,14 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     // Update direction attribute if needed (all these languages are LTR so not changing)
     document.documentElement.dir = 'ltr';
-  }, [language]);
+    
+    // Add a class to the body to allow language-specific styling
+    document.body.classList.remove('lang-english', 'lang-hindi', 'lang-punjabi');
+    document.body.classList.add(`lang-${language}`);
+    
+    // Dispatch a custom event so other components can respond to language changes
+    window.dispatchEvent(new CustomEvent('language-changed', { detail: { language } }));
+  }, [language, isLoaded]);
 
   // Translation function
   const t = (key: string): string => {

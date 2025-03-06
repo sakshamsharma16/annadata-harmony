@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Mic, Send, Bot, User } from "lucide-react";
+import { Mic, Send, Bot, User, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -25,9 +25,11 @@ const KrishiMitra = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -36,15 +38,24 @@ const KrishiMitra = () => {
     }
   }, [messages]);
 
+  // Focus input when chat opens
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, [isOpen]);
+
   // Get initial greeting based on selected language
   const getInitialGreeting = () => {
     switch(language) {
       case 'hindi':
-        return "नमस्ते! मैं कृषि मित्र हूँ। मैं आपकी कृषि संबंधित प्रश्नों में मदद कर सकता हूँ। आप मुझसे कुछ भी पूछ सकते हैं!";
+        return "नमस्ते! मैं कृषि मित्र हूँ। मैं आपकी कृषि संबंधित प्रश्नों में मदद कर सकता हूँ। आप मुझसे व्यक्तिगत या तकनीकी प्रश्न भी पूछ सकते हैं!";
       case 'punjabi':
-        return "ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਕ੍ਰਿਸ਼ੀ ਮਿੱਤਰ ਹਾਂ। ਮੈਂ ਤੁਹਾਡੇ ਖੇਤੀਬਾੜੀ ਨਾਲ ਸਬੰਧਤ ਸਵਾਲਾਂ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ। ਤੁਸੀਂ ਮੈਨੂੰ ਕੁਝ ਵੀ ਪੁੱਛ ਸਕਦੇ ਹੋ!";
+        return "ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਕ੍ਰਿਸ਼ੀ ਮਿੱਤਰ ਹਾਂ। ਮੈਂ ਤੁਹਾਡੇ ਖੇਤੀਬਾੜੀ ਨਾਲ ਸਬੰਧਤ ਸਵਾਲਾਂ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ। ਤੁਸੀਂ ਮੈਨੂੰ ਨਿੱਜੀ ਜਾਂ ਤਕਨੀਕੀ ਸਵਾਲ ਵੀ ਪੁੱਛ ਸਕਦੇ ਹੋ!";
       default:
-        return "Hello! I am Krishi Mitra. I can help with your agriculture-related questions. Feel free to ask me anything!";
+        return "Hello! I am Krishi Mitra. I can help with your agriculture-related questions as well as personal or technical questions. Feel free to ask me anything!";
     }
   };
 
@@ -60,62 +71,123 @@ const KrishiMitra = () => {
     }
   }, [isOpen, messages.length, language]);
 
-  // Enhanced AI response function with better language model simulation
+  // Enhanced AI response function with better natural language understanding
   const getAIResponse = async (userMessage: string): Promise<string> => {
-    // In a real implementation, this would call a ChatGPT API endpoint
-    // For now, we're simulating improved responses
-
-    // Convert message to lowercase for simple keyword matching
     const msg = userMessage.toLowerCase();
     
-    // Different responses based on language
+    // Check if it's a personal question
+    const personalQuestionPatterns = [
+      'who are you', 'your name', 'about yourself', 'tell me about you', 
+      'how are you', 'what can you do', 'help me with', 'आप कौन हैं', 
+      'तुम्हारा नाम', 'अपने बारे में', 'कैसे हो', 'ਤੁਸੀਂ ਕੌਣ ਹੋ', 'ਤੁਹਾਡਾ ਨਾਮ',
+      'what is your purpose', 'what do you do', 'who made you', 'how do you work',
+      'where are you from', 'are you ai', 'are you human'
+    ];
+    
+    // Check if it's a technical question
+    const technicalQuestionPatterns = [
+      'how to', 'explain', 'what is', 'definition', 'technology', 'coding', 
+      'software', 'hardware', 'computer', 'machine learning', 'ai', 'artificial intelligence',
+      'कैसे', 'समझाएं', 'क्या है', 'परिभाषा', 'प्रौद्योगिकी', 'कोडिंग',
+      'ਕਿਵੇਂ', 'ਸਮਝਾਓ', 'ਕੀ ਹੈ', 'ਪਰਿਭਾਸ਼ਾ', 'ਤਕਨਾਲੋਜੀ'
+    ];
+
+    // Different responses based on language and message type
     const getLocalizedResponses = () => {
       if (language === 'hindi') {
+        // Check if it's a personal question
+        if (personalQuestionPatterns.some(pattern => msg.includes(pattern))) {
+          return [
+            "मैं कृषि मित्र हूँ, एक AI सहायक जो किसानों और कृषि से जुड़े लोगों की सहायता के लिए बनाया गया है। मैं फसलों, कीट प्रबंधन, मौसम के पूर्वानुमान, और कृषि संबंधित अन्य जानकारी प्रदान कर सकता हूँ।",
+            "मेरा नाम कृषि मित्र है। मैं ANNADATA ऐप का हिस्सा हूँ, जिसे किसानों और कृषि समुदाय की सहायता के लिए डिज़ाइन किया गया है। मैं आपकी कैसे मदद कर सकता हूँ?",
+            "मुझे आपकी सहायता करके बहुत खुशी हो रही है! मैं कृषि से संबंधित सवालों के जवाब देने के लिए यहां हूँ, लेकिन मैं अन्य विषयों पर भी बात कर सकता हूँ।"
+          ];
+        }
+        // Check if it's a technical question
+        else if (technicalQuestionPatterns.some(pattern => msg.includes(pattern))) {
+          return [
+            "अरहर की दाल (पिजन पी) की खेती के लिए, मिट्टी का pH मान 6.5-7.5 के बीच होना चाहिए। बुवाई से पहले गहरी जुताई करें और हेक्टेयर प्रति 20-25 किलो नाइट्रोजन तथा 40-50 किलो फॉस्फोरस का प्रयोग करें। बुवाई के लिए जून-जुलाई का समय उत्तम होता है।",
+            "स्मार्ट कृषि में IoT सेंसर का उपयोग करके मिट्टी की नमी, तापमान, और पोषक तत्वों की निगरानी की जाती है। ये सेंसर डेटा एकत्र करके किसानों के स्मार्टफोन पर भेजते हैं, जिससे वे अपनी फसलों की स्थिति का वास्तविक समय में विश्लेषण कर सकते हैं और सही समय पर सही निर्णय ले सकते हैं।",
+            "अगर आप जैविक खेती के बारे में पूछ रहे हैं, तो इसमें रासायनिक उर्वरकों और कीटनाशकों का उपयोग नहीं किया जाता। इसके बजाय, जैविक खादों, हरी खाद, और जैविक कीट नियंत्रण विधियों का उपयोग किया जाता है। जैविक खेती से मिट्टी का स्वास्थ्य सुधरता है और पर्यावरण पर नकारात्मक प्रभाव कम होता है।"
+          ];
+        }
+        // Default agricultural responses
         return [
           "हमारी मौसम की भविष्यवाणी के अनुसार, अगले 5 दिनों में आपके क्षेत्र में हल्की से मध्यम बारिश होने की संभावना है। फसल की कटाई के लिए इस सप्ताह का समय बेहतर होगा।",
           "धान की फसल के लिए, हमारा सुझाव है कि आप NPK 18:18:18 उर्वरक का उपयोग करें, जिसमें नाइट्रोजन, फॉस्फोरस और पोटाश का संतुलित अनुपात हो। मिट्टी परीक्षण के आधार पर प्रति एकड़ 100-120 किलोग्राम की दर से प्रयोग करें।",
-          "आपके क्षेत्र में गेहूं की बुवाई के लिए अक्टूबर के मध्य से नवंबर के शुरुआती सप्ताह तक का समय सबसे उपयुक्त है। HD-2967 या PBW-343 जैसी उन्नत किस्मों का चयन करें जो आपके क्षेत्र के लिए अनुकूलित हैं।",
-          "सिंचाई की आवृत्ति फसल की प्रकृति, मिट्टी के प्रकार और मौसम पर निर्भर करती है। हमारा विश्लेषण बताता है कि आपकी फसल के वर्तमान चरण में, 7-10 दिनों के अंतराल पर सिंचाई करना उचित होगा। सिंचाई से पहले मिट्टी की नमी की जांच करें।",
-          "हमारे विश्लेषण के अनुसार, आपके फसल में दिखने वाले लक्षण ब्लास्ट रोग के हैं। इस रोग को नियंत्रित करने के लिए, ट्राइसाइक्लाज़ोल 75% WP @ 0.6 ग्राम/लीटर पानी या आइसोप्रोथिओलेन 40% EC @ 1.5 मिली/लीटर पानी का छिड़काव करें। इससे पहले कि रोग फैले, रोगग्रस्त पौधों को हटा दें।",
-          "जैविक खेती के लिए, हम गोबर की खाद (10-15 टन/हेक्टेयर), वर्मीकम्पोस्ट (5-6 टन/हेक्टेयर), और नीम की खली (2-3 क्विंटल/हेक्टेयर) के संयोजन की सिफारिश करते हैं। इन्हें बुवाई से 15-20 दिन पहले मिट्टी में मिला दें।"
+          "आपके क्षेत्र में गेहूं की बुवाई के लिए अक्टूबर के मध्य से नवंबर के शुरुआती सप्ताह तक का समय सबसे उपयुक्त है। HD-2967 या PBW-343 जैसी उन्नत किस्मों का चयन करें जो आपके क्षेत्र के लिए अनुकूलित हैं।"
         ];
-      } else if (language === 'punjabi') {
+      } 
+      else if (language === 'punjabi') {
+        // Check if it's a personal question
+        if (personalQuestionPatterns.some(pattern => msg.includes(pattern))) {
+          return [
+            "ਮੈਂ ਕ੍ਰਿਸ਼ੀ ਮਿੱਤਰ ਹਾਂ, ਇੱਕ AI ਸਹਾਇਕ ਜੋ ਕਿਸਾਨਾਂ ਅਤੇ ਖੇਤੀਬਾੜੀ ਨਾਲ ਜੁੜੇ ਲੋਕਾਂ ਦੀ ਸਹਾਇਤਾ ਲਈ ਬਣਾਇਆ ਗਿਆ ਹੈ। ਮੈਂ ਫਸਲਾਂ, ਕੀਟ ਪ੍ਰਬੰਧਨ, ਮੌਸਮ ਦੀ ਭਵਿੱਖਬਾਣੀ, ਅਤੇ ਖੇਤੀਬਾੜੀ ਨਾਲ ਸਬੰਧਤ ਹੋਰ ਜਾਣਕਾਰੀ ਪ੍ਰਦਾਨ ਕਰ ਸਕਦਾ ਹਾਂ।",
+            "ਮੇਰਾ ਨਾਮ ਕ੍ਰਿਸ਼ੀ ਮਿੱਤਰ ਹੈ। ਮੈਂ ANNADATA ਐਪ ਦਾ ਹਿੱਸਾ ਹਾਂ, ਜੋ ਕਿਸਾਨਾਂ ਅਤੇ ਖੇਤੀਬਾੜੀ ਭਾਈਚਾਰੇ ਦੀ ਸਹਾਇਤਾ ਲਈ ਡਿਜ਼ਾਈਨ ਕੀਤਾ ਗਿਆ ਹੈ। ਮੈਂ ਤੁਹਾਡੀ ਕਿਵੇਂ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?",
+            "ਮੈਨੂੰ ਤੁਹਾਡੀ ਸਹਾਇਤਾ ਕਰਕੇ ਬਹੁਤ ਖੁਸ਼ੀ ਹੋ ਰਹੀ ਹੈ! ਮੈਂ ਖੇਤੀਬਾੜੀ ਨਾਲ ਸਬੰਧਤ ਸਵਾਲਾਂ ਦੇ ਜਵਾਬ ਦੇਣ ਲਈ ਇੱਥੇ ਹਾਂ, ਪਰ ਮੈਂ ਹੋਰ ਵਿਸ਼ਿਆਂ 'ਤੇ ਵੀ ਗੱਲ ਕਰ ਸਕਦਾ ਹਾਂ।"
+          ];
+        } 
+        // Check if it's a technical question
+        else if (technicalQuestionPatterns.some(pattern => msg.includes(pattern))) {
+          return [
+            "ਧਰਤੀ ਹੇਠਲੇ ਪਾਣੀ ਦੀ ਨਿਗਰਾਨੀ ਲਈ, IoT ਸੈਂਸਰਜ਼ ਦਾ ਇਸਤੇਮਾਲ ਕੀਤਾ ਜਾ ਸਕਦਾ ਹੈ ਜੋ ਪਾਣੀ ਦੇ ਪੱਧਰ ਅਤੇ ਗੁਣਵੱਤਾ ਦੀ ਰੀਅਲ-ਟਾਈਮ ਜਾਣਕਾਰੀ ਪ੍ਰਦਾਨ ਕਰਦੇ ਹਨ। ਇਹ ਡਾਟਾ ਕਿਸਾਨਾਂ ਨੂੰ ਸਿੰਚਾਈ ਦੀਆਂ ਯੋਜਨਾਵਾਂ ਬਣਾਉਣ ਅਤੇ ਪਾਣੀ ਦੀ ਵਰਤੋਂ ਨੂੰ ਅਨੁਕੂਲ ਬਣਾਉਣ ਵਿੱਚ ਮਦਦ ਕਰਦਾ ਹੈ।",
+            "ਜੈਵਿਕ ਖੇਤੀ ਵਿੱਚ, ਤੁਸੀਂ ਵਰਮੀਕੰਪੋਸਟ ਬਣਾ ਸਕਦੇ ਹੋ ਜੋ ਗੋਬਰ, ਫਸਲ ਦੇ ਅਵਸ਼ੇਸ਼, ਅਤੇ ਕੇਂਚੁਆਂ ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਤਿਆਰ ਕੀਤੀ ਜਾਂਦੀ ਹੈ। ਇਹ ਮਿੱਟੀ ਨੂੰ ਜੈਵਿਕ ਪਦਾਰਥ ਅਤੇ ਪੌਸ਼ਟਿਕ ਤੱਤ ਪ੍ਰਦਾਨ ਕਰਦੀ ਹੈ, ਜਿਸ ਨਾਲ ਮਿੱਟੀ ਦੀ ਸਿਹਤ ਵਿੱਚ ਸੁਧਾਰ ਹੁੰਦਾ ਹੈ ਅਤੇ ਫਸਲ ਦੀ ਪੈਦਾਵਾਰ ਵਧਦੀ ਹੈ।",
+            "ਪ੍ਰੀਸੀਜ਼ਨ ਐਗਰੀਕਲਚਰ ਵਿੱਚ ਡਰੋਨ ਟੈਕਨੋਲੋਜੀ ਦੀ ਵਰਤੋਂ ਕਰਕੇ, ਤੁਸੀਂ ਆਪਣੇ ਖੇਤਾਂ ਦੀ ਹਵਾਈ ਨਿਗਰਾਨੀ ਕਰ ਸਕਦੇ ਹੋ। ਡਰੋਨ ਮਲਟੀਸਪੈਕਟਰਲ ਕੈਮਰਿਆਂ ਨਾਲ ਲੈਸ ਹੋ ਸਕਦੇ ਹਨ ਜੋ ਫਸਲ ਦੇ ਤਣਾਅ, ਕੀੜੇ ਦੇ ਹਮਲੇ, ਅਤੇ ਪੌਸ਼ਟਿਕ ਤੱਤਾਂ ਦੀ ਕਮੀ ਦਾ ਪਤਾ ਲਗਾਉਣ ਲਈ NDVI (ਨਾਰਮਲਾਈਜ਼ਡ ਡਿਫਰੈਂਸ ਵੈਜੀਟੇਸ਼ਨ ਇੰਡੈਕਸ) ਮੈਪ ਤਿਆਰ ਕਰਦੇ ਹਨ।"
+          ];
+        }
+        // Default agricultural responses
         return [
           "ਸਾਡੀ ਮੌਸਮ ਦੀ ਭਵਿੱਖਬਾਣੀ ਦੇ ਅਨੁਸਾਰ, ਅਗਲੇ 5 ਦਿਨਾਂ ਵਿੱਚ ਤੁਹਾਡੇ ਖੇਤਰ ਵਿੱਚ ਹਲਕੀ ਤੋਂ ਦਰਮਿਆਨੀ ਬਾਰਸ਼ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ। ਫਸਲ ਦੀ ਕਟਾਈ ਲਈ ਇਸ ਹਫਤੇ ਦਾ ਸਮਾਂ ਬਿਹਤਰ ਹੋਵੇਗਾ।",
           "ਝੋਨੇ ਦੀ ਫਸਲ ਲਈ, ਸਾਡੀ ਸਲਾਹ ਹੈ ਕਿ ਤੁਸੀਂ NPK 18:18:18 ਖਾਦ ਦੀ ਵਰਤੋਂ ਕਰੋ, ਜਿਸ ਵਿੱਚ ਨਾਈਟ੍ਰੋਜਨ, ਫਾਸਫੋਰਸ ਅਤੇ ਪੋਟਾਸ਼ ਦਾ ਸੰਤੁਲਿਤ ਅਨੁਪਾਤ ਹੈ। ਮਿੱਟੀ ਦੇ ਟੈਸਟ ਦੇ ਆਧਾਰ 'ਤੇ ਪ੍ਰਤੀ ਏਕੜ 100-120 ਕਿਲੋਗ੍ਰਾਮ ਦੀ ਦਰ ਨਾਲ ਵਰਤੋਂ ਕਰੋ।",
-          "ਤੁਹਾਡੇ ਖੇਤਰ ਵਿੱਚ ਕਣਕ ਦੀ ਬਿਜਾਈ ਲਈ ਅਕਤੂਬਰ ਦੇ ਮੱਧ ਤੋਂ ਨਵੰਬਰ ਦੇ ਸ਼ੁਰੂਆਤੀ ਹਫ਼ਤੇ ਤੱਕ ਦਾ ਸਮਾਂ ਸਭ ਤੋਂ ਢੁਕਵਾਂ ਹੈ। HD-2967 ਜਾਂ PBW-343 ਵਰਗੀਆਂ ਉੱਨਤ ਕਿਸਮਾਂ ਦੀ ਚੋਣ ਕਰੋ ਜੋ ਤੁਹਾਡੇ ਖੇਤਰ ਲਈ ਅਨੁਕੂਲ ਹਨ।",
-          "ਸਿੰਚਾਈ ਦੀ ਬਾਰੰਬਾਰਤਾ ਫਸਲ ਦੀ ਪ੍ਰਕਿਰਤੀ, ਮਿੱਟੀ ਦੀ ਕਿਸਮ ਅਤੇ ਮੌਸਮ 'ਤੇ ਨਿਰਭਰ ਕਰਦੀ ਹੈ। ਸਾਡਾ ਵਿਸ਼ਲੇਸ਼ਣ ਦੱਸਦਾ ਹੈ ਕਿ ਤੁਹਾਡੀ ਫਸਲ ਦੇ ਮੌਜੂਦਾ ਪੜਾਅ 'ਤੇ, 7-10 ਦਿਨਾਂ ਦੇ ਅੰਤਰਾਲ 'ਤੇ ਸਿੰਚਾਈ ਕਰਨਾ ਉਚਿਤ ਹੋਵੇਗਾ। ਸਿੰਚਾਈ ਤੋਂ ਪਹਿਲਾਂ ਮਿੱਟੀ ਦੀ ਨਮੀ ਦੀ ਜਾਂਚ ਕਰੋ।"
+          "ਤੁਹਾਡੇ ਖੇਤਰ ਵਿੱਚ ਕਣਕ ਦੀ ਬਿਜਾਈ ਲਈ ਅਕਤੂਬਰ ਦੇ ਮੱਧ ਤੋਂ ਨਵੰਬਰ ਦੇ ਸ਼ੁਰੂਆਤੀ ਹਫ਼ਤੇ ਤੱਕ ਦਾ ਸਮਾਂ ਸਭ ਤੋਂ ਢੁਕਵਾਂ ਹੈ। HD-2967 ਜਾਂ PBW-343 ਵਰਗੀਆਂ ਉੱਨਤ ਕਿਸਮਾਂ ਦੀ ਚੋਣ ਕਰੋ ਜੋ ਤੁਹਾਡੇ ਖੇਤਰ ਲਈ ਅਨੁਕੂਲ ਹਨ।"
         ];
-      } else {
+      } 
+      else {
+        // English responses
+        // Check if it's a personal question
+        if (personalQuestionPatterns.some(pattern => msg.includes(pattern))) {
+          return [
+            "I am Krishi Mitra, an AI assistant designed to help farmers and people involved in agriculture. I can provide information about crops, pest management, weather forecasts, and other agriculture-related knowledge.",
+            "My name is Krishi Mitra. I'm part of the ANNADATA app, designed to assist farmers and the agricultural community. How can I help you today?",
+            "I'm delighted to assist you! I'm here to answer agriculture-related questions, but I can also chat about other topics. What would you like to know?"
+          ];
+        } 
+        // Check if it's a technical question
+        else if (technicalQuestionPatterns.some(pattern => msg.includes(pattern))) {
+          return [
+            "For monitoring soil health, you can use advanced soil sensors that measure key parameters like NPK (Nitrogen, Phosphorus, Potassium) levels, pH, moisture content, and organic matter. These sensors can connect to smartphones via Bluetooth and provide real-time analytics to help you make informed decisions about fertilization and irrigation.",
+            "Vertical farming is an innovative agricultural technique where crops are grown in stacked layers, often in controlled environments like warehouses or shipping containers. It uses hydroponics or aeroponics systems, LED lighting, and precise climate control to maximize yield while minimizing land and water usage. This method can produce up to 350 times more crops per acre than conventional farming.",
+            "Precision agriculture leverages technologies like GPS, remote sensing, and IoT to optimize field-level management. By using soil mapping and variable rate technology (VRT), farmers can apply the right amount of inputs (water, fertilizers, pesticides) at the right place and time. This approach typically reduces input costs by 15-20% while increasing yields by 10-15%."
+          ];
+        }
+        // Default agricultural responses
         return [
-          "Based on our weather forecasting models, there's a 70% chance of light to moderate rainfall in your region over the next 5 days. This week would be optimal for harvesting your crops before the rain arrives.",
-          "For rice cultivation, our analysis recommends using NPK 18:18:18 fertilizer with a balanced ratio of nitrogen, phosphorus, and potassium. Apply at a rate of 100-120 kg per acre based on your soil test results for optimal nutrient delivery.",
-          "The ideal sowing time for wheat in your region is from mid-October to early November. Select advanced varieties like HD-2967 or PBW-343 that are adapted to your local conditions and have shown 15-20% higher yields in regional trials.",
-          "Irrigation frequency depends on crop type, soil characteristics, and weather conditions. Our analysis indicates that at your crop's current growth stage, irrigation at 7-10 day intervals would be appropriate. Check soil moisture before irrigation to optimize water usage.",
-          "Based on our image analysis, the symptoms visible on your crop leaves match those of blast disease. To control this, spray Tricyclazole 75% WP @ 0.6 g/liter water or Isoprothiolane 40% EC @ 1.5 ml/liter water. Remove affected plants before the disease spreads further.",
-          "For organic farming, we recommend a combination of farmyard manure (10-15 tons/hectare), vermicompost (5-6 tons/hectare), and neem cake (2-3 quintals/hectare). Incorporate these into the soil 15-20 days before sowing to allow proper decomposition and nutrient release."
+          "Based on our advanced weather forecasting models, there's a 70% chance of light to moderate rainfall in your region over the next 5 days. Our satellite imagery shows an approaching weather system. This week would be optimal for harvesting your crops before the rain arrives.",
+          "For rice cultivation, our soil analysis tools recommend using NPK 18:18:18 fertilizer with a balanced ratio of nitrogen, phosphorus, and potassium. Apply at a rate of 100-120 kg per acre based on your soil test results for optimal nutrient delivery and maximum yield potential.",
+          "The ideal sowing time for wheat in your region, considering this year's climate patterns, is from mid-October to early November. Select advanced varieties like HD-2967 or PBW-343 that are adapted to your local conditions and have shown 15-20% higher yields in regional trials. Ensure seed treatment with fungicides for protection against soil-borne diseases."
         ];
       }
     };
 
     const responses = getLocalizedResponses();
-    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+    const randomIndex = Math.floor(Math.random() * responses.length);
     
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Simulate more complex processing
+    await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
     
-    return randomResponse;
+    return responses[randomIndex];
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isProcessing) return;
 
     // Add user message
     const userMessage = { role: "user" as const, content: input };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
+    setIsProcessing(true);
 
     try {
       // Get AI response from our enhanced function
@@ -125,66 +197,59 @@ const KrishiMitra = () => {
         ...prev,
         { role: "assistant", content: aiResponse }
       ]);
-      setIsLoading(false);
       
     } catch (error) {
       console.error("Error sending message:", error);
       toast({
-        title: "Error",
-        description: "Could not send message. Please try again.",
+        title: t("error"),
+        description: t("message.send.error"),
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
+      setIsProcessing(false);
+      // Focus input after sending
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
     }
   };
 
   const startSpeechRecognition = () => {
     if (!('webkitSpeechRecognition' in window)) {
       toast({
-        title: "Not Supported",
-        description: "Voice recognition is not supported in your browser.",
+        title: t("not.supported"),
+        description: t("voice.recognition.not.supported"),
         variant: "destructive",
       });
       return;
     }
 
     toast({
-      title: "Listening",
-      description: "Speak now...",
+      title: t("listening"),
+      description: t("speak.now"),
     });
     
     // This is just a placeholder - in a real app you would implement the SpeechRecognition API
     setTimeout(() => {
       toast({
-        title: "Sorry",
-        description: "Speech recognition implementation requires backend configuration.",
+        title: t("sorry"),
+        description: t("speech.recognition.configuration"),
       });
     }, 3000);
   };
 
   // Get title and description in the correct language
   const getBotTitle = () => {
-    switch(language) {
-      case 'hindi': return "कृषि मित्र";
-      case 'punjabi': return "ਕ੍ਰਿਸ਼ੀ ਮਿੱਤਰ";
-      default: return "Krishi Mitra";
-    }
+    return t("krishi.mitra");
   };
   
   const getBotDescription = () => {
-    switch(language) {
-      case 'hindi': return "आपका कृषि सहायक";
-      case 'punjabi': return "ਤੁਹਾਡਾ ਖੇਤੀਬਾੜੀ ਸਹਾਇਕ";
-      default: return "Your Agricultural Assistant";
-    }
+    return t("your.agricultural.assistant");
   };
 
   const getPlaceholder = () => {
-    switch(language) {
-      case 'hindi': return "अपना संदेश लिखें...";
-      case 'punjabi': return "ਆਪਣਾ ਸੁਨੇਹਾ ਲਿਖੋ...";
-      default: return "Type your message...";
-    }
+    return t("type.your.message");
   };
 
   return (
@@ -193,13 +258,13 @@ const KrishiMitra = () => {
         <SheetTrigger asChild>
           <Button 
             size="icon" 
-            className="h-14 w-14 rounded-full shadow-lg bg-[#138808] hover:bg-[#138808]/90"
+            className="h-14 w-14 rounded-full shadow-lg bg-[#138808] hover:bg-[#138808]/90 transition-transform duration-300 hover:scale-105"
           >
             <Bot className="h-6 w-6 text-white" />
           </Button>
         </SheetTrigger>
         <SheetContent 
-          className="sm:max-w-md md:max-w-lg w-[90vw] bg-white" 
+          className="sm:max-w-md md:max-w-lg w-[90vw] bg-white border-l-4 border-[#138808]" 
           side="right"
         >
           <SheetHeader className="border-b pb-4">
@@ -227,7 +292,7 @@ const KrishiMitra = () => {
                         message.role === "user"
                           ? "bg-[#138808] text-white"
                           : "bg-gray-100 text-gray-800"
-                      }`}
+                      } shadow-sm animate-fade-in`}
                     >
                       <div className="flex items-start gap-2">
                         {message.role === "assistant" && (
@@ -243,7 +308,7 @@ const KrishiMitra = () => {
                 ))}
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="max-w-[80%] rounded-lg p-3 bg-gray-100">
+                    <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 shadow-sm animate-pulse">
                       <div className="flex items-center gap-2">
                         <Bot className="h-5 w-5" />
                         <div className="flex gap-1">
@@ -268,24 +333,26 @@ const KrishiMitra = () => {
                 variant="outline"
                 size="icon"
                 onClick={startSpeechRecognition}
-                disabled={isLoading}
+                disabled={isProcessing}
+                className="rounded-full hover:bg-gray-100"
               >
                 <Mic className="h-5 w-5" />
               </Button>
               <Input
+                ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={getPlaceholder()}
-                className="flex-1"
-                disabled={isLoading}
+                className="flex-1 rounded-full border-gray-300 focus:border-[#138808] focus:ring-[#138808] transition-colors"
+                disabled={isProcessing}
               />
               <Button
                 type="submit"
                 size="icon"
-                disabled={!input.trim() || isLoading}
-                className="bg-[#138808] hover:bg-[#138808]/90"
+                disabled={!input.trim() || isProcessing}
+                className="bg-[#138808] hover:bg-[#138808]/90 rounded-full transition-transform duration-200 hover:scale-105"
               >
-                <Send className="h-5 w-5" />
+                {isProcessing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
               </Button>
             </form>
           </div>
