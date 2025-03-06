@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Check, Languages } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -15,7 +15,7 @@ const LanguageSelector = () => {
 
   return (
     <div className="flex items-center space-x-2">
-      <Languages className="h-4 w-4 text-muted-foreground" />
+      <Globe className="h-4 w-4 text-muted-foreground" />
       <Select
         value={language}
         onValueChange={(value) => setLanguage(value as Language)}
@@ -27,19 +27,25 @@ const LanguageSelector = () => {
           <SelectItem value="english">
             <div className="flex items-center justify-between w-full">
               <span>{t('english')}</span>
-              {language === 'english' && <Check className="h-4 w-4 ml-2" />}
+              {language === 'english' && (
+                <span className="ml-2 h-1.5 w-1.5 rounded-full bg-green-500"></span>
+              )}
             </div>
           </SelectItem>
           <SelectItem value="hindi">
             <div className="flex items-center justify-between w-full">
               <span>{t('hindi')}</span>
-              {language === 'hindi' && <Check className="h-4 w-4 ml-2" />}
+              {language === 'hindi' && (
+                <span className="ml-2 h-1.5 w-1.5 rounded-full bg-green-500"></span>
+              )}
             </div>
           </SelectItem>
           <SelectItem value="punjabi">
             <div className="flex items-center justify-between w-full">
               <span>{t('punjabi')}</span>
-              {language === 'punjabi' && <Check className="h-4 w-4 ml-2" />}
+              {language === 'punjabi' && (
+                <span className="ml-2 h-1.5 w-1.5 rounded-full bg-green-500"></span>
+              )}
             </div>
           </SelectItem>
         </SelectContent>

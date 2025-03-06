@@ -29,6 +29,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import LanguageSelector from "./LanguageSelector";
 import {
   Bell,
   Menu,
@@ -256,6 +257,9 @@ const AppNavbar = () => {
           </div>
           
           <div className="flex items-center gap-4">
+            {/* Add LanguageSelector here */}
+            <LanguageSelector />
+            
             {isAuthenticated ? (
               <>
                 <Button variant="outline" size="icon" className="relative">
@@ -326,13 +330,18 @@ const AppNavbar = () => {
                 </SheetTrigger>
                 <SheetContent side="right">
                   <SheetHeader>
-                    <SheetTitle>Annadata Harmony</SheetTitle>
+                    <SheetTitle>Annadata</SheetTitle>
                     <SheetDescription>
                       Your integrated agricultural marketplace
                     </SheetDescription>
                   </SheetHeader>
                   <div className="py-6">
                     <div className="flex flex-col space-y-4">
+                      {/* Add LanguageSelector to mobile menu as well */}
+                      <div className="mb-2">
+                        <LanguageSelector />
+                      </div>
+                      
                       {isAuthenticated ? (
                         <>
                           <div className="flex items-center gap-3 mb-4">
