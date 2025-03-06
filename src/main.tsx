@@ -34,10 +34,14 @@ const showLoadingIndicator = () => {
         font-weight: bold;
         color: #138808;
         margin-bottom: 8px;
+        opacity: 0;
+        transform: translateY(10px);
       }
       .loading-text {
         color: #666;
         font-size: 0.9rem;
+        opacity: 0;
+        transform: translateY(10px);
       }
       @keyframes spin {
         0% { transform: rotate(0deg); }
@@ -64,14 +68,33 @@ const removeLoadingIndicator = () => {
     loadingEl.style.opacity = '0';
     setTimeout(() => {
       loadingEl.remove();
-    }, 500);
+    }, 300); // Reduced from 500ms to 300ms for faster transition
   }
 };
 
 // Show loading indicator
 showLoadingIndicator();
 
-// Pre-load critical resources
+// Optimize font loading
+const preloadFonts = () => {
+  // Add preload links for critical fonts
+  const fontPreloadLinks = [
+    { href: '/fonts/font1.woff2', type: 'font/woff2', crossOrigin: 'anonymous' },
+    { href: '/fonts/font2.woff2', type: 'font/woff2', crossOrigin: 'anonymous' }
+  ];
+
+  fontPreloadLinks.forEach(font => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'font';
+    link.href = font.href;
+    link.type = font.type;
+    link.crossOrigin = font.crossOrigin;
+    document.head.appendChild(link);
+  });
+};
+
+// Pre-load critical resources with higher concurrency
 const preloadResources = async () => {
   // Add any critical resources that need to be preloaded here
   const preloadImages = [
@@ -79,6 +102,7 @@ const preloadResources = async () => {
     'https://images.unsplash.com/photo-1523741543316-beb7fc7023d8'
   ];
   
+  // Use Promise.all for concurrent loading instead of sequential
   const preloadPromises = preloadImages.map(url => {
     return new Promise((resolve) => {
       const img = new Image();
@@ -88,11 +112,14 @@ const preloadResources = async () => {
     });
   });
   
-  // Use Promise.allSettled so we don't block on individual image failures
-  return Promise.allSettled(preloadPromises);
+  // Preload fonts in parallel with images
+  preloadFonts();
+  
+  // Return a promise that resolves when all resources are loaded
+  return Promise.all(preloadPromises);
 };
 
-// Add performance monitoring
+// Add performance monitoring with more detailed metrics
 const reportWebVitals = () => {
   // Capture initial load timing
   const loadTime = window.performance?.timing?.loadEventEnd - window.performance?.timing?.navigationStart;
@@ -119,7 +146,7 @@ const reportWebVitals = () => {
   }
 };
 
-// Mount app with performance measuring
+// Mount app with optimized performance
 const mountApp = async () => {
   const startTime = performance.now();
   
@@ -127,9 +154,14 @@ const mountApp = async () => {
     // Preload resources in parallel with app initialization
     const preloadPromise = preloadResources();
     
-    // Create root with an optimized approach
+    // Create root with performance optimizations
     const rootElement = document.getElementById("root")!;
-    rootElement.className = 'hardware-accelerated'; // Add GPU acceleration
+    
+    // Apply GPU acceleration and content-visibility
+    rootElement.className = 'hardware-accelerated';
+    rootElement.style.setProperty('content-visibility', 'auto');
+    
+    // Create root with concurrent mode 
     const root = createRoot(rootElement);
     
     // Render app
@@ -144,7 +176,8 @@ const mountApp = async () => {
     
     // Remove loading indicator with a slight delay to ensure UI is painted
     const removeLoader = () => {
-      setTimeout(removeLoadingIndicator, 300);
+      // Reduced timeout from 300ms to 100ms for faster display
+      setTimeout(removeLoadingIndicator, 100);
     };
     
     // Remove loading indicator when content is fully loaded
@@ -163,5 +196,11 @@ const mountApp = async () => {
   }
 };
 
-// Start mounting the app
-mountApp();
+// Start mounting the app with requestIdleCallback if available for better performance
+if ('requestIdleCallback' in window) {
+  // @ts-ignore - TypeScript doesn't recognize requestIdleCallback
+  window.requestIdleCallback(() => mountApp());
+} else {
+  // Fallback to setTimeout if requestIdleCallback is not available
+  setTimeout(mountApp, 1);
+}

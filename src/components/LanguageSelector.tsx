@@ -20,7 +20,7 @@ const LanguageSelector = () => {
         value={language}
         onValueChange={(value) => setLanguage(value as Language)}
       >
-        <SelectTrigger className="w-[130px] h-8 text-sm border border-green-100 rounded-full bg-white/90 hover:bg-white transition-all duration-300 hover:shadow-md focus:ring-green-500 focus:border-green-500">
+        <SelectTrigger className="w-[130px] h-8 text-sm border border-green-100 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-all duration-300 hover:shadow-md focus:ring-green-500 focus:border-green-500 shadow-sm">
           <SelectValue placeholder={t('select.language')} />
         </SelectTrigger>
         <SelectContent className="border border-green-100 rounded-xl shadow-lg animate-fade-in">
