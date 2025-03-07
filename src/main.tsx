@@ -18,7 +18,7 @@ const showLoadingIndicator = () => {
         justify-content: center;
         background: #F2FCE2;
         z-index: 9999;
-        transition: opacity 0.5s;
+        transition: opacity 0.3s;
       }
       .spinner {
         width: 40px;
@@ -26,7 +26,7 @@ const showLoadingIndicator = () => {
         border: 4px solid rgba(0, 0, 0, 0.1);
         border-top: 4px solid #138808;
         border-radius: 50%;
-        animation: spin 1s linear infinite;
+        animation: spin 0.8s linear infinite;
         margin-bottom: 16px;
       }
       .app-name {
@@ -52,12 +52,12 @@ const showLoadingIndicator = () => {
         to { opacity: 1; transform: translateY(0); }
       }
       .fadeUp {
-        animation: fadeUp 0.5s ease-out forwards;
+        animation: fadeUp 0.3s ease-out forwards;
       }
     </style>
     <div class="spinner"></div>
-    <div class="app-name fadeUp" style="animation-delay: 0.2s">ANNADATA</div>
-    <p class="loading-text fadeUp" style="animation-delay: 0.4s">Loading application...</p>
+    <div class="app-name fadeUp" style="animation-delay: 0.1s">ANNADATA</div>
+    <p class="loading-text fadeUp" style="animation-delay: 0.2s">Loading application...</p>
   `;
   document.body.appendChild(loadingEl);
 };
@@ -68,16 +68,18 @@ const removeLoadingIndicator = () => {
     loadingEl.style.opacity = '0';
     setTimeout(() => {
       loadingEl.remove();
-    }, 300); // Reduced from 500ms to 300ms for faster transition
+    }, 100); // Reduced for faster transition
   }
 };
 
 // Show loading indicator
 showLoadingIndicator();
 
-// Optimize font loading
-const preloadFonts = () => {
-  // Add preload links for critical fonts
+// Optimize font and resource loading with Promise.all for concurrent loading
+const preloadResources = () => {
+  const resources = [];
+  
+  // Preload fonts
   const fontPreloadLinks = [
     { href: '/fonts/font1.woff2', type: 'font/woff2', crossOrigin: 'anonymous' },
     { href: '/fonts/font2.woff2', type: 'font/woff2', crossOrigin: 'anonymous' }
@@ -91,59 +93,41 @@ const preloadFonts = () => {
     link.type = font.type;
     link.crossOrigin = font.crossOrigin;
     document.head.appendChild(link);
+    
+    // Add to resources array to track loading
+    resources.push(new Promise(resolve => {
+      link.onload = resolve;
+      link.onerror = resolve; // Don't block if font fails
+    }));
   });
-};
-
-// Pre-load critical resources with higher concurrency
-const preloadResources = async () => {
-  // Add any critical resources that need to be preloaded here
+  
+  // Preload critical images concurrently
   const preloadImages = [
     'https://images.unsplash.com/photo-1517022812141-23620dba5c23',
-    'https://images.unsplash.com/photo-1523741543316-beb7fc7023d8'
+    'https://images.unsplash.com/photo-1523741543316-beb7fc7023d8',
+    'https://img.icons8.com/fluency/48/shop.png'
   ];
   
-  // Use Promise.all for concurrent loading instead of sequential
-  const preloadPromises = preloadImages.map(url => {
-    return new Promise((resolve) => {
-      const img = new Image();
+  preloadImages.forEach(url => {
+    const img = new Image();
+    resources.push(new Promise(resolve => {
       img.onload = resolve;
       img.onerror = resolve; // Don't block if image fails
       img.src = url;
-    });
+    }));
   });
   
-  // Preload fonts in parallel with images
-  preloadFonts();
-  
-  // Return a promise that resolves when all resources are loaded
-  return Promise.all(preloadPromises);
-};
-
-// Add performance monitoring with more detailed metrics
-const reportWebVitals = () => {
-  // Capture initial load timing
-  const loadTime = window.performance?.timing?.loadEventEnd - window.performance?.timing?.navigationStart;
-  console.log(`Initial page load: ${loadTime}ms`);
-  
-  // Report Core Web Vitals if available
-  if ('performance' in window && 'getEntriesByType' in performance) {
-    const navEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-    if (navEntry) {
-      // Log key metrics
-      console.log(`Time to Interactive: ${navEntry.domInteractive}ms`);
-      console.log(`DOM Content Loaded: ${navEntry.domContentLoadedEventEnd}ms`);
-      console.log(`Load Complete: ${navEntry.loadEventEnd}ms`);
-    }
-    
-    // Report Largest Contentful Paint
-    const observer = new PerformanceObserver((entryList) => {
-      const entries = entryList.getEntries();
-      const lastEntry = entries[entries.length - 1] as PerformanceEntry;
-      console.log(`Largest Contentful Paint: ${lastEntry.startTime}ms`);
-    });
-    
-    observer.observe({ type: 'largest-contentful-paint', buffered: true });
+  // Preload map resources if available
+  if (typeof mapboxgl !== 'undefined') {
+    resources.push(
+      fetch('https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js', { 
+        method: 'HEAD',
+        cache: 'force-cache'
+      }).catch(() => {})
+    );
   }
+  
+  return Promise.all(resources);
 };
 
 // Mount app with optimized performance
@@ -151,15 +135,15 @@ const mountApp = async () => {
   const startTime = performance.now();
   
   try {
-    // Preload resources in parallel with app initialization
+    // Start preloading resources immediately in parallel
     const preloadPromise = preloadResources();
     
     // Create root with performance optimizations
     const rootElement = document.getElementById("root")!;
     
-    // Apply GPU acceleration and content-visibility
-    rootElement.className = 'hardware-accelerated';
-    rootElement.style.setProperty('content-visibility', 'auto');
+    // Apply GPU acceleration
+    rootElement.style.setProperty('transform', 'translateZ(0)');
+    rootElement.style.setProperty('backface-visibility', 'hidden');
     
     // Create root with concurrent mode 
     const root = createRoot(rootElement);
@@ -167,28 +151,20 @@ const mountApp = async () => {
     // Render app
     root.render(<App />);
     
-    // Ensure preloading completes
-    await preloadPromise;
+    // Wait for resources to load, but with a timeout
+    Promise.race([
+      preloadPromise,
+      new Promise(resolve => setTimeout(resolve, 800)) // Don't wait forever
+    ]).then(() => {
+      // Remove loading indicator
+      requestAnimationFrame(() => {
+        removeLoadingIndicator();
+      });
+    });
     
     // Log rendering time
     const renderTime = performance.now() - startTime;
     console.log(`App render time: ${renderTime.toFixed(2)}ms`);
-    
-    // Remove loading indicator with a slight delay to ensure UI is painted
-    const removeLoader = () => {
-      // Reduced timeout from 300ms to 100ms for faster display
-      setTimeout(removeLoadingIndicator, 100);
-    };
-    
-    // Remove loading indicator when content is fully loaded
-    if (document.readyState === 'complete') {
-      removeLoader();
-    } else {
-      window.addEventListener('load', removeLoader);
-    }
-    
-    // Report web vitals after the app loads
-    window.addEventListener('load', reportWebVitals);
     
   } catch (error) {
     console.error('Error mounting app:', error);
@@ -196,11 +172,5 @@ const mountApp = async () => {
   }
 };
 
-// Start mounting the app with requestIdleCallback if available for better performance
-if ('requestIdleCallback' in window) {
-  // @ts-ignore - TypeScript doesn't recognize requestIdleCallback
-  window.requestIdleCallback(() => mountApp());
-} else {
-  // Fallback to setTimeout if requestIdleCallback is not available
-  setTimeout(mountApp, 1);
-}
+// Start mounting immediately
+mountApp();

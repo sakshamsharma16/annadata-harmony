@@ -8,6 +8,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import AppNavbar from "./components/AppNavbar";
 import EnhancedFooter from "./components/EnhancedFooter";
 import KrishiMitra from "./components/KrishiMitra";
+import FastBotsChat from "./components/FastBotsChat";
 
 // Lazy load pages to improve initial load time
 const Index = lazy(() => import("./pages/Index"));
@@ -90,6 +91,19 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
+  // Add a state for controlling which chatbot to show
+  const [useFastBots, setUseFastBots] = useState(true);
+
+  // Check for preference in localStorage on mount
+  useEffect(() => {
+    const preference = localStorage.getItem('preferredChatbot');
+    if (preference === 'krishiMitra') {
+      setUseFastBots(false);
+    } else if (preference === 'fastBots') {
+      setUseFastBots(true);
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
@@ -99,6 +113,14 @@ const App = () => {
           <BrowserRouter>
             <AppLayout />
           </BrowserRouter>
+          
+          {/* Only render one chatbot at a time based on preference */}
+          {useFastBots ? (
+            <FastBotsChat botId="cm4bojr9l0j5zsvbm6faemmyn" />
+          ) : (
+            <KrishiMitra />
+          )}
+          
         </TooltipProvider>
       </LanguageProvider>
     </QueryClientProvider>

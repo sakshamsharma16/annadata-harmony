@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { BellRing, MapPin, Star, ShoppingCart, Clock, Check, Bell } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import NearbyVendorsMap from "@/components/vendor/NearbyVendorsMap";
 
 // Mock vendors data
 const mockVendors = [
@@ -68,6 +69,7 @@ const NearbyVendors = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [searchRadius, setSearchRadius] = useState("5");
   const [unreadNudges, setUnreadNudges] = useState(1);
+  const [activeView, setActiveView] = useState("list");
 
   useEffect(() => {
     // In a real app, you would:
@@ -228,76 +230,96 @@ const NearbyVendors = () => {
       </div>
 
       <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">
+        <h2 className="text-xl font-semibold mb-4">
           Vendors Within {searchRadius} km
         </h2>
-        <p className="text-muted-foreground">
-          {vendors.length} vendors found in your area
-        </p>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {vendors.map((vendor) => (
-          <Card key={vendor.id} className="overflow-hidden">
-            <div className="aspect-video w-full overflow-hidden">
-              <img
-                src={vendor.image}
-                alt={vendor.name}
-                className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-              />
+        
+        <Tabs 
+          defaultValue="list" 
+          value={activeView}
+          onValueChange={setActiveView}
+          className="w-full"
+        >
+          <TabsList className="mb-4 w-full max-w-md">
+            <TabsTrigger value="list" className="flex-1">List View</TabsTrigger>
+            <TabsTrigger value="map" className="flex-1">Map View</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="list" className="mt-2">
+            <p className="text-muted-foreground mb-6">
+              {vendors.length} vendors found in your area
+            </p>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {vendors.map((vendor) => (
+                <Card key={vendor.id} className="overflow-hidden">
+                  <div className="aspect-video w-full overflow-hidden">
+                    <img
+                      src={vendor.image}
+                      alt={vendor.name}
+                      className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                    />
+                  </div>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <CardTitle className="text-lg">{vendor.name}</CardTitle>
+                      <div className="flex items-center gap-1 rounded-full bg-yellow-50 px-2 py-1 text-xs text-yellow-700">
+                        <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                        {vendor.rating}
+                      </div>
+                    </div>
+                    <CardDescription>{vendor.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="h-4 w-4" />
+                      <span>{vendor.location} • {vendor.distance} km away</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {vendor.products.map((product, index) => (
+                        <Badge key={index} variant="outline" className="bg-gray-50">
+                          {product}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => {
+                        toast({
+                          title: "Location Shared",
+                          description: `Your location has been shared with ${vendor.name}.`,
+                        });
+                      }}
+                    >
+                      <MapPin className="mr-2 h-4 w-4" />
+                      Directions
+                    </Button>
+                    <Button
+                      className="flex-1 bg-[#138808] hover:bg-[#138808]/90"
+                      onClick={() => {
+                        toast({
+                          title: "Order Placed",
+                          description: `Your order has been placed with ${vendor.name}.`,
+                        });
+                      }}
+                    >
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      Place Order
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
             </div>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <CardTitle className="text-lg">{vendor.name}</CardTitle>
-                <div className="flex items-center gap-1 rounded-full bg-yellow-50 px-2 py-1 text-xs text-yellow-700">
-                  <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                  {vendor.rating}
-                </div>
-              </div>
-              <CardDescription>{vendor.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin className="h-4 w-4" />
-                <span>{vendor.location} • {vendor.distance} km away</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {vendor.products.map((product, index) => (
-                  <Badge key={index} variant="outline" className="bg-gray-50">
-                    {product}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => {
-                  toast({
-                    title: "Location Shared",
-                    description: `Your location has been shared with ${vendor.name}.`,
-                  });
-                }}
-              >
-                <MapPin className="mr-2 h-4 w-4" />
-                Directions
-              </Button>
-              <Button
-                className="flex-1 bg-[#138808] hover:bg-[#138808]/90"
-                onClick={() => {
-                  toast({
-                    title: "Order Placed",
-                    description: `Your order has been placed with ${vendor.name}.`,
-                  });
-                }}
-              >
-                <ShoppingCart className="mr-2 h-4 w-4" />
-                Place Order
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+          </TabsContent>
+          
+          <TabsContent value="map" className="mt-2">
+            <div className="h-[70vh] mb-6 rounded-lg overflow-hidden border border-green-100 shadow-lg">
+              <NearbyVendorsMap />
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

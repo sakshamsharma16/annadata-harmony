@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -5,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Loader2, MapPin } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Temporary token for development - in production, this should be handled securely
 // Users will be prompted to enter their own token
@@ -67,6 +69,7 @@ const NearbyVendorsMap = () => {
   const [mapToken, setMapToken] = useState(MAPBOX_TOKEN);
   const [vendors, setVendors] = useState<Vendor[]>(mockVendors);
   const [showTokenInput, setShowTokenInput] = useState(!MAPBOX_TOKEN);
+  const { t, language } = useLanguage();
 
   // Get user's current location
   useEffect(() => {
@@ -78,18 +81,49 @@ const NearbyVendorsMap = () => {
             lng: position.coords.longitude,
           };
           setCurrentLocation(newLocation);
+          
+          // Update vendors distances based on new location
+          const updatedVendors = vendors.map(vendor => {
+            const distance = calculateDistance(
+              newLocation.lat, 
+              newLocation.lng,
+              vendor.location.lat,
+              vendor.location.lng
+            );
+            return { ...vendor, distance: parseFloat(distance.toFixed(1)) };
+          });
+          
+          setVendors(updatedVendors);
         },
         (error) => {
           console.error("Error getting location:", error);
           toast({
-            title: "Location access denied",
-            description: "Using default location. Please enable location services for better results.",
+            title: t("location.access.denied"),
+            description: t("using.default.location"),
             variant: "destructive",
           });
         }
       );
     }
-  }, []);
+  }, [t]);
+
+  // Calculate distance between two coordinates (Haversine formula)
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2); 
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    const distance = R * c; // Distance in km
+    return distance;
+  };
+  
+  const deg2rad = (deg: number): number => {
+    return deg * (Math.PI/180);
+  };
 
   // Initialize map when token and location are available
   useEffect(() => {
@@ -124,49 +158,157 @@ const NearbyVendorsMap = () => {
       setLoading(false);
       setShowTokenInput(true);
       toast({
-        title: "Map error",
-        description: "Failed to initialize map. Please check your Mapbox token.",
+        title: t("map.error"),
+        description: t("map.init.fail"),
         variant: "destructive",
       });
     }
-  }, [mapToken, currentLocation]);
+  }, [mapToken, currentLocation, language, t]);
 
   // Add markers for current location and vendors
   const addMarkers = () => {
     if (!map.current) return;
 
     // Add current location marker
-    new mapboxgl.Marker({ color: "#138808" })
+    const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+      `<div style="text-align: center; padding: 5px;">
+        <h3 style="font-weight: bold; margin-bottom: 5px;">${t("your.location")}</h3>
+      </div>`
+    );
+
+    // Custom element for the current location marker
+    const el = document.createElement("div");
+    el.className = "current-location-marker";
+    el.style.width = "22px";
+    el.style.height = "22px";
+    el.style.borderRadius = "50%";
+    el.style.background = "#138808";
+    el.style.border = "3px solid white";
+    el.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)";
+
+    new mapboxgl.Marker(el)
       .setLngLat([currentLocation.lng, currentLocation.lat])
-      .setPopup(new mapboxgl.Popup().setHTML("<h3>Your Location</h3>"))
+      .setPopup(popup)
       .addTo(map.current);
 
-    // Add vendor markers
+    // Add vendor markers with custom elements
     vendors.forEach((vendor) => {
-      // Create custom element for the marker
-      const el = document.createElement("div");
-      el.className = "vendor-marker";
-      el.style.width = "25px";
-      el.style.height = "25px";
-      el.style.backgroundImage = "url('https://img.icons8.com/fluency/48/shop.png')";
-      el.style.backgroundSize = "cover";
-      el.style.borderRadius = "50%";
-      el.style.cursor = "pointer";
+      // Create custom element for the vendor marker
+      const vendorEl = document.createElement("div");
+      vendorEl.className = "vendor-marker";
+      vendorEl.style.width = "30px";
+      vendorEl.style.height = "30px";
+      vendorEl.style.backgroundImage = "url('https://img.icons8.com/fluency/48/shop.png')";
+      vendorEl.style.backgroundSize = "cover";
+      vendorEl.style.cursor = "pointer";
+      vendorEl.style.boxShadow = "0 3px 6px rgba(0,0,0,0.3)";
+      vendorEl.style.borderRadius = "50%";
+      vendorEl.style.border = "2px solid white";
+      vendorEl.style.transition = "transform 0.2s";
 
-      // Add vendor marker
-      new mapboxgl.Marker(el)
+      // Add hover effect
+      vendorEl.onmouseover = () => {
+        vendorEl.style.transform = "scale(1.2)";
+      };
+      vendorEl.onmouseout = () => {
+        vendorEl.style.transform = "scale(1)";
+      };
+
+      // Generate rating stars
+      const generateStars = (rating?: number) => {
+        if (!rating) return '';
+        
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+        
+        return `
+          <div style="display: flex; align-items: center; margin-top: 5px;">
+            ${Array(fullStars).fill('★').join('')}
+            ${hasHalfStar ? '½' : ''}
+            ${Array(emptyStars).fill('☆').join('')}
+            <span style="margin-left: 5px;">(${rating})</span>
+          </div>
+        `;
+      };
+
+      // Add vendor marker with enhanced popup
+      new mapboxgl.Marker(vendorEl)
         .setLngLat([vendor.location.lng, vendor.location.lat])
         .setPopup(
-          new mapboxgl.Popup({ offset: 25 }).setHTML(
-            `<div>
-              <h3 style="font-weight: bold;">${vendor.name}</h3>
-              <p>${vendor.type} vendor</p>
-              <p>${vendor.distance} km away</p>
-              ${vendor.rating ? `<p>Rating: ${vendor.rating}/5</p>` : ""}
+          new mapboxgl.Popup({ offset: 25, closeButton: false }).setHTML(
+            `<div style="padding: 10px; max-width: 200px;">
+              <h3 style="font-weight: bold; color: #138808; margin-bottom: 5px; font-size: 16px;">${vendor.name}</h3>
+              <p style="margin: 5px 0; color: #666; font-size: 13px;">${vendor.type} ${t("vendor")}</p>
+              <p style="margin: 5px 0; display: flex; align-items: center; font-size: 13px;">
+                <span style="margin-right: 5px; color: #FF9933; font-weight: bold;">${vendor.distance} km</span> 
+                ${t("away")}
+              </p>
+              <div style="color: #f8c72c; font-size: 14px;">
+                ${generateStars(vendor.rating)}
+              </div>
+              <button 
+                style="background: #138808; color: white; border: none; padding: 5px 10px; 
+                       border-radius: 4px; margin-top: 8px; width: 100%; cursor: pointer; 
+                       display: flex; align-items: center; justify-content: center; font-size: 13px;"
+                onclick="alert('${t("connecting.with")} ${vendor.name}...')"
+              >
+                <span style="margin-right: 5px;">📱</span> ${t("contact")}
+              </button>
             </div>`
           )
         )
         .addTo(map.current);
+    });
+
+    // Add pulsing effect to show search radius
+    if (map.current.getLayer('radius-circle')) {
+      map.current.removeLayer('radius-circle');
+    }
+    if (map.current.getSource('radius-source')) {
+      map.current.removeSource('radius-source');
+    }
+
+    if (map.current.loaded()) {
+      addRadiusCircle();
+    } else {
+      map.current.on('load', addRadiusCircle);
+    }
+  };
+
+  const addRadiusCircle = () => {
+    if (!map.current) return;
+
+    // Add a source for the radius circle
+    map.current.addSource('radius-source', {
+      type: 'geojson',
+      data: {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [currentLocation.lng, currentLocation.lat]
+        },
+        properties: {}
+      }
+    });
+
+    // Add a layer for the radius circle
+    map.current.addLayer({
+      id: 'radius-circle',
+      type: 'circle',
+      source: 'radius-source',
+      paint: {
+        'circle-radius': {
+          stops: [
+            [0, 0],
+            [20, 5000] // Approximate radius in meters at zoom level 10
+          ],
+          base: 2
+        },
+        'circle-color': 'rgba(19, 136, 8, 0.1)',
+        'circle-stroke-width': 2,
+        'circle-stroke-color': 'rgba(19, 136, 8, 0.3)'
+      }
     });
   };
 
@@ -184,23 +326,39 @@ const NearbyVendorsMap = () => {
     }
   };
 
+  // Get translations for UI elements
+  const getVendorLabel = () => {
+    return t("vendor");
+  };
+
+  const getYourLocationLabel = () => {
+    return t("your.location");
+  };
+
+  const getNearbyVendorsTitle = () => {
+    return t("nearby.vendors");
+  };
+
+  const getViewAllLabel = (count: number) => {
+    return `${t("view.all")} ${count} ${t("vendors")}`;
+  };
+
   return (
-    <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+    <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300 h-full">
       <CardHeader className="border-b bg-gray-50">
-        <CardTitle>Nearby Vendors</CardTitle>
-        <CardDescription>Discover vendors in your area</CardDescription>
+        <CardTitle>{getNearbyVendorsTitle()}</CardTitle>
+        <CardDescription>{t("discover.vendors")}</CardDescription>
       </CardHeader>
       <CardContent className="p-0">
         {showTokenInput ? (
           <div className="p-6 flex flex-col items-center">
             <p className="mb-4 text-center">
-              To display the map, please enter your Mapbox public token.
-              You can get one for free at{" "}
+              {t("mapbox.token.request")}
               <a 
                 href="https://mapbox.com/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
+                className="text-blue-600 hover:underline ml-1"
               >
                 mapbox.com
               </a>
@@ -210,10 +368,10 @@ const NearbyVendorsMap = () => {
                 <input
                   type="text"
                   name="mapbox-token"
-                  placeholder="Enter your Mapbox public token"
+                  placeholder={t("enter.mapbox.token")}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 />
-                <Button type="submit">Submit</Button>
+                <Button type="submit">{t("submit")}</Button>
               </div>
             </form>
           </div>
@@ -227,14 +385,14 @@ const NearbyVendorsMap = () => {
             <div ref={mapContainer} className="h-[400px] w-full" />
             
             {/* Legend */}
-            <div className="absolute bottom-4 right-4 bg-white p-2 rounded-md shadow-md text-xs">
-              <div className="flex items-center mb-1">
-                <div className="w-3 h-3 rounded-full bg-[#138808] mr-2"></div>
-                <span>Your Location</span>
+            <div className="absolute bottom-4 right-4 bg-white p-3 rounded-md shadow-md text-xs">
+              <div className="flex items-center mb-2">
+                <div className="w-4 h-4 rounded-full bg-[#138808] border-2 border-white mr-2"></div>
+                <span>{getYourLocationLabel()}</span>
               </div>
               <div className="flex items-center">
-                <div className="w-4 h-4 bg-no-repeat bg-contain mr-2" style={{ backgroundImage: "url('https://img.icons8.com/fluency/48/shop.png')" }}></div>
-                <span>Vendor</span>
+                <div className="w-5 h-5 bg-no-repeat bg-contain mr-2" style={{ backgroundImage: "url('https://img.icons8.com/fluency/48/shop.png')" }}></div>
+                <span>{getVendorLabel()}</span>
               </div>
             </div>
           </div>
@@ -242,7 +400,7 @@ const NearbyVendorsMap = () => {
         
         {/* Vendors list preview */}
         <div className="p-4 border-t">
-          <h3 className="text-sm font-medium mb-2">Nearby Vendors ({vendors.length})</h3>
+          <h3 className="text-sm font-medium mb-2">{getNearbyVendorsTitle()} ({vendors.length})</h3>
           <ul className="space-y-2">
             {vendors.slice(0, 3).map((vendor) => (
               <li key={vendor.id} className="flex items-center justify-between text-sm">
@@ -255,7 +413,7 @@ const NearbyVendorsMap = () => {
             ))}
             {vendors.length > 3 && (
               <li className="text-xs text-blue-600 cursor-pointer hover:underline">
-                View all {vendors.length} vendors
+                {getViewAllLabel(vendors.length)}
               </li>
             )}
           </ul>
