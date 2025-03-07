@@ -1,7 +1,7 @@
-
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
+import mapboxgl from 'mapbox-gl'
 
 // Create a loading indicator
 const showLoadingIndicator = () => {
