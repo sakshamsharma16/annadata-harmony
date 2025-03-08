@@ -13,6 +13,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 // Default token - users should provide their own in production
 const DEFAULT_MAPBOX_TOKEN = "pk.eyJ1IjoiZXhhbXBsZS11c2VyIiwiYSI6ImNrM25neXpxZjE0Z2szY3F0Z2E5bGw0ZnMifQ.7EYOEHVCnQYS0F0-bM2mZQ";
 
+// Type for Mapbox specific errors
+interface MapboxError extends Error {
+  status?: number;
+}
+
 interface Vendor {
   id: number;
   name: string;
@@ -171,7 +176,9 @@ const NearbyVendorsMap = () => {
       // Add error handling
       map.current.on("error", (e) => {
         console.error("Mapbox error:", e);
-        if (e.error && e.error.status === 401) {
+        // Fix: Check if the error object has status property using type assertion or safe check
+        const mapError = e.error as MapboxError;
+        if (mapError && mapError.status === 401) {
           setMapError(t("invalid.mapbox.token"));
           setShowTokenInput(true);
         } else if (e.error) {
