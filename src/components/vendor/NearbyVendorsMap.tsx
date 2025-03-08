@@ -4,13 +4,14 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, MapPin } from "lucide-react";
+import { Loader2, MapPin, AlertTriangle } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-// Temporary token for development - in production, this should be handled securely
-// Users will be prompted to enter their own token
-const MAPBOX_TOKEN = "pk.eyJ1IjoiZXhhbXBsZS11c2VyIiwiYSI6ImNrM25neXpxZjE0Z2szY3F0Z2E5bGw0ZnMifQ.7EYOEHVCnQYS0F0-bM2mZQ";
+// Default token - users should provide their own in production
+const DEFAULT_MAPBOX_TOKEN = "pk.eyJ1IjoiZXhhbXBsZS11c2VyIiwiYSI6ImNrM25neXpxZjE0Z2szY3F0Z2E5bGw0ZnMifQ.7EYOEHVCnQYS0F0-bM2mZQ";
 
 interface Vendor {
   id: number;
@@ -63,12 +64,17 @@ const NearbyVendorsMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mapError, setMapError] = useState<string | null>(null);
   const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number }>({ 
     lat: 28.6139, lng: 77.2090  // Default to Delhi if geolocation not available
   });
-  const [mapToken, setMapToken] = useState(MAPBOX_TOKEN);
+  const [mapToken, setMapToken] = useState(() => {
+    // Try to get token from localStorage first
+    const savedToken = localStorage.getItem('mapbox_token');
+    return savedToken || DEFAULT_MAPBOX_TOKEN;
+  });
   const [vendors, setVendors] = useState<Vendor[]>(mockVendors);
-  const [showTokenInput, setShowTokenInput] = useState(!MAPBOX_TOKEN);
+  const [showTokenInput, setShowTokenInput] = useState(false);
   const { t, language } = useLanguage();
 
   // Get user's current location
@@ -96,7 +102,7 @@ const NearbyVendorsMap = () => {
           setVendors(updatedVendors);
         },
         (error) => {
-          console.error("Error getting location:", error);
+          console.error("Geolocation error:", error);
           toast({
             title: t("location.access.denied"),
             description: t("using.default.location"),
@@ -129,8 +135,14 @@ const NearbyVendorsMap = () => {
   useEffect(() => {
     if (!mapContainer.current || !mapToken) return;
     
+    console.log("Initializing map with token:", mapToken.substring(0, 10) + "...");
+    
     try {
+      // First, try to initialize mapboxgl with the token
       mapboxgl.accessToken = mapToken;
+      
+      // Clear any previous errors
+      setMapError(null);
 
       // Initialize map
       map.current = new mapboxgl.Map({
@@ -138,7 +150,11 @@ const NearbyVendorsMap = () => {
         style: "mapbox://styles/mapbox/streets-v12",
         center: [currentLocation.lng, currentLocation.lat],
         zoom: 13,
+        attributionControl: false,
       });
+
+      // Add attribution control separately
+      map.current.addControl(new mapboxgl.AttributionControl(), 'bottom-right');
 
       // Add navigation controls
       map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
@@ -147,6 +163,23 @@ const NearbyVendorsMap = () => {
       map.current.on("load", () => {
         setLoading(false);
         addMarkers();
+        
+        // Store valid token in localStorage for future use
+        localStorage.setItem('mapbox_token', mapToken);
+      });
+      
+      // Add error handling
+      map.current.on("error", (e) => {
+        console.error("Mapbox error:", e);
+        if (e.error && e.error.status === 401) {
+          setMapError(t("invalid.mapbox.token"));
+          setShowTokenInput(true);
+        } else if (e.error) {
+          setMapError(`${t("map.error")}: ${e.error.message}`);
+        } else {
+          setMapError(t("map.unknown.error"));
+        }
+        setLoading(false);
       });
 
       // Cleanup
@@ -154,9 +187,11 @@ const NearbyVendorsMap = () => {
         map.current?.remove();
       };
     } catch (error) {
-      console.error("Error initializing map:", error);
+      console.error("Map initialization error:", error);
       setLoading(false);
+      setMapError(t("map.init.fail"));
       setShowTokenInput(true);
+      
       toast({
         title: t("map.error"),
         description: t("map.init.fail"),
@@ -279,37 +314,41 @@ const NearbyVendorsMap = () => {
   const addRadiusCircle = () => {
     if (!map.current) return;
 
-    // Add a source for the radius circle
-    map.current.addSource('radius-source', {
-      type: 'geojson',
-      data: {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [currentLocation.lng, currentLocation.lat]
-        },
-        properties: {}
-      }
-    });
+    try {
+      // Add a source for the radius circle
+      map.current.addSource('radius-source', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [currentLocation.lng, currentLocation.lat]
+          },
+          properties: {}
+        }
+      });
 
-    // Add a layer for the radius circle
-    map.current.addLayer({
-      id: 'radius-circle',
-      type: 'circle',
-      source: 'radius-source',
-      paint: {
-        'circle-radius': {
-          stops: [
-            [0, 0],
-            [20, 5000] // Approximate radius in meters at zoom level 10
-          ],
-          base: 2
-        },
-        'circle-color': 'rgba(19, 136, 8, 0.1)',
-        'circle-stroke-width': 2,
-        'circle-stroke-color': 'rgba(19, 136, 8, 0.3)'
-      }
-    });
+      // Add a layer for the radius circle
+      map.current.addLayer({
+        id: 'radius-circle',
+        type: 'circle',
+        source: 'radius-source',
+        paint: {
+          'circle-radius': {
+            stops: [
+              [0, 0],
+              [20, 5000] // Approximate radius in meters at zoom level 10
+            ],
+            base: 2
+          },
+          'circle-color': 'rgba(19, 136, 8, 0.1)',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': 'rgba(19, 136, 8, 0.3)'
+        }
+      });
+    } catch (error) {
+      console.error("Error adding radius circle:", error);
+    }
   };
 
   const handleTokenSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -320,9 +359,18 @@ const NearbyVendorsMap = () => {
     if (token) {
       setMapToken(token);
       setShowTokenInput(false);
+      setLoading(true);
+      
       // Reinitialize map
-      map.current?.remove();
-      map.current = null;
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+      
+      toast({
+        title: t("token.updated"),
+        description: t("map.reinitializing"),
+      });
     }
   };
 
@@ -350,26 +398,35 @@ const NearbyVendorsMap = () => {
         <CardDescription>{t("discover.vendors")}</CardDescription>
       </CardHeader>
       <CardContent className="p-0">
-        {showTokenInput ? (
+        {showTokenInput || mapError ? (
           <div className="p-6 flex flex-col items-center">
+            {mapError && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>{mapError}</AlertDescription>
+              </Alert>
+            )}
+            
             <p className="mb-4 text-center">
               {t("mapbox.token.request")}
               <a 
-                href="https://mapbox.com/" 
+                href="https://account.mapbox.com/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:underline ml-1"
               >
-                mapbox.com
+                account.mapbox.com
               </a>
             </p>
+            
             <form onSubmit={handleTokenSubmit} className="w-full max-w-md">
               <div className="flex gap-2">
-                <input
+                <Input
                   type="text"
                   name="mapbox-token"
                   placeholder={t("enter.mapbox.token")}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex-1"
+                  defaultValue={mapToken === DEFAULT_MAPBOX_TOKEN ? "" : mapToken}
                 />
                 <Button type="submit">{t("submit")}</Button>
               </div>
