@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import { ArrowUpRight, ArrowDownRight, BarChart, Clock, RefreshCcw, Users, Store, ShoppingCart, Database, MessageSquare, Leaf, PieChart } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, BarChart, Clock, RefreshCcw, Users, Store, ShoppingCart, Database, MessageSquare, Leaf, PieChart, User, Bot } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -857,3 +856,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
