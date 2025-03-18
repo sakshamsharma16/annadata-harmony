@@ -1,6 +1,9 @@
 
-import { useEffect, useRef } from "react";
-import { ArrowUpRight, ArrowDownRight, TrendingUp } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight, ArrowDownRight, TrendingUp, BarChart, Clock, RefreshCcw } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 const products = [
   {
@@ -8,97 +11,170 @@ const products = [
     price: "₹2,450",
     change: "+5.2%",
     trend: "up",
+    volume: "12,450 tons",
+    lastUpdated: "2 hours ago"
   },
   {
     name: "Rice",
     price: "₹3,200",
     change: "-2.1%",
     trend: "down",
+    volume: "18,320 tons",
+    lastUpdated: "1 hour ago"
   },
   {
     name: "Corn",
     price: "₹1,850",
     change: "+3.7%",
     trend: "up",
+    volume: "8,750 tons",
+    lastUpdated: "3 hours ago"
   },
   {
     name: "Soybeans",
     price: "₹4,100",
     change: "+1.5%",
     trend: "up",
+    volume: "5,280 tons",
+    lastUpdated: "30 minutes ago"
   },
 ];
 
 const MarketPrices = () => {
-  const marketRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("active");
-          }
-        });
-      },
-      { threshold: 0.2 }
-    );
-
-    if (marketRef.current) {
-      observer.observe(marketRef.current);
-    }
-
-    return () => {
-      if (marketRef.current) {
-        observer.unobserve(marketRef.current);
-      }
-    };
-  }, []);
+  const [lastRefreshed, setLastRefreshed] = useState(new Date());
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  const refreshData = () => {
+    setIsRefreshing(true);
+    // Simulate data refresh
+    setTimeout(() => {
+      setLastRefreshed(new Date());
+      setIsRefreshing(false);
+    }, 1200);
+  };
 
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div ref={marketRef} className="flex flex-col lg:flex-row items-center gap-12 reveal reveal-up">
-          <div className="flex-1 text-center lg:text-left space-y-6">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Real-Time Market Prices</h2>
-            <p className="text-lg text-gray-600 max-w-2xl">
-              Stay updated with the latest market prices and trends. Make informed decisions for your agricultural business.
-            </p>
-            <button className="btn-primary flex items-center gap-2 mx-auto lg:mx-0">
-              View All Prices
-              <TrendingUp size={20} />
-            </button>
-          </div>
+    <div className="p-6 space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Market Prices Dashboard</h1>
+          <p className="text-muted-foreground">Monitor and analyze current agricultural commodity prices</p>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Clock className="h-4 w-4" />
+          <span>Last updated: {lastRefreshed.toLocaleTimeString()}</span>
+          <Button 
+            size="sm" 
+            variant="outline"
+            className="ml-2"
+            onClick={refreshData}
+            disabled={isRefreshing}
+          >
+            <RefreshCcw className={`h-4 w-4 mr-1 ${isRefreshing ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+        </div>
+      </div>
 
-          <div className="flex-1 w-full">
-            <div className="glass-card p-6 reveal reveal-right">
-              <h3 className="text-xl font-semibold mb-4 text-center lg:text-left">Latest Prices</h3>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Total Trading Volume</CardTitle>
+            <CardDescription>All commodities</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">44,800 tons</div>
+            <div className="text-xs text-muted-foreground">+12% from last week</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Average Price Change</CardTitle>
+            <CardDescription>Last 24 hours</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">+2.1%</div>
+            <div className="text-xs text-muted-foreground">Bullish trend</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Active Traders</CardTitle>
+            <CardDescription>Currently online</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">243</div>
+            <div className="text-xs text-muted-foreground">32 new today</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Market Volatility</CardTitle>
+            <CardDescription>Price fluctuation index</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">Medium</div>
+            <div className="text-xs text-muted-foreground">Decreased by 5%</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Commodity Prices</CardTitle>
+              <CardDescription>Current market rates of major agricultural products</CardDescription>
+            </div>
+            <Button variant="outline" size="sm" className="h-8 gap-1">
+              <BarChart className="h-4 w-4" />
+              View Analytics
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Commodity</TableHead>
+                <TableHead>Current Price</TableHead>
+                <TableHead>24h Change</TableHead>
+                <TableHead className="hidden md:table-cell">Volume</TableHead>
+                <TableHead className="hidden md:table-cell">Last Updated</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {products.map((product, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-4 border-b last:border-b-0 hover:bg-gray-50 transition-colors rounded-lg"
-                >
-                  <span className="font-semibold">{product.name}</span>
-                  <div className="flex items-center gap-4">
-                    <span className="font-bold">{product.price}</span>
+                <TableRow key={index}>
+                  <TableCell className="font-semibold">{product.name}</TableCell>
+                  <TableCell>{product.price}</TableCell>
+                  <TableCell>
                     <span className={`flex items-center ${
                       product.trend === 'up' ? 'text-green-500' : 'text-red-500'
                     }`}>
                       {product.trend === 'up' ? (
-                        <ArrowUpRight size={16} />
+                        <ArrowUpRight size={16} className="mr-1" />
                       ) : (
-                        <ArrowDownRight size={16} />
+                        <ArrowDownRight size={16} className="mr-1" />
                       )}
                       {product.change}
                     </span>
-                  </div>
-                </div>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">{product.volume}</TableCell>
+                  <TableCell className="hidden md:table-cell">{product.lastUpdated}</TableCell>
+                </TableRow>
               ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+            </TableBody>
+          </Table>
+        </CardContent>
+        <CardFooter className="border-t px-6 py-4">
+          <Button variant="outline" className="ml-auto gap-1">
+            <TrendingUp className="h-4 w-4" />
+            Export Report
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
 
