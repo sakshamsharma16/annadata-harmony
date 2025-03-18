@@ -1,3 +1,4 @@
+
 import { Suspense, lazy, useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -66,12 +67,16 @@ const AppLayout = () => {
             <Route path="/vendor/marketplace" element={<Marketplace />} />
             <Route path="/consumer/nearby-vendors" element={<NearbyVendors />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/market-prices" element={<AdminDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </main>
       {!isAuthRoute && <EnhancedFooter />}
+      
+      {/* KrishiMitra chatbot token is always visible */}
+      <KrishiMitra />
     </div>
   );
 };
@@ -87,7 +92,7 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  const [useFastBots, setUseFastBots] = useState(true);
+  const [useFastBots, setUseFastBots] = useState(false);
 
   useEffect(() => {
     const preference = localStorage.getItem('preferredChatbot');
@@ -118,10 +123,8 @@ const App = () => {
             <AppLayout />
           </BrowserRouter>
           
-          {useFastBots ? (
+          {useFastBots && (
             <FastBotsChat botId="cm4bojr9l0j5zsvbm6faemmyn" />
-          ) : (
-            <KrishiMitra />
           )}
         </TooltipProvider>
       </LanguageProvider>

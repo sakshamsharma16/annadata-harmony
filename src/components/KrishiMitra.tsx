@@ -11,13 +11,18 @@ import {
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Mic, Send, Bot, User, Loader2 } from "lucide-react";
+import { Mic, Send, Bot, User, Loader2, ClipboardList, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getCacheItem, setCacheItem } from "@/utils/cacheUtils";
 
 type Message = {
   role: "user" | "assistant";
   content: string;
+  timestamp: string;
+  category?: "farmers" | "vendors" | "consumers" | "all";
 };
 
 const KrishiMitra = () => {
@@ -26,10 +31,27 @@ const KrishiMitra = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [activeHistoryTab, setActiveHistoryTab] = useState("all");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { language, t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Initialize history from cache
+  useEffect(() => {
+    const cachedMessages = getCacheItem("krishiMitra-history");
+    if (cachedMessages) {
+      setMessages(cachedMessages);
+    }
+  }, []);
+
+  // Save messages to cache when they change
+  useEffect(() => {
+    if (messages.length > 0) {
+      setCacheItem("krishiMitra-history", messages, 1440); // Cache for 24 hours
+    }
+  }, [messages]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -62,14 +84,36 @@ const KrishiMitra = () => {
   // Initial greeting message when chat opens
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      setMessages([
-        {
-          role: "assistant",
-          content: getInitialGreeting()
-        }
-      ]);
+      const greeting = {
+        role: "assistant" as const, 
+        content: getInitialGreeting(),
+        timestamp: new Date().toISOString(),
+        category: "all" as const
+      };
+      setMessages([greeting]);
     }
   }, [isOpen, messages.length, language]);
+
+  // Categorize message based on content
+  const categorizeMessage = (content: string): "farmers" | "vendors" | "consumers" | "all" => {
+    const lowerContent = content.toLowerCase();
+    
+    if (lowerContent.includes("farm") || lowerContent.includes("crop") || lowerContent.includes("harvest") || 
+        lowerContent.includes("खेती") || lowerContent.includes("फसल") || 
+        lowerContent.includes("ਖੇਤੀ") || lowerContent.includes("ਫਸਲ")) {
+      return "farmers";
+    } else if (lowerContent.includes("sell") || lowerContent.includes("market") || lowerContent.includes("price") || 
+               lowerContent.includes("बेचना") || lowerContent.includes("बाजार") || lowerContent.includes("मूल्य") || 
+               lowerContent.includes("ਵੇਚਣਾ") || lowerContent.includes("ਬਾਜ਼ਾਰ") || lowerContent.includes("ਮੁੱਲ")) {
+      return "vendors";
+    } else if (lowerContent.includes("buy") || lowerContent.includes("purchase") || lowerContent.includes("order") || 
+               lowerContent.includes("खरीदना") || lowerContent.includes("ऑर्डर") || 
+               lowerContent.includes("ਖਰੀਦਣਾ") || lowerContent.includes("ਆਰਡਰ")) {
+      return "consumers";
+    }
+    
+    return "all";
+  };
 
   // Enhanced AI response function with better natural language understanding
   const getAIResponse = async (userMessage: string): Promise<string> => {
@@ -183,7 +227,14 @@ const KrishiMitra = () => {
     if (!input.trim() || isProcessing) return;
 
     // Add user message
-    const userMessage = { role: "user" as const, content: input };
+    const category = categorizeMessage(input);
+    const userMessage = { 
+      role: "user" as const, 
+      content: input,
+      timestamp: new Date().toISOString(),
+      category
+    };
+    
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
@@ -195,7 +246,12 @@ const KrishiMitra = () => {
       
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: aiResponse }
+        { 
+          role: "assistant", 
+          content: aiResponse,
+          timestamp: new Date().toISOString(),
+          category 
+        }
       ]);
       
     } catch (error) {
@@ -213,6 +269,17 @@ const KrishiMitra = () => {
         inputRef.current?.focus();
       }, 100);
     }
+  };
+
+  const toggleHistory = () => {
+    setIsHistoryOpen((prev) => !prev);
+  };
+
+  const getFilteredMessages = (category: string) => {
+    if (category === "all") {
+      return messages;
+    }
+    return messages.filter(msg => msg.category === category);
   };
 
   const startSpeechRecognition = () => {
@@ -253,19 +320,171 @@ const KrishiMitra = () => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 left-6 z-50">
+      {/* Chat History Panel */}
+      {isHistoryOpen && (
+        <div className="fixed left-20 bottom-24 z-50 w-80 md:w-96 bg-white rounded-lg shadow-lg overflow-hidden">
+          <Card>
+            <CardHeader className="bg-[#138808] text-white py-2 px-4 flex flex-row justify-between items-center">
+              <CardTitle className="text-lg">Conversation History</CardTitle>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={toggleHistory}
+                className="h-8 w-8 text-white hover:bg-[#0c5d04] hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Tabs defaultValue="all" value={activeHistoryTab} onValueChange={setActiveHistoryTab}>
+                <TabsList className="w-full grid grid-cols-4">
+                  <TabsTrigger value="all">All</TabsTrigger>
+                  <TabsTrigger value="farmers">Farmers</TabsTrigger>
+                  <TabsTrigger value="vendors">Vendors</TabsTrigger>
+                  <TabsTrigger value="consumers">Consumers</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="all" className="p-0 max-h-96 overflow-y-auto">
+                  {messages.length > 0 ? (
+                    <div className="p-4 space-y-3">
+                      {messages.map((msg, index) => (
+                        <div 
+                          key={index} 
+                          className={`p-3 rounded-lg ${
+                            msg.role === 'user' 
+                              ? 'bg-gray-100 ml-4 mr-1' 
+                              : 'bg-[#E9F7E2] ml-1 mr-4'
+                          }`}
+                        >
+                          <div className="text-xs text-gray-500">
+                            {new Date(msg.timestamp).toLocaleString()}
+                          </div>
+                          <div className="mt-1">
+                            {msg.content}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-8 text-center text-gray-500">
+                      No conversation history yet.
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="farmers" className="p-0 max-h-96 overflow-y-auto">
+                  {getFilteredMessages("farmers").length > 0 ? (
+                    <div className="p-4 space-y-3">
+                      {getFilteredMessages("farmers").map((msg, index) => (
+                        <div 
+                          key={index} 
+                          className={`p-3 rounded-lg ${
+                            msg.role === 'user' 
+                              ? 'bg-gray-100 ml-4 mr-1' 
+                              : 'bg-[#E9F7E2] ml-1 mr-4'
+                          }`}
+                        >
+                          <div className="text-xs text-gray-500">
+                            {new Date(msg.timestamp).toLocaleString()}
+                          </div>
+                          <div className="mt-1">
+                            {msg.content}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-8 text-center text-gray-500">
+                      No farmer-related conversations yet.
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="vendors" className="p-0 max-h-96 overflow-y-auto">
+                  {getFilteredMessages("vendors").length > 0 ? (
+                    <div className="p-4 space-y-3">
+                      {getFilteredMessages("vendors").map((msg, index) => (
+                        <div 
+                          key={index} 
+                          className={`p-3 rounded-lg ${
+                            msg.role === 'user' 
+                              ? 'bg-gray-100 ml-4 mr-1' 
+                              : 'bg-[#E9F7E2] ml-1 mr-4'
+                          }`}
+                        >
+                          <div className="text-xs text-gray-500">
+                            {new Date(msg.timestamp).toLocaleString()}
+                          </div>
+                          <div className="mt-1">
+                            {msg.content}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-8 text-center text-gray-500">
+                      No vendor-related conversations yet.
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="consumers" className="p-0 max-h-96 overflow-y-auto">
+                  {getFilteredMessages("consumers").length > 0 ? (
+                    <div className="p-4 space-y-3">
+                      {getFilteredMessages("consumers").map((msg, index) => (
+                        <div 
+                          key={index} 
+                          className={`p-3 rounded-lg ${
+                            msg.role === 'user' 
+                              ? 'bg-gray-100 ml-4 mr-1' 
+                              : 'bg-[#E9F7E2] ml-1 mr-4'
+                          }`}
+                        >
+                          <div className="text-xs text-gray-500">
+                            {new Date(msg.timestamp).toLocaleString()}
+                          </div>
+                          <div className="mt-1">
+                            {msg.content}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-8 text-center text-gray-500">
+                      No consumer-related conversations yet.
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetTrigger asChild>
-          <Button 
-            size="icon" 
-            className="h-14 w-14 rounded-full shadow-lg bg-[#138808] hover:bg-[#138808]/90 transition-transform duration-300 hover:scale-105"
+        <div className="flex flex-col items-start space-y-2">
+          <Button
+            onClick={toggleHistory}
+            size="icon"
+            className="rounded-full bg-white text-[#138808] border border-[#138808] shadow-md hover:bg-gray-100"
           >
-            <Bot className="h-6 w-6 text-white" />
+            <ClipboardList className="h-5 w-5" />
           </Button>
-        </SheetTrigger>
+          
+          <SheetTrigger asChild>
+            <Button 
+              size="icon" 
+              className="h-14 w-14 rounded-full shadow-lg bg-[#138808] hover:bg-[#138808]/90 transition-transform duration-300 hover:scale-105"
+            >
+              <Bot className="h-6 w-6 text-white" />
+            </Button>
+          </SheetTrigger>
+        </div>
+
         <SheetContent 
           className="sm:max-w-md md:max-w-lg w-[90vw] bg-white border-l-4 border-[#138808]" 
-          side="right"
+          side="left"
         >
           <SheetHeader className="border-b pb-4">
             <SheetTitle className="flex items-center gap-2 text-[#138808]">

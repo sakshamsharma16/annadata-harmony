@@ -1,13 +1,11 @@
 
-import { useEffect, useState, useCallback } from "react";
-import { ArrowUpRight, ArrowDownRight, BarChart, Clock, RefreshCcw, Users, Store, ShoppingCart, Database, MessageSquare, Leaf, PieChart, Download, Filter } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowUpRight, ArrowDownRight, BarChart, Clock, RefreshCcw, Users, Store, ShoppingCart, Database, MessageSquare, Leaf, PieChart } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
-import { Badge } from "@/components/ui/badge";
+import { getCacheItem, setCacheItem } from "@/utils/cacheUtils";
 
 // Sample data for admin dashboard
 const farmers = [
@@ -43,22 +41,6 @@ const farmers = [
     status: "inactive",
     lastActive: "3 days ago"
   },
-  {
-    name: "Vikram Singh",
-    region: "Uttar Pradesh",
-    products: 10,
-    revenue: "₹120,400",
-    status: "active",
-    lastActive: "1 day ago"
-  },
-  {
-    name: "Priya Reddy",
-    region: "Telangana",
-    products: 7,
-    revenue: "₹85,600",
-    status: "active",
-    lastActive: "4 hours ago"
-  }
 ];
 
 const vendors = [
@@ -94,22 +76,6 @@ const vendors = [
     status: "inactive",
     lastOrder: "2 days ago"
   },
-  {
-    name: "Nature's Bounty",
-    location: "Chennai",
-    orders: 31,
-    revenue: "₹230,500",
-    status: "active",
-    lastOrder: "5 hours ago"
-  },
-  {
-    name: "Village Harvest",
-    location: "Kolkata",
-    orders: 22,
-    revenue: "₹175,600",
-    status: "active",
-    lastOrder: "1 day ago"
-  }
 ];
 
 const consumers = [
@@ -145,22 +111,6 @@ const consumers = [
     status: "active",
     lastOrder: "2 hours ago"
   },
-  {
-    name: "Rahul Mehta",
-    location: "Pune",
-    orders: 7,
-    spending: "₹11,200",
-    status: "active",
-    lastOrder: "1 day ago"
-  },
-  {
-    name: "Kavita Joshi",
-    location: "Hyderabad",
-    orders: 10,
-    spending: "₹15,800",
-    status: "active",
-    lastOrder: "4 hours ago"
-  }
 ];
 
 const products = [
@@ -196,152 +146,59 @@ const products = [
     volume: "5,280 tons",
     lastUpdated: "30 minutes ago"
   },
-  {
-    name: "Potatoes",
-    price: "₹1,200",
-    change: "+2.8%",
-    trend: "up",
-    volume: "9,450 tons",
-    lastUpdated: "1 hour ago"
-  },
-  {
-    name: "Tomatoes",
-    price: "₹2,800",
-    change: "-1.5%",
-    trend: "down",
-    volume: "6,780 tons",
-    lastUpdated: "2 hours ago"
-  }
 ];
 
-const recentActivities = [
-  {
-    type: "farmer",
-    title: "New Farmer Registration",
-    description: "Ramesh Yadav from Uttar Pradesh registered as a farmer",
-    time: "10 minutes ago",
-    icon: Leaf
-  },
-  {
-    type: "vendor",
-    title: "New Vendor Onboarded",
-    description: "Metro Grocers from Chennai completed verification",
-    time: "1 hour ago",
-    icon: Store
-  },
-  {
-    type: "consumer",
-    title: "Large Order Placed",
-    description: "Hotel Sunshine placed a bulk order worth ₹45,000",
-    time: "2 hours ago",
-    icon: ShoppingCart
-  },
-  {
-    type: "system",
-    title: "Support Ticket Resolved",
-    description: "Payment issue for vendor ID #V2345 has been resolved",
-    time: "3 hours ago",
-    icon: MessageSquare
-  },
-  {
-    type: "system",
-    title: "System Update",
-    description: "Platform successfully updated to version 2.3.1",
-    time: "5 hours ago",
-    icon: RefreshCcw
-  },
-  {
-    type: "farmer",
-    title: "New Product Added",
-    description: "Farmer ID #F5678 added organic tomatoes to their inventory",
-    time: "6 hours ago",
-    icon: Leaf
-  }
-];
-
-// Function to get icon color based on activity type
-const getActivityIconColor = (type: string) => {
-  switch (type) {
-    case "farmer": return "bg-green-100 text-green-600";
-    case "vendor": return "bg-blue-100 text-blue-600";
-    case "consumer": return "bg-purple-100 text-purple-600";
-    case "system": return "bg-amber-100 text-amber-600";
-    default: return "bg-gray-100 text-gray-600";
-  }
+// Get chat history from localStorage for the chat tab
+const getChatHistory = () => {
+  const krishiMitraHistory = getCacheItem("krishiMitra-history") || [];
+  const fastbotsHistory = JSON.parse(localStorage.getItem('fastbots_history') || '{"all":[],"farmers":[],"vendors":[],"consumers":[]}');
+  
+  return {
+    krishiMitra: krishiMitraHistory,
+    fastbots: fastbotsHistory
+  };
 };
 
 const AdminDashboard = () => {
   const [lastRefreshed, setLastRefreshed] = useState(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
-  const [searchQuery, setSearchQuery] = useState("");
-  const { toast } = useToast();
+  const [chatSource, setChatSource] = useState("krishiMitra");
+  const [chatHistory, setChatHistory] = useState(getChatHistory());
   
-  // Add a function to apply search filtering
-  const filterData = useCallback((data, query) => {
-    if (!query) return data;
-    const lowercaseQuery = query.toLowerCase();
-    return data.filter(item => 
-      Object.values(item).some(value => 
-        String(value).toLowerCase().includes(lowercaseQuery)
-      )
-    );
-  }, []);
+  useEffect(() => {
+    // Cache dashboard data for better performance
+    const cachedData = getCacheItem("admin-dashboard-data");
+    if (!cachedData) {
+      // In a real app, you would fetch this data from an API
+      setCacheItem("admin-dashboard-data", { 
+        lastRefreshed, 
+        farmers, 
+        vendors, 
+        consumers, 
+        products 
+      }, 15); // Cache for 15 minutes
+    }
+  }, [lastRefreshed]);
 
-  // Filtered data based on search query
-  const filteredFarmers = filterData(farmers, searchQuery);
-  const filteredVendors = filterData(vendors, searchQuery);
-  const filteredConsumers = filterData(consumers, searchQuery);
-  const filteredProducts = filterData(products, searchQuery);
-  
   const refreshData = () => {
     setIsRefreshing(true);
     // Simulate data refresh
     setTimeout(() => {
       setLastRefreshed(new Date());
+      setChatHistory(getChatHistory());
       setIsRefreshing(false);
-      toast({
-        title: "Dashboard Refreshed",
-        description: "All data has been updated with the latest information.",
-        duration: 3000
-      });
+      
+      // Update cache
+      setCacheItem("admin-dashboard-data", { 
+        lastRefreshed: new Date(), 
+        farmers, 
+        vendors, 
+        consumers, 
+        products 
+      }, 15);
     }, 800);
   };
-  
-  // Export data function
-  const exportData = (dataType: string) => {
-    toast({
-      title: "Export Initiated",
-      description: `${dataType} data is being prepared for download.`,
-      duration: 3000
-    });
-    
-    // In a real application, you would generate a CSV or Excel file here
-    setTimeout(() => {
-      toast({
-        title: "Export Complete",
-        description: `${dataType} data has been exported successfully.`,
-        duration: 3000
-      });
-    }, 1500);
-  };
-
-  // Use memory cache for recent activities
-  useEffect(() => {
-    // Cache data in memory
-    const cacheKey = `admin-dashboard-data-${new Date().toDateString()}`;
-    const cachedData = sessionStorage.getItem(cacheKey);
-    
-    if (!cachedData) {
-      // In a real app, you would fetch data here
-      // For demo, just cache the current data
-      const dataToCache = {
-        timestamp: new Date().toISOString(),
-        activities: recentActivities
-      };
-      sessionStorage.setItem(cacheKey, JSON.stringify(dataToCache));
-    }
-  }, []);
 
   return (
     <div className="p-6 space-y-6">
@@ -350,15 +207,13 @@ const AdminDashboard = () => {
           <h1 className="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
           <p className="text-muted-foreground">Comprehensive view of all platform stakeholders and market data</p>
         </div>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock className="h-4 w-4" />
-            <span>Last updated: {lastRefreshed.toLocaleTimeString()}</span>
-          </div>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Clock className="h-4 w-4" />
+          <span>Last updated: {lastRefreshed.toLocaleTimeString()}</span>
           <Button 
             size="sm" 
             variant="outline"
-            className="ml-0 sm:ml-2"
+            className="ml-2"
             onClick={refreshData}
             disabled={isRefreshing}
           >
@@ -369,7 +224,7 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+        <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Farmers</CardTitle>
             <CardDescription>Registered on platform</CardDescription>
@@ -383,7 +238,7 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
         
-        <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+        <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Vendors</CardTitle>
             <CardDescription>Active businesses</CardDescription>
@@ -397,7 +252,7 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
         
-        <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+        <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Consumers</CardTitle>
             <CardDescription>Registered users</CardDescription>
@@ -411,7 +266,7 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
         
-        <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+        <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
             <CardDescription>Platform-wide</CardDescription>
@@ -426,34 +281,19 @@ const AdminDashboard = () => {
         </Card>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-5 md:w-auto w-full">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="farmers">Farmers</TabsTrigger>
-            <TabsTrigger value="vendors">Vendors</TabsTrigger>
-            <TabsTrigger value="consumers">Consumers</TabsTrigger>
-            <TabsTrigger value="market">Market Prices</TabsTrigger>
-          </TabsList>
-        </Tabs>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="grid grid-cols-6 md:w-auto w-full">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="farmers">Farmers</TabsTrigger>
+          <TabsTrigger value="vendors">Vendors</TabsTrigger>
+          <TabsTrigger value="consumers">Consumers</TabsTrigger>
+          <TabsTrigger value="market">Market Prices</TabsTrigger>
+          <TabsTrigger value="chats">Chatbot Logs</TabsTrigger>
+        </TabsList>
         
-        <div className="w-full md:w-auto flex gap-2">
-          <Input 
-            placeholder="Search..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="max-w-xs"
-          />
-          <Button variant="outline" size="icon">
-            <Filter className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-      
-      <div className="mb-6">
-        <TabsContent value="overview" className="space-y-4 mt-0">
+        <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+            <Card>
               <CardHeader>
                 <CardTitle>Platform Activity</CardTitle>
                 <CardDescription>Last 30 days user activity</CardDescription>
@@ -466,7 +306,7 @@ const AdminDashboard = () => {
               </CardContent>
             </Card>
             
-            <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+            <Card>
               <CardHeader>
                 <CardTitle>Transaction Volume</CardTitle>
                 <CardDescription>Daily transaction trend</CardDescription>
@@ -480,57 +320,71 @@ const AdminDashboard = () => {
             </Card>
           </div>
           
-          <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+          <Card>
             <CardHeader>
-              <div className="flex justify-between items-center">
-                <div>
-                  <CardTitle>Recent Activities</CardTitle>
-                  <CardDescription>Latest platform updates</CardDescription>
-                </div>
-                <Badge variant="outline" className="hidden sm:inline-flex">
-                  Live Updates
-                </Badge>
-              </div>
+              <CardTitle>Recent Activities</CardTitle>
+              <CardDescription>Latest platform updates</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentActivities.slice(0, 6).map((activity, index) => (
-                  <div key={index} className="flex items-start gap-4">
-                    <div className={`p-2 rounded-full ${getActivityIconColor(activity.type)}`}>
-                      <activity.icon className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{activity.title}</p>
-                      <p className="text-sm text-muted-foreground">{activity.description}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{activity.time}</p>
-                    </div>
+                <div className="flex items-start gap-4">
+                  <div className="bg-green-100 p-2 rounded-full">
+                    <Leaf className="h-4 w-4 text-green-600" />
                   </div>
-                ))}
+                  <div>
+                    <p className="font-medium">New Farmer Registration</p>
+                    <p className="text-sm text-muted-foreground">Ramesh Yadav from Uttar Pradesh registered as a farmer</p>
+                    <p className="text-xs text-muted-foreground mt-1">10 minutes ago</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4">
+                  <div className="bg-blue-100 p-2 rounded-full">
+                    <Store className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">New Vendor Onboarded</p>
+                    <p className="text-sm text-muted-foreground">Metro Grocers from Chennai completed verification</p>
+                    <p className="text-xs text-muted-foreground mt-1">1 hour ago</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4">
+                  <div className="bg-purple-100 p-2 rounded-full">
+                    <ShoppingCart className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Large Order Placed</p>
+                    <p className="text-sm text-muted-foreground">Hotel Sunshine placed a bulk order worth ₹45,000</p>
+                    <p className="text-xs text-muted-foreground mt-1">2 hours ago</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4">
+                  <div className="bg-amber-100 p-2 rounded-full">
+                    <MessageSquare className="h-4 w-4 text-amber-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Support Ticket Resolved</p>
+                    <p className="text-sm text-muted-foreground">Payment issue for vendor ID #V2345 has been resolved</p>
+                    <p className="text-xs text-muted-foreground mt-1">3 hours ago</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
-            <CardFooter className="border-t bg-gray-50 rounded-b-lg">
-              <Button variant="ghost" size="sm" className="ml-auto">
-                View All Activities
-              </Button>
-            </CardFooter>
           </Card>
         </TabsContent>
         
-        <TabsContent value="farmers" className="space-y-4 mt-0">
-          <Card className="shadow-sm">
+        <TabsContent value="farmers" className="space-y-4">
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Registered Farmers</CardTitle>
                   <CardDescription>Complete list of farmers on the platform</CardDescription>
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="h-8 gap-1"
-                  onClick={() => exportData('Farmers')}
-                >
-                  <Download className="h-4 w-4" />
+                <Button variant="outline" size="sm" className="h-8 gap-1">
+                  <BarChart className="h-4 w-4" />
                   Export Data
                 </Button>
               </div>
@@ -548,7 +402,7 @@ const AdminDashboard = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredFarmers.map((farmer, index) => (
+                  {farmers.map((farmer, index) => (
                     <TableRow key={index}>
                       <TableCell className="font-medium">{farmer.name}</TableCell>
                       <TableCell>{farmer.region}</TableCell>
@@ -567,30 +421,19 @@ const AdminDashboard = () => {
                 </TableBody>
               </Table>
             </CardContent>
-            <CardFooter className="border-t bg-gray-50 rounded-b-lg">
-              <div className="flex items-center justify-between w-full">
-                <p className="text-sm text-muted-foreground">Showing {filteredFarmers.length} of {farmers.length} farmers</p>
-                <Button variant="ghost" size="sm">Load More</Button>
-              </div>
-            </CardFooter>
           </Card>
         </TabsContent>
         
-        <TabsContent value="vendors" className="space-y-4 mt-0">
-          <Card className="shadow-sm">
+        <TabsContent value="vendors" className="space-y-4">
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Registered Vendors</CardTitle>
                   <CardDescription>Complete list of vendors on the platform</CardDescription>
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="h-8 gap-1"
-                  onClick={() => exportData('Vendors')}
-                >
-                  <Download className="h-4 w-4" />
+                <Button variant="outline" size="sm" className="h-8 gap-1">
+                  <BarChart className="h-4 w-4" />
                   Export Data
                 </Button>
               </div>
@@ -608,7 +451,7 @@ const AdminDashboard = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredVendors.map((vendor, index) => (
+                  {vendors.map((vendor, index) => (
                     <TableRow key={index}>
                       <TableCell className="font-medium">{vendor.name}</TableCell>
                       <TableCell>{vendor.location}</TableCell>
@@ -627,30 +470,19 @@ const AdminDashboard = () => {
                 </TableBody>
               </Table>
             </CardContent>
-            <CardFooter className="border-t bg-gray-50 rounded-b-lg">
-              <div className="flex items-center justify-between w-full">
-                <p className="text-sm text-muted-foreground">Showing {filteredVendors.length} of {vendors.length} vendors</p>
-                <Button variant="ghost" size="sm">Load More</Button>
-              </div>
-            </CardFooter>
           </Card>
         </TabsContent>
         
-        <TabsContent value="consumers" className="space-y-4 mt-0">
-          <Card className="shadow-sm">
+        <TabsContent value="consumers" className="space-y-4">
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Registered Consumers</CardTitle>
                   <CardDescription>Complete list of consumers on the platform</CardDescription>
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="h-8 gap-1"
-                  onClick={() => exportData('Consumers')}
-                >
-                  <Download className="h-4 w-4" />
+                <Button variant="outline" size="sm" className="h-8 gap-1">
+                  <BarChart className="h-4 w-4" />
                   Export Data
                 </Button>
               </div>
@@ -668,7 +500,7 @@ const AdminDashboard = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredConsumers.map((consumer, index) => (
+                  {consumers.map((consumer, index) => (
                     <TableRow key={index}>
                       <TableCell className="font-medium">{consumer.name}</TableCell>
                       <TableCell>{consumer.location}</TableCell>
@@ -687,29 +519,18 @@ const AdminDashboard = () => {
                 </TableBody>
               </Table>
             </CardContent>
-            <CardFooter className="border-t bg-gray-50 rounded-b-lg">
-              <div className="flex items-center justify-between w-full">
-                <p className="text-sm text-muted-foreground">Showing {filteredConsumers.length} of {consumers.length} consumers</p>
-                <Button variant="ghost" size="sm">Load More</Button>
-              </div>
-            </CardFooter>
           </Card>
         </TabsContent>
         
-        <TabsContent value="market" className="space-y-4 mt-0">
-          <Card className="shadow-sm">
+        <TabsContent value="market" className="space-y-4">
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Commodity Prices</CardTitle>
                   <CardDescription>Current market rates of major agricultural products</CardDescription>
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="h-8 gap-1"
-                  onClick={() => exportData('Market Prices')}
-                >
+                <Button variant="outline" size="sm" className="h-8 gap-1">
                   <BarChart className="h-4 w-4" />
                   View Analytics
                 </Button>
@@ -727,7 +548,7 @@ const AdminDashboard = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredProducts.map((product, index) => (
+                  {products.map((product, index) => (
                     <TableRow key={index}>
                       <TableCell className="font-semibold">{product.name}</TableCell>
                       <TableCell>{product.price}</TableCell>
@@ -750,15 +571,287 @@ const AdminDashboard = () => {
                 </TableBody>
               </Table>
             </CardContent>
-            <CardFooter className="border-t bg-gray-50 rounded-b-lg">
-              <div className="flex items-center justify-between w-full">
-                <p className="text-sm text-muted-foreground">Showing {filteredProducts.length} of {products.length} products</p>
-                <Button variant="ghost" size="sm">Load More</Button>
-              </div>
-            </CardFooter>
           </Card>
         </TabsContent>
-      </div>
+
+        <TabsContent value="chats" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Chatbot Conversations</CardTitle>
+                  <CardDescription>View user interactions with our AI assistants</CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Tabs value={chatSource} onValueChange={setChatSource} className="w-full">
+                    <TabsList>
+                      <TabsTrigger value="krishiMitra">KrishiMitra</TabsTrigger>
+                      <TabsTrigger value="fastbots">FastBots</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {chatSource === "krishiMitra" ? (
+                <>
+                  <Tabs defaultValue="all">
+                    <TabsList className="w-full grid grid-cols-4 mb-4">
+                      <TabsTrigger value="all">All</TabsTrigger>
+                      <TabsTrigger value="farmers">Farmers</TabsTrigger>
+                      <TabsTrigger value="vendors">Vendors</TabsTrigger>
+                      <TabsTrigger value="consumers">Consumers</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="all">
+                      <div className="max-h-96 overflow-y-auto space-y-3">
+                        {chatHistory.krishiMitra && chatHistory.krishiMitra.length > 0 ? (
+                          chatHistory.krishiMitra.map((msg, idx) => (
+                            <div 
+                              key={idx} 
+                              className={`p-3 rounded-lg ${
+                                msg.role === 'user' 
+                                  ? 'bg-gray-100' 
+                                  : 'bg-[#E9F7E2]'
+                              }`}
+                            >
+                              <div className="text-xs text-gray-500">
+                                {msg.timestamp ? new Date(msg.timestamp).toLocaleString() : 'Unknown time'}
+                              </div>
+                              <div className="mt-1 flex gap-2">
+                                {msg.role === 'assistant' ? <Bot className="h-4 w-4 mt-1 flex-shrink-0" /> : null}
+                                <span>{msg.content}</span>
+                                {msg.role === 'user' ? <User className="h-4 w-4 mt-1 flex-shrink-0" /> : null}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center text-gray-500 py-8">
+                            No KrishiMitra conversations found
+                          </div>
+                        )}
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="farmers">
+                      <div className="max-h-96 overflow-y-auto space-y-3">
+                        {chatHistory.krishiMitra && chatHistory.krishiMitra.filter(m => m.category === 'farmers').length > 0 ? (
+                          chatHistory.krishiMitra.filter(m => m.category === 'farmers').map((msg, idx) => (
+                            <div 
+                              key={idx} 
+                              className={`p-3 rounded-lg ${
+                                msg.role === 'user' 
+                                  ? 'bg-gray-100' 
+                                  : 'bg-[#E9F7E2]'
+                              }`}
+                            >
+                              <div className="text-xs text-gray-500">
+                                {msg.timestamp ? new Date(msg.timestamp).toLocaleString() : 'Unknown time'}
+                              </div>
+                              <div className="mt-1 flex gap-2">
+                                {msg.role === 'assistant' ? <Bot className="h-4 w-4 mt-1 flex-shrink-0" /> : null}
+                                <span>{msg.content}</span>
+                                {msg.role === 'user' ? <User className="h-4 w-4 mt-1 flex-shrink-0" /> : null}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center text-gray-500 py-8">
+                            No farmer-related KrishiMitra conversations found
+                          </div>
+                        )}
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="vendors">
+                      <div className="max-h-96 overflow-y-auto space-y-3">
+                        {chatHistory.krishiMitra && chatHistory.krishiMitra.filter(m => m.category === 'vendors').length > 0 ? (
+                          chatHistory.krishiMitra.filter(m => m.category === 'vendors').map((msg, idx) => (
+                            <div 
+                              key={idx} 
+                              className={`p-3 rounded-lg ${
+                                msg.role === 'user' 
+                                  ? 'bg-gray-100' 
+                                  : 'bg-[#E9F7E2]'
+                              }`}
+                            >
+                              <div className="text-xs text-gray-500">
+                                {msg.timestamp ? new Date(msg.timestamp).toLocaleString() : 'Unknown time'}
+                              </div>
+                              <div className="mt-1 flex gap-2">
+                                {msg.role === 'assistant' ? <Bot className="h-4 w-4 mt-1 flex-shrink-0" /> : null}
+                                <span>{msg.content}</span>
+                                {msg.role === 'user' ? <User className="h-4 w-4 mt-1 flex-shrink-0" /> : null}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center text-gray-500 py-8">
+                            No vendor-related KrishiMitra conversations found
+                          </div>
+                        )}
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="consumers">
+                      <div className="max-h-96 overflow-y-auto space-y-3">
+                        {chatHistory.krishiMitra && chatHistory.krishiMitra.filter(m => m.category === 'consumers').length > 0 ? (
+                          chatHistory.krishiMitra.filter(m => m.category === 'consumers').map((msg, idx) => (
+                            <div 
+                              key={idx} 
+                              className={`p-3 rounded-lg ${
+                                msg.role === 'user' 
+                                  ? 'bg-gray-100' 
+                                  : 'bg-[#E9F7E2]'
+                              }`}
+                            >
+                              <div className="text-xs text-gray-500">
+                                {msg.timestamp ? new Date(msg.timestamp).toLocaleString() : 'Unknown time'}
+                              </div>
+                              <div className="mt-1 flex gap-2">
+                                {msg.role === 'assistant' ? <Bot className="h-4 w-4 mt-1 flex-shrink-0" /> : null}
+                                <span>{msg.content}</span>
+                                {msg.role === 'user' ? <User className="h-4 w-4 mt-1 flex-shrink-0" /> : null}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center text-gray-500 py-8">
+                            No consumer-related KrishiMitra conversations found
+                          </div>
+                        )}
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </>
+              ) : (
+                <>
+                  <Tabs defaultValue="all">
+                    <TabsList className="w-full grid grid-cols-4 mb-4">
+                      <TabsTrigger value="all">All</TabsTrigger>
+                      <TabsTrigger value="farmers">Farmers</TabsTrigger>
+                      <TabsTrigger value="vendors">Vendors</TabsTrigger>
+                      <TabsTrigger value="consumers">Consumers</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="all">
+                      <div className="max-h-96 overflow-y-auto space-y-3">
+                        {chatHistory.fastbots && chatHistory.fastbots.all.length > 0 ? (
+                          chatHistory.fastbots.all.map((msg, idx) => (
+                            <div 
+                              key={idx} 
+                              className={`p-3 rounded-lg ${
+                                msg.sender === 'user' 
+                                  ? 'bg-gray-100' 
+                                  : 'bg-[#E9F7E2]'
+                              }`}
+                            >
+                              <div className="text-xs text-gray-500">
+                                {msg.timestamp ? new Date(msg.timestamp).toLocaleString() : 'Unknown time'}
+                              </div>
+                              <div className="mt-1">
+                                {msg.text}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center text-gray-500 py-8">
+                            No FastBots conversations found
+                          </div>
+                        )}
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="farmers">
+                      <div className="max-h-96 overflow-y-auto space-y-3">
+                        {chatHistory.fastbots && chatHistory.fastbots.farmers.length > 0 ? (
+                          chatHistory.fastbots.farmers.map((msg, idx) => (
+                            <div 
+                              key={idx} 
+                              className={`p-3 rounded-lg ${
+                                msg.sender === 'user' 
+                                  ? 'bg-gray-100' 
+                                  : 'bg-[#E9F7E2]'
+                              }`}
+                            >
+                              <div className="text-xs text-gray-500">
+                                {msg.timestamp ? new Date(msg.timestamp).toLocaleString() : 'Unknown time'}
+                              </div>
+                              <div className="mt-1">
+                                {msg.text}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center text-gray-500 py-8">
+                            No farmer-related FastBots conversations found
+                          </div>
+                        )}
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="vendors">
+                      <div className="max-h-96 overflow-y-auto space-y-3">
+                        {chatHistory.fastbots && chatHistory.fastbots.vendors.length > 0 ? (
+                          chatHistory.fastbots.vendors.map((msg, idx) => (
+                            <div 
+                              key={idx} 
+                              className={`p-3 rounded-lg ${
+                                msg.sender === 'user' 
+                                  ? 'bg-gray-100' 
+                                  : 'bg-[#E9F7E2]'
+                              }`}
+                            >
+                              <div className="text-xs text-gray-500">
+                                {msg.timestamp ? new Date(msg.timestamp).toLocaleString() : 'Unknown time'}
+                              </div>
+                              <div className="mt-1">
+                                {msg.text}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center text-gray-500 py-8">
+                            No vendor-related FastBots conversations found
+                          </div>
+                        )}
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="consumers">
+                      <div className="max-h-96 overflow-y-auto space-y-3">
+                        {chatHistory.fastbots && chatHistory.fastbots.consumers.length > 0 ? (
+                          chatHistory.fastbots.consumers.map((msg, idx) => (
+                            <div 
+                              key={idx} 
+                              className={`p-3 rounded-lg ${
+                                msg.sender === 'user' 
+                                  ? 'bg-gray-100' 
+                                  : 'bg-[#E9F7E2]'
+                              }`}
+                            >
+                              <div className="text-xs text-gray-500">
+                                {msg.timestamp ? new Date(msg.timestamp).toLocaleString() : 'Unknown time'}
+                              </div>
+                              <div className="mt-1">
+                                {msg.text}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center text-gray-500 py-8">
+                            No consumer-related FastBots conversations found
+                          </div>
+                        )}
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
