@@ -72,14 +72,61 @@ const removeLoadingIndicator = () => {
   }
 };
 
+// Set up application cache
+const setupAppCache = () => {
+  if ('caches' in window) {
+    // Create and open a cache storage
+    caches.open('annadata-app-cache-v1').then(cache => {
+      // Pre-cache important assets
+      const urlsToCache = [
+        '/',
+        '/index.html',
+        '/src/index.css',
+        '/src/App.tsx',
+        '/src/main.tsx'
+      ];
+      return cache.addAll(urlsToCache);
+    }).catch(error => {
+      console.warn('Caching failed:', error);
+    });
+  }
+};
+
 // Show loading indicator
 showLoadingIndicator();
+
+// Setup caching
+setupAppCache();
 
 // Optimize font and resource loading with Promise.all for concurrent loading
 const preloadResources = () => {
   const resources = [];
   
-  // Preload fonts
+  // Cache lookup for images before fetching
+  const checkCacheAndLoad = (url) => {
+    if ('caches' in window) {
+      return caches.match(url).then(response => {
+        if (response) {
+          return response; // Return from cache if exists
+        }
+        // Otherwise load and store in cache
+        return fetch(url, { cache: 'force-cache' }).then(res => {
+          if (res.ok) {
+            const cloneRes = res.clone();
+            caches.open('annadata-app-cache-v1').then(cache => {
+              cache.put(url, cloneRes);
+            });
+          }
+          return res;
+        });
+      });
+    } else {
+      // Fallback for browsers without cache API
+      return fetch(url, { cache: 'force-cache' });
+    }
+  };
+  
+  // Preload fonts with high priority
   const fontPreloadLinks = [
     { href: '/fonts/font1.woff2', type: 'font/woff2', crossOrigin: 'anonymous' },
     { href: '/fonts/font2.woff2', type: 'font/woff2', crossOrigin: 'anonymous' }
@@ -115,15 +162,15 @@ const preloadResources = () => {
       img.onerror = resolve; // Don't block if image fails
       img.src = url;
     }));
+    
+    // Also cache the image
+    checkCacheAndLoad(url);
   });
   
   // Preload map resources if available
   if (typeof mapboxgl !== 'undefined') {
     resources.push(
-      fetch('https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js', { 
-        method: 'HEAD',
-        cache: 'force-cache'
-      }).catch(() => {})
+      checkCacheAndLoad('https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js')
     );
   }
   
@@ -141,9 +188,10 @@ const mountApp = async () => {
     // Create root with performance optimizations
     const rootElement = document.getElementById("root")!;
     
-    // Apply GPU acceleration
+    // Enable hardware acceleration
     rootElement.style.setProperty('transform', 'translateZ(0)');
     rootElement.style.setProperty('backface-visibility', 'hidden');
+    rootElement.style.setProperty('will-change', 'transform');
     
     // Create root with concurrent mode 
     const root = createRoot(rootElement);
@@ -151,10 +199,33 @@ const mountApp = async () => {
     // Render app
     root.render(<App />);
     
+    // Enable local storage caching for React components
+    if (window.localStorage) {
+      // Set up a cache time limit (24 hours)
+      const CACHE_EXPIRATION = 24 * 60 * 60 * 1000; 
+      
+      // Create cache for API responses
+      window.addEventListener('beforeunload', () => {
+        // Store timestamp for cache invalidation
+        localStorage.setItem('annadata-cache-timestamp', Date.now().toString());
+      });
+      
+      // Check cache validity when loaded
+      const timestamp = localStorage.getItem('annadata-cache-timestamp');
+      if (timestamp && (Date.now() - parseInt(timestamp, 10)) > CACHE_EXPIRATION) {
+        // Clear cache if expired
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('annadata-cache-')) {
+            localStorage.removeItem(key);
+          }
+        });
+      }
+    }
+    
     // Wait for resources to load, but with a timeout
     Promise.race([
       preloadPromise,
-      new Promise(resolve => setTimeout(resolve, 800)) // Don't wait forever
+      new Promise(resolve => setTimeout(resolve, 600)) // Slightly shorter timeout for faster perceived performance
     ]).then(() => {
       // Remove loading indicator
       requestAnimationFrame(() => {
@@ -172,5 +243,20 @@ const mountApp = async () => {
   }
 };
 
-// Start mounting immediately
-mountApp();
+// Register a service worker for caching
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(registration => {
+        console.log('ServiceWorker registration successful');
+      })
+      .catch(error => {
+        console.log('ServiceWorker registration failed:', error);
+      });
+  });
+}
+
+// Start mounting immediately with requestAnimationFrame for smoother loading
+requestAnimationFrame(() => {
+  mountApp();
+});

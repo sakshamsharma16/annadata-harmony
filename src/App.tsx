@@ -9,8 +9,8 @@ import AppNavbar from "./components/AppNavbar";
 import EnhancedFooter from "./components/EnhancedFooter";
 import KrishiMitra from "./components/KrishiMitra";
 import FastBotsChat from "./components/FastBotsChat";
+import AdminDashboard from "./components/AdminDashboard";
 
-// Lazy load pages to improve initial load time
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const FarmerDashboard = lazy(() => import("./pages/dashboards/FarmerDashboard"));
@@ -25,25 +25,21 @@ const CropHealthDashboard = lazy(() => import("./pages/agriculture/CropHealthDas
 const Login = lazy(() => import("./pages/auth/Login"));
 const Register = lazy(() => import("./pages/auth/Register"));
 
-// Add a loading spinner component
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center min-h-screen">
     <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-[#138808] border-t-transparent"></div>
   </div>
 );
 
-// Layout component to handle logic for showing/hiding navbar and footer
 const AppLayout = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    // Simulate checking if resources are loaded
     const timer = setTimeout(() => setIsLoading(false), 500);
     return () => clearTimeout(timer);
   }, []);
   
-  // Determine if the current route is an auth page to hide navbar/footer
   const isAuthRoute = location.pathname === "/login" || 
                      location.pathname === "/register" || 
                      location.pathname === "/forgot-password";
@@ -70,12 +66,12 @@ const AppLayout = () => {
             <Route path="/vendor/marketplace" element={<Marketplace />} />
             <Route path="/consumer/nearby-vendors" element={<NearbyVendors />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/market-prices" element={<AdminDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </main>
       {!isAuthRoute && <EnhancedFooter />}
-      <KrishiMitra />
     </div>
   );
 };
@@ -83,18 +79,16 @@ const AppLayout = () => {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60 * 1000, // Cache data for 1 minute
-      refetchOnWindowFocus: false, // Disable automatic refetch on window focus
-      retry: 1, // Reduce retry attempts
+      staleTime: 60 * 1000,
+      refetchOnWindowFocus: false,
+      retry: 1,
     },
   },
 });
 
 const App = () => {
-  // Add a state for controlling which chatbot to show
   const [useFastBots, setUseFastBots] = useState(true);
 
-  // Check for preference in localStorage on mount
   useEffect(() => {
     const preference = localStorage.getItem('preferredChatbot');
     if (preference === 'krishiMitra') {
@@ -103,6 +97,16 @@ const App = () => {
       setUseFastBots(true);
     }
   }, []);
+
+  useEffect(() => {
+    if (useFastBots && window.FastBots) {
+      window.FastBots.init({
+        rasaProLicenseToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0MmRkMTRhZC1kMmVkLTRlZTItODJkNS0xNTliZjFjMjM0NDUiLCJpYXQiOjE3NDIzMTk3ODgsIm5iZiI6MTc0MjMxOTc4OCwic2NvcGUiOiJyYXNhOnBybyByYXNhOnBybzpjaGFtcGlvbiByYXNhOnZvaWNlIiwiZXhwIjoxODM3MDE0MTg4LCJlbWFpbCI6ImtycmlzaGdhdXIwMDAwQGdtYWlsLmNvbSIsImNvbXBhbnkiOiJSYXNhIENoYW1waW9ucyJ9.di37RXJshZJvCgau0W-XVhnnYldGY23TC_suNb_hHaKSTHMIXr93-NdElWVt_3-JdJjVtU8GABKCmYqAkIdPTnOHYHbq8oUVxGNwvaY9OcL3toxLa-RNbdb3O4i_0-CC8lDtJgBLZNfuLEF1P3L_l8K9Dj9wBIxniUehySnMTQMroH6pmgf9VPGkvae9NzQPXoj6YJMlt2eLe_jODw7gt4olpy6mSp-jRVe56tzWNmPlSYmEfLs7UraI7dgbMM3kXINicCyJy1bhffebWnFH6Q5_NSkItiEDqE6FmEg_xSpVtHVGQN5n7Dusf0gp3ioXnsQA-RuP88wtOCv83LtpBg",
+        multilingual: true,
+        voiceEnabled: true
+      });
+    }
+  }, [useFastBots]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -114,13 +118,11 @@ const App = () => {
             <AppLayout />
           </BrowserRouter>
           
-          {/* Only render one chatbot at a time based on preference */}
           {useFastBots ? (
             <FastBotsChat botId="cm4bojr9l0j5zsvbm6faemmyn" />
           ) : (
             <KrishiMitra />
           )}
-          
         </TooltipProvider>
       </LanguageProvider>
     </QueryClientProvider>
