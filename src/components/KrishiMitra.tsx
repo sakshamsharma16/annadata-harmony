@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Mic, Send, Bot, User, Loader2, ClipboardList, X } from "lucide-react";
+import { Mic, Send, Bot, User, Loader2, ClipboardList, X, Globe, Languages } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -319,14 +319,29 @@ const KrishiMitra = () => {
     return t("type.your.message");
   };
 
+  // Get chat history title based on language
+  const getChatTitle = () => {
+    switch (language) {
+      case 'hindi':
+        return "संवाद इतिहास";
+      case 'punjabi':
+        return "ਗੱਲਬਾਤ ਇਤਿਹਾਸ";
+      default:
+        return "Conversation History";
+    }
+  };
+
   return (
     <div className="fixed bottom-6 left-6 z-50">
       {/* Chat History Panel */}
       {isHistoryOpen && (
-        <div className="fixed left-20 bottom-24 z-50 w-80 md:w-96 bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="fixed left-20 bottom-24 z-50 w-80 md:w-96 bg-white rounded-lg shadow-lg overflow-hidden animate-fade-in">
           <Card>
             <CardHeader className="bg-[#138808] text-white py-2 px-4 flex flex-row justify-between items-center">
-              <CardTitle className="text-lg">Conversation History</CardTitle>
+              <CardTitle className="text-lg flex items-center">
+                <ClipboardList className="h-4 w-4 mr-2" />
+                {getChatTitle()}
+              </CardTitle>
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -360,8 +375,14 @@ const KrishiMitra = () => {
                           <div className="text-xs text-gray-500">
                             {new Date(msg.timestamp).toLocaleString()}
                           </div>
-                          <div className="mt-1">
-                            {msg.content}
+                          <div className="mt-1 flex gap-2">
+                            {msg.role === 'assistant' && (
+                              <Bot className="h-4 w-4 mt-1 flex-shrink-0" />
+                            )}
+                            <span>{msg.content}</span>
+                            {msg.role === 'user' && (
+                              <User className="h-4 w-4 mt-1 flex-shrink-0" />
+                            )}
                           </div>
                         </div>
                       ))}
@@ -373,89 +394,41 @@ const KrishiMitra = () => {
                   )}
                 </TabsContent>
 
-                <TabsContent value="farmers" className="p-0 max-h-96 overflow-y-auto">
-                  {getFilteredMessages("farmers").length > 0 ? (
-                    <div className="p-4 space-y-3">
-                      {getFilteredMessages("farmers").map((msg, index) => (
-                        <div 
-                          key={index} 
-                          className={`p-3 rounded-lg ${
-                            msg.role === 'user' 
-                              ? 'bg-gray-100 ml-4 mr-1' 
-                              : 'bg-[#E9F7E2] ml-1 mr-4'
-                          }`}
-                        >
-                          <div className="text-xs text-gray-500">
-                            {new Date(msg.timestamp).toLocaleString()}
+                {["farmers", "vendors", "consumers"].map((category) => (
+                  <TabsContent key={category} value={category} className="p-0 max-h-96 overflow-y-auto">
+                    {getFilteredMessages(category).length > 0 ? (
+                      <div className="p-4 space-y-3">
+                        {getFilteredMessages(category).map((msg, index) => (
+                          <div 
+                            key={index} 
+                            className={`p-3 rounded-lg ${
+                              msg.role === 'user' 
+                                ? 'bg-gray-100 ml-4 mr-1' 
+                                : 'bg-[#E9F7E2] ml-1 mr-4'
+                            }`}
+                          >
+                            <div className="text-xs text-gray-500">
+                              {new Date(msg.timestamp).toLocaleString()}
+                            </div>
+                            <div className="mt-1 flex gap-2">
+                              {msg.role === 'assistant' && (
+                                <Bot className="h-4 w-4 mt-1 flex-shrink-0" />
+                              )}
+                              <span>{msg.content}</span>
+                              {msg.role === 'user' && (
+                                <User className="h-4 w-4 mt-1 flex-shrink-0" />
+                              )}
+                            </div>
                           </div>
-                          <div className="mt-1">
-                            {msg.content}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-8 text-center text-gray-500">
-                      No farmer-related conversations yet.
-                    </div>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="vendors" className="p-0 max-h-96 overflow-y-auto">
-                  {getFilteredMessages("vendors").length > 0 ? (
-                    <div className="p-4 space-y-3">
-                      {getFilteredMessages("vendors").map((msg, index) => (
-                        <div 
-                          key={index} 
-                          className={`p-3 rounded-lg ${
-                            msg.role === 'user' 
-                              ? 'bg-gray-100 ml-4 mr-1' 
-                              : 'bg-[#E9F7E2] ml-1 mr-4'
-                          }`}
-                        >
-                          <div className="text-xs text-gray-500">
-                            {new Date(msg.timestamp).toLocaleString()}
-                          </div>
-                          <div className="mt-1">
-                            {msg.content}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-8 text-center text-gray-500">
-                      No vendor-related conversations yet.
-                    </div>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="consumers" className="p-0 max-h-96 overflow-y-auto">
-                  {getFilteredMessages("consumers").length > 0 ? (
-                    <div className="p-4 space-y-3">
-                      {getFilteredMessages("consumers").map((msg, index) => (
-                        <div 
-                          key={index} 
-                          className={`p-3 rounded-lg ${
-                            msg.role === 'user' 
-                              ? 'bg-gray-100 ml-4 mr-1' 
-                              : 'bg-[#E9F7E2] ml-1 mr-4'
-                          }`}
-                        >
-                          <div className="text-xs text-gray-500">
-                            {new Date(msg.timestamp).toLocaleString()}
-                          </div>
-                          <div className="mt-1">
-                            {msg.content}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-8 text-center text-gray-500">
-                      No consumer-related conversations yet.
-                    </div>
-                  )}
-                </TabsContent>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-8 text-center text-gray-500">
+                        No {category}-related conversations yet.
+                      </div>
+                    )}
+                  </TabsContent>
+                ))}
               </Tabs>
             </CardContent>
           </Card>
@@ -467,18 +440,30 @@ const KrishiMitra = () => {
           <Button
             onClick={toggleHistory}
             size="icon"
-            className="rounded-full bg-white text-[#138808] border border-[#138808] shadow-md hover:bg-gray-100"
+            className="rounded-full bg-white text-[#138808] border border-[#138808] shadow-md hover:bg-gray-100 transition-transform duration-200 hover:scale-105"
           >
             <ClipboardList className="h-5 w-5" />
           </Button>
           
           <SheetTrigger asChild>
-            <Button 
-              size="icon" 
-              className="h-14 w-14 rounded-full shadow-lg bg-[#138808] hover:bg-[#138808]/90 transition-transform duration-300 hover:scale-105"
-            >
-              <Bot className="h-6 w-6 text-white" />
-            </Button>
+            <div className="relative">
+              <Button 
+                size="icon" 
+                className="h-14 w-14 rounded-full shadow-lg bg-[#138808] hover:bg-[#138808]/90 transition-transform duration-300 hover:scale-105"
+              >
+                <Bot className="h-6 w-6 text-white" />
+              </Button>
+              
+              {/* Multilingual badge */}
+              <span className="absolute -top-1 -right-1 bg-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-[#138808]">
+                <Globe className="h-4 w-4 text-[#138808]" />
+              </span>
+              
+              {/* "Your Personal Assistant" floating label */}
+              <div className="absolute bottom-full mb-2 left-0 bg-white px-3 py-1 rounded-full shadow-md text-xs font-medium text-[#138808] whitespace-nowrap border border-[#138808]">
+                Your Personal Assistant
+              </div>
+            </div>
           </SheetTrigger>
         </div>
 
@@ -490,6 +475,10 @@ const KrishiMitra = () => {
             <SheetTitle className="flex items-center gap-2 text-[#138808]">
               <Bot className="h-5 w-5" />
               {getBotTitle()}
+              <div className="flex items-center bg-[#E9F7E2] rounded-full px-2 py-0.5 text-xs font-medium text-[#138808] ml-2">
+                <Globe className="h-3 w-3 mr-1" />
+                Multilingual
+              </div>
             </SheetTitle>
             <SheetDescription>
               {getBotDescription()}

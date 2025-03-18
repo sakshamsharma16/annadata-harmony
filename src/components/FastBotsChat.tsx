@@ -1,15 +1,28 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ClipboardList, MessageCircle, X } from "lucide-react";
+import { ClipboardList, MessageCircle, X, Globe, Bot, Languages } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ScriptLoader from "@/components/ui/script-loader";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FastBotsChatProps {
-  botId: string;
+  botId?: string;
 }
 
-const FastBotsChat = ({ botId }: FastBotsChatProps) => {
+// Extend the window interface to include FastBots
+declare global {
+  interface Window {
+    FastBots?: {
+      init: (options: any) => void;
+      open: () => void;
+      close: () => void;
+    };
+  }
+}
+
+const FastBotsChat = ({ botId = "cm4bojr9l0j5zsvbm6faemmyn" }: FastBotsChatProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [chatHistory, setChatHistory] = useState<{[key: string]: any[]}>({
@@ -19,31 +32,11 @@ const FastBotsChat = ({ botId }: FastBotsChatProps) => {
     consumers: []
   });
   const [activeHistoryTab, setActiveHistoryTab] = useState("all");
+  const { language, t } = useLanguage();
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Initialize FastBots with Rasa Pro token
+  // Initialize FastBots with the provided botId
   useEffect(() => {
-    const loadFastBots = () => {
-      const script = document.createElement("script");
-      script.src = "https://app.fastbots.ai/embed.js";
-      script.async = true;
-      script.onload = () => {
-        if (window.FastBots) {
-          window.FastBots.init({
-            rasaProLicenseToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0MmRkMTRhZC1kMmVkLTRlZTItODJkNS0xNTliZjFjMjM0NDUiLCJpYXQiOjE3NDIzMTk3ODgsIm5iZiI6MTc0MjMxOTc4OCwic2NvcGUiOiJyYXNhOnBybyByYXNhOnBybzpjaGFtcGlvbiByYXNhOnZvaWNlIiwiZXhwIjoxODM3MDE0MTg4LCJlbWFpbCI6ImtycmlzaGdhdXIwMDAwQGdtYWlsLmNvbSIsImNvbXBhbnkiOiJSYXNhIENoYW1waW9ucyJ9.di37RXJshZJvCgau0W-XVhnnYldGY23TC_suNb_hHaKSTHMIXr93-NdElWVt_3-JdJjVtU8GABKCmYqAkIdPTnOHYHbq8oUVxGNwvaY9OcL3toxLa-RNbdb3O4i_0-CC8lDtJgBLZNfuLEF1P3L_l8K9Dj9wBIxniUehySnMTQMroH6pmgf9VPGkvae9NzQPXoj6YJMlt2eLe_jODw7gt4olpy6mSp-jRVe56tzWNmPlSYmEfLs7UraI7dgbMM3kXINicCyJy1bhffebWnFH6Q5_NSkItiEDqE6FmEg_xSpVtHVGQN5n7Dusf0gp3ioXnsQA-RuP88wtOCv83LtpBg",
-            multilingual: true,
-            voiceEnabled: true
-          });
-        }
-      };
-      document.body.appendChild(script);
-
-      return () => {
-        document.body.removeChild(script);
-      };
-    };
-
-    loadFastBots();
-
     // Set up message listener for chat history
     window.addEventListener('message', handleChatMessages);
     
@@ -51,6 +44,35 @@ const FastBotsChat = ({ botId }: FastBotsChatProps) => {
       window.removeEventListener('message', handleChatMessages);
     };
   }, [botId]);
+
+  const handleScriptLoad = () => {
+    setIsLoaded(true);
+    if (window.FastBots) {
+      window.FastBots.init({
+        botId: botId,
+        rasaProLicenseToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0MmRkMTRhZC1kMmVkLTRlZTItODJkNS0xNTliZjFjMjM0NDUiLCJpYXQiOjE3NDIzMTk3ODgsIm5iZiI6MTc0MjMxOTc4OCwic2NvcGUiOiJyYXNhOnBybyByYXNhOnBybzpjaGFtcGlvbiByYXNhOnZvaWNlIiwiZXhwIjoxODM3MDE0MTg4LCJlbWFpbCI6ImtycmlzaGdhdXIwMDAwQGdtYWlsLmNvbSIsImNvbXBhbnkiOiJSYXNhIENoYW1waW9ucyJ9.di37RXJshZJvCgau0W-XVhnnYldGY23TC_suNb_hHaKSTHMIXr93-NdElWVt_3-JdJjVtU8GABKCmYqAkIdPTnOHYHbq8oUVxGNwvaY9OcL3toxLa-RNbdb3O4i_0-CC8lDtJgBLZNfuLEF1P3L_l8K9Dj9wBIxniUehySnMTQMroH6pmgf9VPGkvae9NzQPXoj6YJMlt2eLe_jODw7gt4olpy6mSp-jRVe56tzWNmPlSYmEfLs7UraI7dgbMM3kXINicCyJy1bhffebWnFH6Q5_NSkItiEDqE6FmEg_xSpVtHVGQN5n7Dusf0gp3ioXnsQA-RuP88wtOCv83LtpBg",
+        multilingual: true,
+        voiceEnabled: true,
+        theme: {
+          primaryColor: "#215f33",
+          secondaryColor: "#e9f7e2",
+          chatWindowBackground: "#ffffff",
+          userMessageBackground: "#215f33",
+          userMessageTextColor: "#ffffff",
+          botMessageBackground: "#e9f7e2",
+          botMessageTextColor: "#333333",
+          fontFamily: "Inter, system-ui, sans-serif",
+          headerBackground: "#215f33",
+          headerTextColor: "#ffffff"
+        }
+      });
+      
+      // If chat was already open, make sure to reopen it
+      if (isOpen) {
+        window.FastBots.open();
+      }
+    }
+  };
 
   // Handle messages from FastBots to collect history
   const handleChatMessages = (event: MessageEvent) => {
@@ -104,14 +126,36 @@ const FastBotsChat = ({ botId }: FastBotsChatProps) => {
     setIsHistoryOpen((prev) => !prev);
   };
 
+  // Get appropriate title based on language
+  const getChatTitle = () => {
+    switch (language) {
+      case 'hindi':
+        return "संवाद इतिहास";
+      case 'punjabi':
+        return "ਗੱਲਬਾਤ ਇਤਿਹਾਸ";
+      default:
+        return "Conversation History";
+    }
+  };
+
   return (
     <>
+      {/* Load the FastBots script */}
+      <ScriptLoader 
+        src="https://app.fastbots.ai/embed.js" 
+        attributes={{ "data-bot-id": botId }}
+        onLoad={handleScriptLoad}
+      />
+
       {/* Chat History Panel */}
       {isHistoryOpen && (
-        <div className="fixed right-20 bottom-24 z-50 w-80 md:w-96 bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="fixed right-20 bottom-24 z-50 w-80 md:w-96 bg-white rounded-lg shadow-lg overflow-hidden animate-fade-in">
           <Card>
             <CardHeader className="bg-[#215f33] text-white py-2 px-4 flex flex-row justify-between items-center">
-              <CardTitle className="text-lg">Conversation History</CardTitle>
+              <CardTitle className="text-lg flex items-center">
+                <ClipboardList className="h-4 w-4 mr-2" />
+                {getChatTitle()}
+              </CardTitle>
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -170,18 +214,30 @@ const FastBotsChat = ({ botId }: FastBotsChatProps) => {
         <Button
           onClick={toggleHistory}
           size="icon"
-          className="rounded-full bg-white text-[#215f33] border border-[#215f33] shadow-md hover:bg-gray-100"
+          className="rounded-full bg-white text-[#215f33] border border-[#215f33] shadow-md hover:bg-gray-100 transition-transform duration-200 hover:scale-105"
         >
           <ClipboardList className="h-5 w-5" />
         </Button>
         
-        <Button
-          onClick={toggleChat}
-          size="icon"
-          className="rounded-full bg-[#215f33] hover:bg-[#184426] shadow-md"
-        >
-          <MessageCircle className="h-5 w-5" />
-        </Button>
+        <div className="relative">
+          <Button
+            onClick={toggleChat}
+            size="icon"
+            className="rounded-full w-14 h-14 bg-[#215f33] hover:bg-[#184426] shadow-md transition-transform duration-200 hover:scale-105 relative"
+          >
+            <Bot className="h-6 w-6 text-white" />
+            
+            {/* Multi-lingual indicator */}
+            <span className="absolute -top-1 -right-1 bg-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-[#215f33]">
+              <Globe className="h-4 w-4 text-[#215f33]" />
+            </span>
+          </Button>
+          
+          {/* "Your Personal Assistant" floating label */}
+          <div className="absolute bottom-full mb-2 right-0 bg-white px-3 py-1 rounded-full shadow-md text-xs font-medium text-[#215f33] whitespace-nowrap border border-[#215f33]">
+            Your Personal Assistant
+          </div>
+        </div>
       </div>
 
       {/* Preload the bot */}
