@@ -1,62 +1,21 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import LanguageSelector from "./LanguageSelector";
-import {
-  Bell,
-  Menu,
-  User,
-  ShoppingCart,
-  Leaf,
-  Settings,
-  LogOut,
-  ChevronRight,
-  Home,
-  Package,
-  Users,
-  Warehouse,
-  BarChart3,
-  MapPin,
-} from "lucide-react";
-
+import { Bell, Menu, User, ShoppingCart, Leaf, Settings, LogOut, ChevronRight, Home, Package, Users, Warehouse, BarChart3, MapPin } from "lucide-react";
 const AppNavbar = () => {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<"farmer" | "vendor" | "consumer" | null>(null);
-  
   useEffect(() => {
     if (location.pathname.includes("dashboard")) {
       setIsAuthenticated(true);
-      
       if (location.pathname.includes("farmer")) {
         setUserRole("farmer");
       } else if (location.pathname.includes("vendor")) {
@@ -69,7 +28,6 @@ const AppNavbar = () => {
       setUserRole(null);
     }
   }, [location]);
-  
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -78,25 +36,19 @@ const AppNavbar = () => {
         setScrolled(false);
       }
     };
-    
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  
   const dashboardLink = userRole ? `/dashboard/${userRole}` : "/";
-  
-  return (
-    <header
-      className={`sticky top-0 z-40 w-full transition-all duration-200 ${
-        scrolled ? "bg-white/95 backdrop-blur-sm shadow-sm" : "bg-[#F2FCE2]"
-      }`}
-    >
+  return <header className={`sticky top-0 z-40 w-full transition-all duration-200 ${scrolled ? "bg-white/95 backdrop-blur-sm shadow-sm" : "bg-[#F2FCE2]"}`}>
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2">
               <Leaf className="h-6 w-6 text-[#138808]" />
-              <span className="font-bold text-xl">ANNADATA</span>
+              <span className="font-bold text-xl">ANNADATA
+
+            </span>
             </Link>
             
             <div className="hidden md:flex ml-10">
@@ -108,10 +60,7 @@ const AppNavbar = () => {
                       <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
                         <li className="row-span-3">
                           <NavigationMenuLink asChild>
-                            <Link
-                              to="/dashboard/farmer"
-                              className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-green-50 to-green-100 p-6 no-underline outline-none focus:shadow-md"
-                            >
+                            <Link to="/dashboard/farmer" className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-green-50 to-green-100 p-6 no-underline outline-none focus:shadow-md">
                               <Leaf className="h-6 w-6 text-[#138808]" />
                               <div className="mb-2 mt-4 text-lg font-medium">
                                 Farmer Dashboard
@@ -156,10 +105,7 @@ const AppNavbar = () => {
                       <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
                         <li className="row-span-3">
                           <NavigationMenuLink asChild>
-                            <Link
-                              to="/dashboard/vendor"
-                              className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-amber-50 to-amber-100 p-6 no-underline outline-none focus:shadow-md"
-                            >
+                            <Link to="/dashboard/vendor" className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-amber-50 to-amber-100 p-6 no-underline outline-none focus:shadow-md">
                               <Warehouse className="h-6 w-6 text-[#FF9933]" />
                               <div className="mb-2 mt-4 text-lg font-medium">
                                 Vendor Dashboard
@@ -204,10 +150,7 @@ const AppNavbar = () => {
                       <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
                         <li className="row-span-3">
                           <NavigationMenuLink asChild>
-                            <Link
-                              to="/dashboard/consumer"
-                              className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-blue-50 to-blue-100 p-6 no-underline outline-none focus:shadow-md"
-                            >
+                            <Link to="/dashboard/consumer" className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-blue-50 to-blue-100 p-6 no-underline outline-none focus:shadow-md">
                               <Users className="h-6 w-6 text-[#0000FF]" />
                               <div className="mb-2 mt-4 text-lg font-medium">
                                 Consumer Dashboard
@@ -260,8 +203,7 @@ const AppNavbar = () => {
             {/* Add LanguageSelector here */}
             <LanguageSelector />
             
-            {isAuthenticated ? (
-              <>
+            {isAuthenticated ? <>
                 <Button variant="outline" size="icon" className="relative">
                   <Bell className="h-5 w-5" />
                   <Badge className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full p-0">
@@ -309,17 +251,14 @@ const AppNavbar = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </>
-            ) : (
-              <div className="hidden md:flex items-center gap-4">
+              </> : <div className="hidden md:flex items-center gap-4">
                 <Link to="/login">
                   <Button variant="outline">Login</Button>
                 </Link>
                 <Link to="/register">
                   <Button className="bg-[#138808] hover:bg-[#138808]/90">Register</Button>
                 </Link>
-              </div>
-            )}
+              </div>}
             
             <div className="md:hidden">
               <Sheet>
@@ -342,8 +281,7 @@ const AppNavbar = () => {
                         <LanguageSelector />
                       </div>
                       
-                      {isAuthenticated ? (
-                        <>
+                      {isAuthenticated ? <>
                           <div className="flex items-center gap-3 mb-4">
                             <Avatar className="h-9 w-9">
                               <AvatarImage src="https://randomuser.me/api/portraits/men/1.jpg" alt="User" />
@@ -362,17 +300,14 @@ const AppNavbar = () => {
                             </div>
                             <ChevronRight className="h-4 w-4" />
                           </Link>
-                        </>
-                      ) : (
-                        <div className="space-y-2 mb-6">
+                        </> : <div className="space-y-2 mb-6">
                           <Link to="/login">
                             <Button variant="outline" className="w-full">Login</Button>
                           </Link>
                           <Link to="/register">
                             <Button className="w-full bg-[#138808] hover:bg-[#138808]/90">Register</Button>
                           </Link>
-                        </div>
-                      )}
+                        </div>}
                       
                       <Link to="/" className="flex items-center rounded-md p-2 hover:bg-gray-100">
                         <Home className="mr-2 h-5 w-5" />
@@ -428,8 +363,6 @@ const AppNavbar = () => {
           </div>
         </div>
       </div>
-    </header>
-  );
+    </header>;
 };
-
 export default AppNavbar;
