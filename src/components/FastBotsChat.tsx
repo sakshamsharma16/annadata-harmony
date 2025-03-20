@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ClipboardList, MessageCircle, X, Globe, Bot, Languages } from "lucide-react";
@@ -9,17 +8,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FastBotsChatProps {
   botId?: string;
-}
-
-// Extend the window interface to include FastBots
-declare global {
-  interface Window {
-    FastBots?: {
-      init: (options: any) => void;
-      open: () => void;
-      close: () => void;
-    };
-  }
 }
 
 const FastBotsChat = ({ botId = "cm4bojr9l0j5zsvbm6faemmyn" }: FastBotsChatProps) => {
@@ -35,9 +23,7 @@ const FastBotsChat = ({ botId = "cm4bojr9l0j5zsvbm6faemmyn" }: FastBotsChatProps
   const { language, t } = useLanguage();
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Initialize FastBots with the provided botId
   useEffect(() => {
-    // Set up message listener for chat history
     window.addEventListener('message', handleChatMessages);
     
     return () => {
@@ -67,43 +53,34 @@ const FastBotsChat = ({ botId = "cm4bojr9l0j5zsvbm6faemmyn" }: FastBotsChatProps
         }
       });
       
-      // If chat was already open, make sure to reopen it
       if (isOpen) {
         window.FastBots.open();
       }
     }
   };
 
-  // Handle messages from FastBots to collect history
   const handleChatMessages = (event: MessageEvent) => {
-    // Check if the message is from FastBots and contains chat data
     if (event.data && event.data.type === 'fastbots_message') {
-      // Store the message in our history
       const newMessage = {
         text: event.data.message,
         timestamp: new Date().toISOString(),
         sender: event.data.sender || 'user',
-        role: event.data.role || 'all' // Default to 'all' if no role specified
+        role: event.data.role || 'all'
       };
       
-      // Update history in localStorage for persistence
       const storedHistory = JSON.parse(localStorage.getItem('fastbots_history') || '{"all":[],"farmers":[],"vendors":[],"consumers":[]}');
       
-      // Add to appropriate categories
       storedHistory.all.push(newMessage);
       if (newMessage.role === 'farmer') storedHistory.farmers.push(newMessage);
       if (newMessage.role === 'vendor') storedHistory.vendors.push(newMessage);
       if (newMessage.role === 'consumer') storedHistory.consumers.push(newMessage);
       
-      // Store back to localStorage
       localStorage.setItem('fastbots_history', JSON.stringify(storedHistory));
       
-      // Update state
       setChatHistory(storedHistory);
     }
   };
 
-  // Load chat history from localStorage on component mount
   useEffect(() => {
     const storedHistory = localStorage.getItem('fastbots_history');
     if (storedHistory) {
@@ -126,7 +103,6 @@ const FastBotsChat = ({ botId = "cm4bojr9l0j5zsvbm6faemmyn" }: FastBotsChatProps
     setIsHistoryOpen((prev) => !prev);
   };
 
-  // Get appropriate title based on language
   const getChatTitle = () => {
     switch (language) {
       case 'hindi':
@@ -140,14 +116,12 @@ const FastBotsChat = ({ botId = "cm4bojr9l0j5zsvbm6faemmyn" }: FastBotsChatProps
 
   return (
     <>
-      {/* Load the FastBots script */}
       <ScriptLoader 
         src="https://app.fastbots.ai/embed.js" 
         attributes={{ "data-bot-id": botId }}
         onLoad={handleScriptLoad}
       />
 
-      {/* Chat History Panel */}
       {isHistoryOpen && (
         <div className="fixed right-20 bottom-24 z-50 w-80 md:w-96 bg-white rounded-lg shadow-lg overflow-hidden animate-fade-in">
           <Card>
@@ -209,7 +183,6 @@ const FastBotsChat = ({ botId = "cm4bojr9l0j5zsvbm6faemmyn" }: FastBotsChatProps
         </div>
       )}
 
-      {/* Chat control buttons */}
       <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end space-y-2">
         <Button
           onClick={toggleHistory}
@@ -227,20 +200,17 @@ const FastBotsChat = ({ botId = "cm4bojr9l0j5zsvbm6faemmyn" }: FastBotsChatProps
           >
             <Bot className="h-6 w-6 text-white" />
             
-            {/* Multi-lingual indicator */}
             <span className="absolute -top-1 -right-1 bg-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-[#215f33]">
               <Globe className="h-4 w-4 text-[#215f33]" />
             </span>
           </Button>
           
-          {/* "Your Personal Assistant" floating label */}
           <div className="absolute bottom-full mb-2 right-0 bg-white px-3 py-1 rounded-full shadow-md text-xs font-medium text-[#215f33] whitespace-nowrap border border-[#215f33]">
             Your Personal Assistant
           </div>
         </div>
       </div>
 
-      {/* Preload the bot */}
       <div id={`fastbots-${botId}`} style={{ display: "none" }} />
     </>
   );
