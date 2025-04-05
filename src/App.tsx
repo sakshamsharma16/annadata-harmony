@@ -11,7 +11,7 @@ import SEOHead from "./components/SEOHead";
 import AppNavbar from "./components/AppNavbar";
 import EnhancedFooter from "./components/EnhancedFooter";
 import KrishiMitra from "./components/KrishiMitra";
-import FastBotsChat from "./components/FastBotsChat";
+import GeminiChat from "./components/GeminiChat";
 import NavigationMenu from "./components/NavigationMenu";
 import { getCacheItem, setCacheItem } from "./utils/cacheUtils";
 
@@ -148,7 +148,8 @@ const AppLayout = () => {
         </main>
         {!isAuthRoute && <EnhancedFooter />}
         
-        <KrishiMitra />
+        {/* Use the new Gemini chatbot instead of FastBotsChat */}
+        <GeminiChat />
       </div>
     </>
   );
@@ -168,21 +169,24 @@ const queryClient = new QueryClient({
 
 // Create basic placeholder pages for new sections
 const App = () => {
-  const [useFastBots, setUseFastBots] = useState(true);
+  const [useGeminiAssistant, setUseGeminiAssistant] = useState(true);
 
   useEffect(() => {
     const preference = localStorage.getItem('preferredChatbot');
     if (preference === 'krishiMitra') {
-      setUseFastBots(false);
-    } else if (preference === 'fastBots' || !preference) {
-      setUseFastBots(true);
-      localStorage.setItem('preferredChatbot', 'fastBots');
+      setUseGeminiAssistant(false);
+    } else if (preference === 'gemini' || !preference) {
+      setUseGeminiAssistant(true);
+      localStorage.setItem('preferredChatbot', 'gemini');
     }
     
     // Preload important resources
     const preloadLinks = [
       { href: '/og-image.png', as: 'image' },
-      { href: 'https://app.fastbots.ai/embed.js', as: 'script' }
+      { href: '/image1.jpg', as: 'image' },
+      { href: '/image2.jpg', as: 'image' },
+      { href: '/image3.jpg', as: 'image' },
+      { href: '/image4.jpg', as: 'image' }
     ];
     
     // Add preload links to document head
@@ -206,8 +210,8 @@ const App = () => {
               <AppLayout />
             </BrowserRouter>
             
-            {useFastBots && (
-              <FastBotsChat botId="cm4bojr9l0j5zsvbm6faemmyn" />
+            {!useGeminiAssistant && (
+              <KrishiMitra />
             )}
           </TooltipProvider>
         </LanguageProvider>
