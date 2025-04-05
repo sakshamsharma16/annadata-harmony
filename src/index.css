@@ -37,6 +37,24 @@
   }
 }
 
+@layer utilities {
+  /* New crisp design enhancements - moved to utilities layer */
+  .shadow-crisp {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 
+                0 2px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  .shadow-crisp-md {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05), 
+                0 4px 8px rgba(0, 0, 0, 0.03);
+  }
+
+  .shadow-crisp-lg {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04), 
+                0 6px 12px rgba(0, 0, 0, 0.02);
+  }
+}
+
 @layer components {
   .gradient-background {
     @apply bg-gradient-to-b from-[#FF9933] via-white to-[#138808];
@@ -97,9 +115,28 @@
     @apply rounded-2xl bg-white p-6 shadow-md hover:shadow-lg transition-shadow duration-200;
   }
   
+  /* Enhanced card styling - modified to use @apply correctly */
+  .card-crisp {
+    @apply bg-white rounded-xl shadow-crisp p-5 transition-all duration-200;
+  }
+  
+  .card-crisp:hover {
+    @apply shadow-crisp-md;
+  }
+  
   /* Form styles */
   .form-input {
     @apply w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-[#138808] focus:ring focus:ring-[#138808] focus:ring-opacity-50 transition-colors duration-150;
+  }
+  
+  /* Improved button animations */
+  .btn-animate {
+    @apply transition-all duration-150 hover:translate-y-[-2px];
+  }
+  
+  /* Enhanced focus states */
+  .focus-crisp {
+    @apply focus:outline-none focus:ring-2 focus:ring-[#138808]/40 focus:ring-offset-1;
   }
 }
 
@@ -284,35 +321,4 @@ img {
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
-}
-
-/* New crisp design enhancements */
-.shadow-crisp {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 
-              0 2px 4px rgba(0, 0, 0, 0.04);
-}
-
-.shadow-crisp-md {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05), 
-              0 4px 8px rgba(0, 0, 0, 0.03);
-}
-
-.shadow-crisp-lg {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04), 
-              0 6px 12px rgba(0, 0, 0, 0.02);
-}
-
-/* Enhanced card styling */
-.card-crisp {
-  @apply bg-white rounded-xl shadow-crisp p-5 hover:shadow-crisp-md transition-all duration-200;
-}
-
-/* Improved button animations */
-.btn-animate {
-  @apply transition-all duration-150 hover:translate-y-[-2px];
-}
-
-/* Enhanced focus states */
-.focus-crisp {
-  @apply focus:outline-none focus:ring-2 focus:ring-[#138808]/40 focus:ring-offset-1;
 }
