@@ -6,12 +6,15 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { HelmetProvider } from "react-helmet-async";
+import SEOHead from "./components/SEOHead";
 import AppNavbar from "./components/AppNavbar";
 import EnhancedFooter from "./components/EnhancedFooter";
 import KrishiMitra from "./components/KrishiMitra";
 import FastBotsChat from "./components/FastBotsChat";
 import AdminDashboard from "./components/AdminDashboard";
 import NavigationMenu from "./components/NavigationMenu";
+import { getCacheItem, setCacheItem } from "./utils/cacheUtils";
 
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -27,6 +30,13 @@ const CropHealthDashboard = lazy(() => import("./pages/agriculture/CropHealthDas
 const Login = lazy(() => import("./pages/auth/Login"));
 const Register = lazy(() => import("./pages/auth/Register"));
 
+// Route-based code splitting helps reduce initial load time
+const AboutPage = lazy(() => import("./pages/About"));
+const TeamPage = lazy(() => import("./pages/Team"));
+const ContactPage = lazy(() => import("./pages/Contact"));
+const FaqPage = lazy(() => import("./pages/FAQ"));
+const ServicesPage = lazy(() => import("./pages/Services"));
+
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center min-h-screen">
     <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-[#138808] border-t-transparent"></div>
@@ -36,12 +46,54 @@ const LoadingSpinner = () => (
 const AppLayout = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
+  const [pageTitle, setPageTitle] = useState("Home");
+  const [pageDescription, setPageDescription] = useState("");
   
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, []);
+    // Check if we have a cached version of this page to show immediately
+    const cachedContent = getCacheItem(`page-content-${location.pathname}`);
+    if (cachedContent) {
+      setIsLoading(false);
+    } else {
+      // Add artificial delay to show loading spinner (can be removed in production)
+      const timer = setTimeout(() => setIsLoading(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [location.pathname]);
   
+  // Update page metadata based on current route
+  useEffect(() => {
+    // Set title and description based on current path
+    const path = location.pathname;
+    
+    if (path === "/") {
+      setPageTitle("Home");
+      setPageDescription("An integrated digital platform connecting farmers, vendors, and consumers");
+    } else if (path.includes("/dashboard/farmer")) {
+      setPageTitle("Farmer Dashboard");
+      setPageDescription("Manage your farm business, products and analytics");
+    } else if (path.includes("/dashboard/vendor")) {
+      setPageTitle("Vendor Dashboard");
+      setPageDescription("Access your marketplace analytics and manage orders");
+    } else if (path.includes("/dashboard/consumer")) {
+      setPageTitle("Consumer Dashboard");
+      setPageDescription("Track your orders and find fresh local produce");
+    } else if (path.includes("/about")) {
+      setPageTitle("About Us");
+      setPageDescription("Learn about our mission to transform agriculture");
+    } else if (path.includes("/contact")) {
+      setPageTitle("Contact");
+      setPageDescription("Get in touch with our team");
+    } else if (path.includes("/services")) {
+      setPageTitle("Services");
+      setPageDescription("Explore our range of services for the agricultural ecosystem");
+    }
+    
+    // Cache current path after navigation
+    setCacheItem(`last-visited-${path}`, new Date().toISOString());
+  }, [location]);
+  
+  // Check if we're on an authentication route
   const isAuthRoute = location.pathname === "/login" || 
                      location.pathname === "/register" || 
                      location.pathname === "/forgot-password";
@@ -51,48 +103,69 @@ const AppLayout = () => {
   }
   
   return (
-    <div className="bg-[#F2FCE2] min-h-screen">
-      {!isAuthRoute && <NavigationMenu />}
-      <main>
-        <Suspense fallback={<LoadingSpinner />}>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dashboard/farmer" element={<FarmerDashboard />} />
-            <Route path="/dashboard/vendor" element={<VendorDashboard />} />
-            <Route path="/dashboard/consumer" element={<ConsumerDashboard />} />
-            <Route path="/dashboard/analytics" element={<MarketAnalytics />} />
-            <Route path="/agriculture/crop-health" element={<CropHealthDashboard />} />
-            <Route path="/farmer/products" element={<ManageProducts />} />
-            <Route path="/vendor/marketplace" element={<Marketplace />} />
-            <Route path="/consumer/nearby-vendors" element={<NearbyVendors />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/market-prices" element={<AdminDashboard />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </main>
-      {!isAuthRoute && <EnhancedFooter />}
-      
-      <KrishiMitra />
-    </div>
+    <>
+      <SEOHead 
+        title={pageTitle}
+        description={pageDescription}
+        ogUrl={`https://annadata.com${location.pathname}`}
+      />
+      <div className="bg-[#F2FCE2] min-h-screen">
+        {!isAuthRoute && <NavigationMenu />}
+        <main className={!isAuthRoute ? "pt-20" : ""}>
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/dashboard/farmer" element={<FarmerDashboard />} />
+              <Route path="/dashboard/vendor" element={<VendorDashboard />} />
+              <Route path="/dashboard/consumer" element={<ConsumerDashboard />} />
+              <Route path="/dashboard/analytics" element={<MarketAnalytics />} />
+              <Route path="/agriculture/crop-health" element={<CropHealthDashboard />} />
+              <Route path="/farmer/products" element={<ManageProducts />} />
+              <Route path="/vendor/marketplace" element={<Marketplace />} />
+              <Route path="/consumer/nearby-vendors" element={<NearbyVendors />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              <Route path="/market-prices" element={<AdminDashboard />} />
+              
+              {/* New routes for About section */}
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/team" element={<TeamPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/faq" element={<FaqPage />} />
+              
+              {/* New routes for Services section */}
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/services/:service" element={<ServicesPage />} />
+              
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </main>
+        {!isAuthRoute && <EnhancedFooter />}
+        
+        <KrishiMitra />
+      </div>
+    </>
   );
 };
 
+// Create and configure query client with caching strategy
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60 * 1000,
+      staleTime: 60 * 1000, // Data remains fresh for 1 minute
+      cacheTime: 5 * 60 * 1000, // Cache persists for 5 minutes
       refetchOnWindowFocus: false,
       retry: 1,
     },
   },
 });
 
+// Create basic placeholder pages for new sections
 const App = () => {
-  const [useFastBots, setUseFastBots] = useState(true); // Set to true by default to enable the improved chatbot
+  const [useFastBots, setUseFastBots] = useState(true);
 
   useEffect(() => {
     const preference = localStorage.getItem('preferredChatbot');
@@ -100,35 +173,42 @@ const App = () => {
       setUseFastBots(false);
     } else if (preference === 'fastBots' || !preference) {
       setUseFastBots(true);
-      localStorage.setItem('preferredChatbot', 'fastBots'); // Set preference if not already set
+      localStorage.setItem('preferredChatbot', 'fastBots');
     }
+    
+    // Preload important resources
+    const preloadLinks = [
+      { href: '/og-image.png', as: 'image' },
+      { href: 'https://app.fastbots.ai/embed.js', as: 'script' }
+    ];
+    
+    // Add preload links to document head
+    preloadLinks.forEach(link => {
+      const preloadLink = document.createElement('link');
+      preloadLink.rel = 'preload';
+      preloadLink.href = link.href;
+      preloadLink.as = link.as;
+      document.head.appendChild(preloadLink);
+    });
   }, []);
-
-  useEffect(() => {
-    if (useFastBots && window.FastBots) {
-      window.FastBots.init({
-        rasaProLicenseToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0MmRkMTRhZC1kMmVkLTRlZTItODJkNS0xNTliZjFjMjM0NDUiLCJpYXQiOjE3NDIzMTk3ODgsIm5iZiI6MTc0MjMxOTc4OCwic2NvcGUiOiJyYXNhOnBybyByYXNhOnBybzpjaGFtcGlvbiByYXNhOnZvaWNlIiwiZXhwIjoxODM3MDE0MTg4LCJlbWFpbCI6ImtycmlzaGdhdXIwMDAwQGdtYWlsLmNvbSIsImNvbXBhbnkiOiJSYXNhIENoYW1waW9ucyJ9.di37RXJshZJvCgau0W-XVhnnYldGY23TC_suNb_hHaKSTHMIXr93-NdElWVt_3-JdJjVtU8GABKCmYqAkIdPTnOHYHbq8oUVxGNwvaY9OcL3toxLa-RNbdb3O4i_0-CC8lDtJgBLZNfuLEF1P3L_l8K9Dj9wBIxniUehySnMTQMroH6pmgf9VPGkvae9NzQPXoj6YJMlt2eLe_jODw7gt4olpy6mSp-jRVe56tzWNmPlSYmEfLs7UraI7dgbMM3kXINicCyJy1bhffebWnFH6Q5_NSkItiEDqE6FmEg_xSpVtHVGQN5n7Dusf0gp3ioXnsQA-RuP88wtOCv83LtpBg",
-        multilingual: true,
-        voiceEnabled: true
-      });
-    }
-  }, [useFastBots]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppLayout />
-          </BrowserRouter>
-          
-          {useFastBots && (
-            <FastBotsChat botId="cm4bojr9l0j5zsvbm6faemmyn" />
-          )}
-        </TooltipProvider>
-      </LanguageProvider>
+      <HelmetProvider>
+        <LanguageProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppLayout />
+            </BrowserRouter>
+            
+            {useFastBots && (
+              <FastBotsChat botId="cm4bojr9l0j5zsvbm6faemmyn" />
+            )}
+          </TooltipProvider>
+        </LanguageProvider>
+      </HelmetProvider>
     </QueryClientProvider>
   );
 };
