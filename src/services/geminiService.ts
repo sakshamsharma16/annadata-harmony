@@ -23,6 +23,8 @@ export async function sendMessageToGemini(message: string): Promise<GeminiRespon
     const baseUrl = import.meta.env.VITE_GEMINI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta";
     const url = `${baseUrl}/models/gemini-pro:generateContent?key=${apiKey}`;
     
+    console.log('Sending request to Gemini API...');
+    
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -41,7 +43,27 @@ export async function sendMessageToGemini(message: string): Promise<GeminiRespon
         generationConfig: {
           temperature: 0.7,
           maxOutputTokens: 1000,
-        }
+          topP: 0.8,
+          topK: 40
+        },
+        safetySettings: [
+          {
+            category: "HARM_CATEGORY_HARASSMENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_HATE_SPEECH",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          }
+        ]
       })
     });
     
@@ -55,6 +77,8 @@ export async function sendMessageToGemini(message: string): Promise<GeminiRespon
       };
     }
     
+    console.log('Received response from Gemini API:', data);
+    
     // Extract the response text from Gemini API response
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 
                  "Sorry, I couldn't generate a response at this time.";
@@ -66,5 +90,22 @@ export async function sendMessageToGemini(message: string): Promise<GeminiRespon
       text: "Sorry, there was an error connecting to my services. Please try again later.",
       error: error instanceof Error ? error.message : "UNKNOWN_ERROR"
     };
+  }
+}
+
+// Add a function to check if the API key is configured correctly
+export async function checkGeminiAPIKey(): Promise<boolean> {
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  
+  if (!apiKey) {
+    console.error("Gemini API key is missing. Please check your .env file.");
+    return false;
+  }
+  
+  try {
+    const response = await sendMessageToGemini("Hello");
+    return !response.error;
+  } catch (error) {
+    return false;
   }
 }
