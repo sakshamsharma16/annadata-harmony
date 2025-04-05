@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ClipboardList, MessageCircle, X, Globe, Bot, Languages } from "lucide-react";
@@ -127,7 +128,7 @@ const FastBotsChat = ({ botId = "cm4bojr9l0j5zsvbm6faemmyn" }: FastBotsChatProps
           <Card>
             <CardHeader className="bg-[#215f33] text-white py-2 px-4 flex flex-row justify-between items-center">
               <CardTitle className="text-lg flex items-center">
-                <ClipboardList className="h-4 w-4 mr-2" />
+                <ClipboardList className="h-4 w-4 mr-2" aria-hidden="true" />
                 {getChatTitle()}
               </CardTitle>
               <Button 
@@ -135,8 +136,9 @@ const FastBotsChat = ({ botId = "cm4bojr9l0j5zsvbm6faemmyn" }: FastBotsChatProps
                 size="icon" 
                 onClick={toggleHistory}
                 className="h-8 w-8 text-white hover:bg-[#184426] hover:text-white"
+                aria-label="Close conversation history"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </CardHeader>
             <CardContent className="p-0">
@@ -188,8 +190,9 @@ const FastBotsChat = ({ botId = "cm4bojr9l0j5zsvbm6faemmyn" }: FastBotsChatProps
           onClick={toggleHistory}
           size="icon"
           className="rounded-full bg-white text-[#215f33] border border-[#215f33] shadow-md hover:bg-gray-100 transition-transform duration-200 hover:scale-105"
+          aria-label="View conversation history"
         >
-          <ClipboardList className="h-5 w-5" />
+          <ClipboardList className="h-5 w-5" aria-hidden="true" />
         </Button>
         
         <div className="relative">
@@ -197,11 +200,13 @@ const FastBotsChat = ({ botId = "cm4bojr9l0j5zsvbm6faemmyn" }: FastBotsChatProps
             onClick={toggleChat}
             size="icon"
             className="rounded-full w-14 h-14 bg-[#215f33] hover:bg-[#184426] shadow-md transition-transform duration-200 hover:scale-105 relative"
+            aria-label="Open chat assistant"
           >
-            <Bot className="h-6 w-6 text-white" />
+            <Bot className="h-6 w-6 text-white" aria-hidden="true" />
             
             <span className="absolute -top-1 -right-1 bg-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-[#215f33]">
-              <Globe className="h-4 w-4 text-[#215f33]" />
+              <Globe className="h-4 w-4 text-[#215f33]" aria-hidden="true" title="Multilingual Support" />
+              <span className="sr-only">Multilingual Support</span>
             </span>
           </Button>
           
@@ -211,7 +216,7 @@ const FastBotsChat = ({ botId = "cm4bojr9l0j5zsvbm6faemmyn" }: FastBotsChatProps
         </div>
       </div>
 
-      <div id={`fastbots-${botId}`} style={{ display: "none" }} />
+      <div id={`fastbots-${botId}`} style={{ display: "none" }} aria-hidden="true" />
     </>
   );
 };

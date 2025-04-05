@@ -11,6 +11,7 @@ import EnhancedFooter from "./components/EnhancedFooter";
 import KrishiMitra from "./components/KrishiMitra";
 import FastBotsChat from "./components/FastBotsChat";
 import AdminDashboard from "./components/AdminDashboard";
+import NavigationMenu from "./components/NavigationMenu";
 
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -51,7 +52,7 @@ const AppLayout = () => {
   
   return (
     <div className="bg-[#F2FCE2] min-h-screen">
-      {!isAuthRoute && <AppNavbar />}
+      {!isAuthRoute && <NavigationMenu />}
       <main>
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
@@ -75,7 +76,6 @@ const AppLayout = () => {
       </main>
       {!isAuthRoute && <EnhancedFooter />}
       
-      {/* KrishiMitra chatbot token is always visible */}
       <KrishiMitra />
     </div>
   );
@@ -92,14 +92,15 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  const [useFastBots, setUseFastBots] = useState(false);
+  const [useFastBots, setUseFastBots] = useState(true); // Set to true by default to enable the improved chatbot
 
   useEffect(() => {
     const preference = localStorage.getItem('preferredChatbot');
     if (preference === 'krishiMitra') {
       setUseFastBots(false);
-    } else if (preference === 'fastBots') {
+    } else if (preference === 'fastBots' || !preference) {
       setUseFastBots(true);
+      localStorage.setItem('preferredChatbot', 'fastBots'); // Set preference if not already set
     }
   }, []);
 
