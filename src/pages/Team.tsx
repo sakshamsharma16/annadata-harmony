@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { LinkedIn, Twitter, Mail } from "lucide-react";
+import { Linkedin, Twitter, Mail } from "lucide-react"; // Fixed LinkedIn to Linkedin (lowercase 'd')
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
@@ -123,7 +123,7 @@ const TeamMember = ({ member }) => {
                 className="text-gray-500 hover:text-[#0077B5] transition-colors"
                 aria-label={`LinkedIn profile of ${member.name}`}
               >
-                <LinkedIn size={18} />
+                <Linkedin size={18} />
               </a>
               <a 
                 href={member.social.twitter} 
