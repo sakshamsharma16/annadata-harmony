@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { NavigationMenu as NavMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown, Download, UserPlus, Leaf, MapPin } from "lucide-react";
+import { Menu, X, ChevronDown, Download, UserPlus, Leaf, Shield } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import { getCacheItem, setCacheItem } from "@/utils/cacheUtils";
@@ -44,6 +44,8 @@ const NavigationMenu = () => {
       setActiveSection("consumers");
     } else if (path.includes("/dashboard/analytics")) {
       setActiveSection("analytics");
+    } else if (path.includes("/dashboard/admin")) {
+      setActiveSection("admin");
     } else if (path.includes("/about") || path.includes("/team") || path.includes("/contact") || path.includes("/faq")) {
       setActiveSection("about");
     } else if (path.includes("/services")) {
@@ -58,10 +60,10 @@ const NavigationMenu = () => {
 
   return (
     <header 
-      className={`fixed w-full z-50 transition-all duration-300 ${
+      className={`fixed w-full z-50 transition-all duration-200 ${
         scrolled 
           ? "bg-white shadow-md py-2" 
-          : "bg-white/90 backdrop-blur-md border-b border-gray-200 py-4"
+          : "bg-white/95 backdrop-blur-md border-b border-gray-100 py-3"
       }`}
       role="banner"
     >
@@ -69,7 +71,7 @@ const NavigationMenu = () => {
         <div className="flex justify-between items-center">
           <Link 
             to="/" 
-            className="flex-shrink-0 flex items-center font-bold text-2xl text-[#138808]"
+            className="flex-shrink-0 flex items-center font-bold text-2xl text-[#138808] transition-transform duration-200 hover:scale-105"
             aria-label="Annadata Home"
           >
             <Leaf className="h-6 w-6 mr-2" aria-hidden="true" />
@@ -85,7 +87,7 @@ const NavigationMenu = () => {
                     <NavigationMenuLink 
                       className={cn(
                         navigationMenuTriggerStyle(),
-                        activeSection === "home" && "bg-accent text-accent-foreground"
+                        activeSection === "home" && "bg-accent/20 text-accent-foreground font-medium"
                       )}
                     >
                       {t('nav.home')}
@@ -96,13 +98,13 @@ const NavigationMenu = () => {
                 <NavigationMenuItem>
                   <NavigationMenuTrigger 
                     className={cn(
-                      activeSection === "farmers" && "bg-accent text-accent-foreground"
+                      activeSection === "farmers" && "bg-accent/20 text-accent-foreground font-medium"
                     )}
                   >
                     {t('nav.farmers')}
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[280px] gap-2 p-4 md:w-[400px] md:grid-cols-2">
+                    <ul className="grid w-[280px] gap-1 p-4 md:w-[400px] md:grid-cols-2">
                       <li className="md:col-span-2">
                         <div className="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
                           Farmer Resources
@@ -111,7 +113,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link 
                           to="/dashboard/farmer"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent hover:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
                         >
                           <div className="text-sm font-medium">Farmer Dashboard</div>
                           <div className="text-xs text-muted-foreground">Manage your farming business</div>
@@ -120,7 +122,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link 
                           to="/farmer/products"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent hover:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
                         >
                           <div className="text-sm font-medium">Products</div>
                           <div className="text-xs text-muted-foreground">List and manage your products</div>
@@ -129,7 +131,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link 
                           to="/agriculture/crop-health"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent hover:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
                         >
                           <div className="text-sm font-medium">Crop Health</div>
                           <div className="text-xs text-muted-foreground">Monitor and improve crop health</div>
@@ -138,7 +140,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link 
                           to="/market-prices"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent hover:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
                         >
                           <div className="text-sm font-medium">Market Prices</div>
                           <div className="text-xs text-muted-foreground">View current market trends</div>
@@ -151,13 +153,13 @@ const NavigationMenu = () => {
                 <NavigationMenuItem>
                   <NavigationMenuTrigger 
                     className={cn(
-                      activeSection === "vendors" && "bg-accent text-accent-foreground"
+                      activeSection === "vendors" && "bg-accent/20 text-accent-foreground font-medium"
                     )}
                   >
                     {t('nav.vendors')}
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[280px] gap-2 p-4 md:w-[400px] md:grid-cols-2">
+                    <ul className="grid w-[280px] gap-1 p-4 md:w-[400px] md:grid-cols-2">
                       <li className="md:col-span-2">
                         <div className="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
                           Vendor Resources
@@ -166,7 +168,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link 
                           to="/dashboard/vendor"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent hover:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
                         >
                           <div className="text-sm font-medium">Vendor Dashboard</div>
                           <div className="text-xs text-muted-foreground">Manage your vendor account</div>
@@ -175,7 +177,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link 
                           to="/vendor/marketplace"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent hover:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
                         >
                           <div className="text-sm font-medium">Marketplace</div>
                           <div className="text-xs text-muted-foreground">Browse available products</div>
@@ -184,7 +186,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link 
                           to="/vendor/analytics"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent hover:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
                         >
                           <div className="text-sm font-medium">Sales Analytics</div>
                           <div className="text-xs text-muted-foreground">Track your business performance</div>
@@ -193,7 +195,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link 
                           to="/vendor/resources"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent hover:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
                         >
                           <div className="text-sm font-medium">Resources</div>
                           <div className="text-xs text-muted-foreground">Helpful guides and tools</div>
@@ -206,13 +208,13 @@ const NavigationMenu = () => {
                 <NavigationMenuItem>
                   <NavigationMenuTrigger 
                     className={cn(
-                      activeSection === "consumers" && "bg-accent text-accent-foreground"
+                      activeSection === "consumers" && "bg-accent/20 text-accent-foreground font-medium"
                     )}
                   >
                     {t('nav.consumers')}
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[280px] gap-2 p-4 md:w-[400px] md:grid-cols-2">
+                    <ul className="grid w-[280px] gap-1 p-4 md:w-[400px] md:grid-cols-2">
                       <li className="md:col-span-2">
                         <div className="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
                           Consumer Resources
@@ -221,7 +223,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link 
                           to="/dashboard/consumer"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent hover:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
                         >
                           <div className="text-sm font-medium">Consumer Dashboard</div>
                           <div className="text-xs text-muted-foreground">Manage your consumer account</div>
@@ -230,7 +232,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link 
                           to="/consumer/nearby-vendors"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent hover:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
                         >
                           <div className="text-sm font-medium">Nearby Vendors</div>
                           <div className="text-xs text-muted-foreground">Find vendors close to you</div>
@@ -239,7 +241,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link 
                           to="/consumer/orders"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent hover:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
                         >
                           <div className="text-sm font-medium">My Orders</div>
                           <div className="text-xs text-muted-foreground">Track your orders</div>
@@ -248,7 +250,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link 
                           to="/consumer/seasonal"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent hover:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
                         >
                           <div className="text-sm font-medium">Seasonal Products</div>
                           <div className="text-xs text-muted-foreground">Discover what's fresh now</div>
@@ -263,7 +265,7 @@ const NavigationMenu = () => {
                     <NavigationMenuLink 
                       className={cn(
                         navigationMenuTriggerStyle(),
-                        activeSection === "analytics" && "bg-accent text-accent-foreground"
+                        activeSection === "analytics" && "bg-accent/20 text-accent-foreground font-medium"
                       )}
                     >
                       {t('nav.analytics')}
@@ -272,15 +274,30 @@ const NavigationMenu = () => {
                 </NavigationMenuItem>
                 
                 <NavigationMenuItem>
+                  <Link to="/dashboard/admin">
+                    <NavigationMenuLink 
+                      className={cn(
+                        navigationMenuTriggerStyle(),
+                        activeSection === "admin" && "bg-accent/20 text-accent-foreground font-medium",
+                        "flex items-center gap-1"
+                      )}
+                    >
+                      <Shield className="h-4 w-4" />
+                      Admin
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+                
+                <NavigationMenuItem>
                   <NavigationMenuTrigger 
                     className={cn(
-                      activeSection === "services" && "bg-accent text-accent-foreground"
+                      activeSection === "services" && "bg-accent/20 text-accent-foreground font-medium"
                     )}
                   >
                     Services
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:grid-cols-2">
+                    <ul className="grid w-[400px] gap-2 p-4 md:grid-cols-2">
                       <li className="md:col-span-2">
                         <div className="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
                           Our Services
@@ -289,7 +306,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link
                           to="/services/logistics"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
                         >
                           <div className="text-sm font-medium leading-none">Logistics & Delivery</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -300,7 +317,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link
                           to="/services/farm-consulting"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
                         >
                           <div className="text-sm font-medium leading-none">Farm Consulting</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -311,7 +328,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link
                           to="/services/certifications"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
                         >
                           <div className="text-sm font-medium leading-none">Certifications</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -322,7 +339,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link
                           to="/services/financial"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
                         >
                           <div className="text-sm font-medium leading-none">Financial Services</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -337,17 +354,17 @@ const NavigationMenu = () => {
                 <NavigationMenuItem>
                   <NavigationMenuTrigger 
                     className={cn(
-                      activeSection === "about" && "bg-accent text-accent-foreground"
+                      activeSection === "about" && "bg-accent/20 text-accent-foreground font-medium"
                     )}
                   >
                     About
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:grid-cols-2">
+                    <ul className="grid w-[400px] gap-2 p-4 md:grid-cols-2">
                       <li>
                         <Link
                           to="/about"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
                         >
                           <div className="text-sm font-medium leading-none">About Us</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -358,7 +375,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link
                           to="/team"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
                         >
                           <div className="text-sm font-medium leading-none">Our Team</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -369,7 +386,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link
                           to="/contact"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
                         >
                           <div className="text-sm font-medium leading-none">Contact</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -380,7 +397,7 @@ const NavigationMenu = () => {
                       <li>
                         <Link
                           to="/faq"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
                         >
                           <div className="text-sm font-medium leading-none">FAQ</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -398,14 +415,14 @@ const NavigationMenu = () => {
           <div className="hidden md:flex space-x-4">
             <Button 
               variant="outline" 
-              className="flex items-center space-x-2 bg-white hover:bg-gray-100"
+              className="flex items-center space-x-2 bg-white hover:bg-gray-50 transition-all duration-200"
               aria-label="Download App"
             >
               <Download className="w-4 h-4" />
               <span>Download App</span>
             </Button>
             <Button 
-              className="bg-[#138808] hover:bg-[#0d6b06] text-white flex items-center space-x-2"
+              className="bg-[#138808] hover:bg-[#0d6b06] text-white flex items-center space-x-2 shadow-sm hover:shadow-md transition-all duration-200"
               aria-label="Join Movement"
             >
               <UserPlus className="w-4 h-4" />
@@ -437,16 +454,16 @@ const NavigationMenu = () => {
       {/* Mobile Menu */}
       <div 
         id="mobile-menu"
-        className={`md:hidden overflow-hidden transition-all duration-300 ${
+        className={`md:hidden overflow-hidden transition-all duration-200 ${
           isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
         }`}
         aria-hidden={!isOpen}
       >
-        <div className="px-4 py-3 space-y-3 bg-white shadow-lg rounded-b-xl max-h-[80vh] overflow-y-auto">
+        <div className="px-4 py-3 space-y-2 bg-white shadow-lg rounded-b-xl max-h-[80vh] overflow-y-auto">
           <Link 
             to="/" 
             className={cn(
-              "block px-3 py-2 hover:bg-gray-100 rounded-md",
+              "block px-3 py-2 hover:bg-gray-50 rounded-md transition-colors duration-150",
               activeSection === "home" ? "text-[#138808] font-medium" : "text-gray-700"
             )}
             onClick={() => setIsOpen(false)}
@@ -455,35 +472,35 @@ const NavigationMenu = () => {
           </Link>
           
           {/* Mobile Farmers Dropdown */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             <div className={cn(
               "font-medium px-3 py-2",
               activeSection === "farmers" ? "text-[#138808]" : "text-gray-700"
             )}>Farmers</div>
             <Link 
               to="/dashboard/farmer" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Farmer Dashboard
             </Link>
             <Link 
               to="/farmer/products" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Products
             </Link>
             <Link 
               to="/agriculture/crop-health"
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Crop Health
             </Link>
             <Link 
               to="/market-prices"
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Market Prices
@@ -491,35 +508,35 @@ const NavigationMenu = () => {
           </div>
           
           {/* Mobile Vendors Dropdown */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             <div className={cn(
               "font-medium px-3 py-2",
               activeSection === "vendors" ? "text-[#138808]" : "text-gray-700"
             )}>Vendors</div>
             <Link 
               to="/dashboard/vendor" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Vendor Dashboard
             </Link>
             <Link 
               to="/vendor/marketplace" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Marketplace
             </Link>
             <Link 
               to="/vendor/analytics" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Sales Analytics
             </Link>
             <Link 
               to="/vendor/resources" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Resources
@@ -527,35 +544,35 @@ const NavigationMenu = () => {
           </div>
           
           {/* Mobile Consumers Dropdown */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             <div className={cn(
               "font-medium px-3 py-2",
               activeSection === "consumers" ? "text-[#138808]" : "text-gray-700"
             )}>Consumers</div>
             <Link 
               to="/dashboard/consumer" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Consumer Dashboard
             </Link>
             <Link 
               to="/consumer/nearby-vendors" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Nearby Vendors
             </Link>
             <Link 
               to="/consumer/orders" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               My Orders
             </Link>
             <Link 
               to="/consumer/seasonal" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Seasonal Products
@@ -565,7 +582,7 @@ const NavigationMenu = () => {
           <Link 
             to="/dashboard/analytics" 
             className={cn(
-              "block px-3 py-2 hover:bg-gray-100 rounded-md",
+              "block px-3 py-2 hover:bg-gray-50 rounded-md transition-colors duration-150",
               activeSection === "analytics" ? "text-[#138808] font-medium" : "text-gray-700"
             )}
             onClick={() => setIsOpen(false)}
@@ -573,36 +590,49 @@ const NavigationMenu = () => {
             Market Analytics
           </Link>
           
+          {/* Admin Dashboard in mobile menu */}
+          <Link 
+            to="/dashboard/admin" 
+            className={cn(
+              "block px-3 py-2 hover:bg-gray-50 rounded-md transition-colors duration-150 flex items-center gap-1",
+              activeSection === "admin" ? "text-[#138808] font-medium" : "text-gray-700"
+            )}
+            onClick={() => setIsOpen(false)}
+          >
+            <Shield className="h-4 w-4" />
+            <span>Admin Dashboard</span>
+          </Link>
+          
           {/* Services section in mobile view */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             <div className={cn(
               "font-medium px-3 py-2",
               activeSection === "services" ? "text-[#138808]" : "text-gray-700"
             )}>Services</div>
             <Link 
               to="/services/logistics" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Logistics & Delivery
             </Link>
             <Link 
               to="/services/farm-consulting" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Farm Consulting
             </Link>
             <Link 
               to="/services/certifications" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Certifications
             </Link>
             <Link 
               to="/services/financial" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Financial Services
@@ -610,35 +640,35 @@ const NavigationMenu = () => {
           </div>
           
           {/* About section in mobile view */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             <div className={cn(
               "font-medium px-3 py-2",
               activeSection === "about" ? "text-[#138808]" : "text-gray-700"
             )}>About</div>
             <Link 
               to="/about" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               About Us
             </Link>
             <Link 
               to="/team" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Our Team
             </Link>
             <Link 
               to="/contact" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               Contact
             </Link>
             <Link 
               to="/faq" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
               onClick={() => setIsOpen(false)}
             >
               FAQ
@@ -646,11 +676,11 @@ const NavigationMenu = () => {
           </div>
           
           <div className="pt-2 space-y-3">
-            <Button variant="outline" className="w-full flex items-center justify-center space-x-2">
+            <Button variant="outline" className="w-full flex items-center justify-center space-x-2 transition-all duration-200">
               <Download className="w-4 h-4" />
               <span>Download App</span>
             </Button>
-            <Button className="w-full bg-[#138808] hover:bg-[#0d6b06] text-white flex items-center justify-center space-x-2">
+            <Button className="w-full bg-[#138808] hover:bg-[#0d6b06] text-white flex items-center justify-center space-x-2 shadow-sm hover:shadow-md transition-all duration-200">
               <UserPlus className="w-4 h-4" />
               <span>Join Movement</span>
             </Button>

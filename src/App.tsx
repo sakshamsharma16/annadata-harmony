@@ -12,7 +12,6 @@ import AppNavbar from "./components/AppNavbar";
 import EnhancedFooter from "./components/EnhancedFooter";
 import KrishiMitra from "./components/KrishiMitra";
 import FastBotsChat from "./components/FastBotsChat";
-import AdminDashboard from "./components/AdminDashboard";
 import NavigationMenu from "./components/NavigationMenu";
 import { getCacheItem, setCacheItem } from "./utils/cacheUtils";
 
@@ -29,6 +28,7 @@ const Checkout = lazy(() => import("./pages/checkout/Checkout"));
 const CropHealthDashboard = lazy(() => import("./pages/agriculture/CropHealthDashboard"));
 const Login = lazy(() => import("./pages/auth/Login"));
 const Register = lazy(() => import("./pages/auth/Register"));
+const AdminDashboard = lazy(() => import("./components/AdminDashboard"));
 
 // Route-based code splitting helps reduce initial load time
 const AboutPage = lazy(() => import("./pages/About"));
@@ -56,7 +56,7 @@ const AppLayout = () => {
       setIsLoading(false);
     } else {
       // Add artificial delay to show loading spinner (can be removed in production)
-      const timer = setTimeout(() => setIsLoading(false), 500);
+      const timer = setTimeout(() => setIsLoading(false), 300); // Reduced from 500ms to 300ms for faster transitions
       return () => clearTimeout(timer);
     }
   }, [location.pathname]);
@@ -78,6 +78,9 @@ const AppLayout = () => {
     } else if (path.includes("/dashboard/consumer")) {
       setPageTitle("Consumer Dashboard");
       setPageDescription("Track your orders and find fresh local produce");
+    } else if (path.includes("/dashboard/admin")) {
+      setPageTitle("Admin Dashboard");
+      setPageDescription("Manage the platform, users and analytics");
     } else if (path.includes("/about")) {
       setPageTitle("About Us");
       setPageDescription("Learn about our mission to transform agriculture");
@@ -121,21 +124,21 @@ const AppLayout = () => {
               <Route path="/dashboard/vendor" element={<VendorDashboard />} />
               <Route path="/dashboard/consumer" element={<ConsumerDashboard />} />
               <Route path="/dashboard/analytics" element={<MarketAnalytics />} />
+              <Route path="/dashboard/admin" element={<AdminDashboard />} />
               <Route path="/agriculture/crop-health" element={<CropHealthDashboard />} />
               <Route path="/farmer/products" element={<ManageProducts />} />
               <Route path="/vendor/marketplace" element={<Marketplace />} />
               <Route path="/consumer/nearby-vendors" element={<NearbyVendors />} />
               <Route path="/checkout" element={<Checkout />} />
-              <Route path="/admin-dashboard" element={<AdminDashboard />} />
-              <Route path="/market-prices" element={<AdminDashboard />} />
+              <Route path="/market-prices" element={<MarketAnalytics />} />
               
-              {/* New routes for About section */}
+              {/* Routes for About section */}
               <Route path="/about" element={<AboutPage />} />
               <Route path="/team" element={<TeamPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/faq" element={<FaqPage />} />
               
-              {/* New routes for Services section */}
+              {/* Routes for Services section */}
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/services/:service" element={<ServicesPage />} />
               
