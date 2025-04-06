@@ -1,8 +1,8 @@
 
+import React from 'react';
 import { CircleUserRound, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import React from 'react';
 
 const WelcomePage: React.FC = () => {
   const containerVariants = {

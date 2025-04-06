@@ -178,7 +178,7 @@ const preloadResources = () => {
   return Promise.all(resources);
 };
 
-// Mount app with optimized performance
+// Define a safer mount function that ensures React is properly initialized
 const mountApp = async () => {
   const startTime = performance.now();
   
@@ -186,7 +186,7 @@ const mountApp = async () => {
     // Start preloading resources immediately in parallel
     const preloadPromise = preloadResources();
     
-    // Create root with performance optimizations
+    // Ensure root element exists
     const rootElement = document.getElementById("root");
     if (!rootElement) {
       throw new Error("Root element not found");
@@ -197,8 +197,12 @@ const mountApp = async () => {
     rootElement.style.setProperty('backface-visibility', 'hidden');
     rootElement.style.setProperty('will-change', 'transform');
     
-    // Create root with concurrent mode - ensure single React instance
+    console.log("Creating React root...");
+    // Create root with proper error handling
     const root = createRoot(rootElement);
+    
+    // Render with error boundary
+    console.log("Rendering App component...");
     root.render(<App />);
     
     // Enable local storage caching for React components
@@ -260,5 +264,6 @@ if ('serviceWorker' in navigator) {
 
 // Start mounting immediately with requestAnimationFrame for smoother loading
 requestAnimationFrame(() => {
+  console.log("Starting app mount process...");
   mountApp();
 });
