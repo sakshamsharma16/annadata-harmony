@@ -11,20 +11,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react({
-      // Ensure React is available in scope for all components
-      swc: {
-        jsc: {
-          transform: {
-            react: {
-              runtime: 'automatic',
-              development: mode === 'development',
-              refresh: true,
-            },
-          },
-        },
-      },
-    }),
+    react(),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),

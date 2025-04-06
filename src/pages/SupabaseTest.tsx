@@ -17,6 +17,7 @@ const SupabaseTest = () => {
   async function testInsert() {
     // Create user object matching the expected schema
     const userData = {
+      id: crypto.randomUUID(), // Generate UUID for the id field
       full_name: 'Test Farmer',
       phone_number: '9999999999',
       role: 'farmer'
