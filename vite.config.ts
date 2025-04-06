@@ -12,7 +12,6 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react({
-      jsxRuntime: 'automatic',
       // Ensure React is available in scope for all components
       fastRefresh: true,
       swc: {

@@ -13,6 +13,7 @@ import EnhancedFooter from "./components/EnhancedFooter";
 import KrishiMitra from "./components/KrishiMitra";
 import FastBotsChat from "./components/FastBotsChat";
 import NavigationMenu from "./components/NavigationMenu";
+import SupabaseTestLink from "./components/SupabaseTestLink";
 import { getCacheItem, setCacheItem } from "./utils/cacheUtils";
 
 const Index = lazy(() => import("./pages/Index"));
@@ -149,6 +150,7 @@ const AppLayout = () => {
         {!isAuthRoute && <EnhancedFooter />}
         
         <KrishiMitra />
+        <SupabaseTestLink />
       </div>
     </>
   );

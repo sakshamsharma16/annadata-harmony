@@ -1,693 +1,311 @@
-
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { NavigationMenu as NavMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
-import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown, Download, UserPlus, Leaf, Shield } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { cn } from "@/lib/utils";
-import { getCacheItem, setCacheItem } from "@/utils/cacheUtils";
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X, ChevronDown, User, ShoppingCart, Bell } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const NavigationMenu = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState("");
-  const { t } = useLanguage();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState(3);
+  const [cartItems, setCartItems] = useState(2);
   const location = useLocation();
+  const { t } = useLanguage();
 
-  // Handle scroll events for navbar styling
+  // Check authentication status on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        setIsLoggedIn(true);
+        // Fetch user role from profiles table
+        const { data: userData } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.session.user.id)
+          .single();
+        
+        if (userData) {
+          setUserRole(userData.role);
+        }
+      }
+    };
+    
+    checkAuth();
+  }, []);
+
+  // Handle scroll events to change navbar appearance
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setScrolled(true);
+      if (window.scrollY > 10) {
+        setIsScrolled(true);
       } else {
-        setScrolled(false);
+        setIsScrolled(false);
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Set active section based on current route
+  // Close mobile menu when route changes
   useEffect(() => {
-    const path = location.pathname;
-    if (path === "/") {
-      setActiveSection("home");
-    } else if (path.includes("/dashboard/farmer") || path.includes("/farmer")) {
-      setActiveSection("farmers");
-    } else if (path.includes("/dashboard/vendor") || path.includes("/vendor")) {
-      setActiveSection("vendors");
-    } else if (path.includes("/dashboard/consumer") || path.includes("/consumer")) {
-      setActiveSection("consumers");
-    } else if (path.includes("/dashboard/analytics")) {
-      setActiveSection("analytics");
-    } else if (path.includes("/dashboard/admin")) {
-      setActiveSection("admin");
-    } else if (path.includes("/about") || path.includes("/team") || path.includes("/contact") || path.includes("/faq")) {
-      setActiveSection("about");
-    } else if (path.includes("/services")) {
-      setActiveSection("services");
-    }
-  }, [location]);
-
-  // Cache the last visited page for a smoother return experience
-  useEffect(() => {
-    setCacheItem('annadata-last-page', location.pathname, 1440); // Cache for 24 hours
+    setIsMenuOpen(false);
   }, [location.pathname]);
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setIsLoggedIn(false);
+    setUserRole(null);
+    // Redirect to home page
+    window.location.href = '/';
+  };
+
+  const navLinks = [
+    { name: t('nav.home'), path: '/' },
+    { name: t('nav.about'), path: '/about' },
+    { name: t('nav.services'), path: '/services' },
+    { name: t('nav.contact'), path: '/contact' },
+    { name: t('nav.supabaseTest'), path: '/supabase-test' }
+  ];
+
+  const dashboardLink = () => {
+    switch(userRole) {
+      case 'farmer':
+        return '/dashboard/farmer';
+      case 'vendor':
+        return '/dashboard/vendor';
+      case 'consumer':
+        return '/dashboard/consumer';
+      case 'admin':
+        return '/dashboard/admin';
+      default:
+        return '/login';
+    }
+  };
+
   return (
-    <header 
-      className={`fixed w-full z-50 transition-all duration-200 ${
-        scrolled 
-          ? "bg-white shadow-md py-2" 
-          : "bg-white/95 backdrop-blur-md border-b border-gray-100 py-3"
+    <nav 
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        isScrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'
       }`}
-      role="banner"
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
-          <Link 
-            to="/" 
-            className="flex-shrink-0 flex items-center font-bold text-2xl text-[#138808] transition-transform duration-200 hover:scale-105"
-            aria-label="Annadata Home"
-          >
-            <Leaf className="h-6 w-6 mr-2" aria-hidden="true" />
-            Annadata
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
+            <img 
+              src="/logo-placeholder.svg" 
+              alt="Annadata Logo" 
+              className="h-10 w-10 mr-2"
+            />
+            <span className="font-bold text-xl text-[#138808]">ANNADATA</span>
           </Link>
-          
+
           {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <NavMenu className="relative z-[100]">
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <Link to="/">
-                    <NavigationMenuLink 
-                      className={cn(
-                        navigationMenuTriggerStyle(),
-                        activeSection === "home" && "bg-accent/20 text-accent-foreground font-medium"
-                      )}
-                    >
-                      {t('nav.home')}
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger 
-                    className={cn(
-                      activeSection === "farmers" && "bg-accent/20 text-accent-foreground font-medium"
-                    )}
-                  >
-                    {t('nav.farmers')}
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[280px] gap-1 p-4 md:w-[400px] md:grid-cols-2">
-                      <li className="md:col-span-2">
-                        <div className="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-                          Farmer Resources
-                        </div>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/dashboard/farmer"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
-                        >
-                          <div className="text-sm font-medium">Farmer Dashboard</div>
-                          <div className="text-xs text-muted-foreground">Manage your farming business</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/farmer/products"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
-                        >
-                          <div className="text-sm font-medium">Products</div>
-                          <div className="text-xs text-muted-foreground">List and manage your products</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/agriculture/crop-health"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
-                        >
-                          <div className="text-sm font-medium">Crop Health</div>
-                          <div className="text-xs text-muted-foreground">Monitor and improve crop health</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/market-prices"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
-                        >
-                          <div className="text-sm font-medium">Market Prices</div>
-                          <div className="text-xs text-muted-foreground">View current market trends</div>
-                        </Link>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger 
-                    className={cn(
-                      activeSection === "vendors" && "bg-accent/20 text-accent-foreground font-medium"
-                    )}
-                  >
-                    {t('nav.vendors')}
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[280px] gap-1 p-4 md:w-[400px] md:grid-cols-2">
-                      <li className="md:col-span-2">
-                        <div className="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-                          Vendor Resources
-                        </div>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/dashboard/vendor"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
-                        >
-                          <div className="text-sm font-medium">Vendor Dashboard</div>
-                          <div className="text-xs text-muted-foreground">Manage your vendor account</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/vendor/marketplace"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
-                        >
-                          <div className="text-sm font-medium">Marketplace</div>
-                          <div className="text-xs text-muted-foreground">Browse available products</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/vendor/analytics"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
-                        >
-                          <div className="text-sm font-medium">Sales Analytics</div>
-                          <div className="text-xs text-muted-foreground">Track your business performance</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/vendor/resources"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
-                        >
-                          <div className="text-sm font-medium">Resources</div>
-                          <div className="text-xs text-muted-foreground">Helpful guides and tools</div>
-                        </Link>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger 
-                    className={cn(
-                      activeSection === "consumers" && "bg-accent/20 text-accent-foreground font-medium"
-                    )}
-                  >
-                    {t('nav.consumers')}
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[280px] gap-1 p-4 md:w-[400px] md:grid-cols-2">
-                      <li className="md:col-span-2">
-                        <div className="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-                          Consumer Resources
-                        </div>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/dashboard/consumer"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
-                        >
-                          <div className="text-sm font-medium">Consumer Dashboard</div>
-                          <div className="text-xs text-muted-foreground">Manage your consumer account</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/consumer/nearby-vendors"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
-                        >
-                          <div className="text-sm font-medium">Nearby Vendors</div>
-                          <div className="text-xs text-muted-foreground">Find vendors close to you</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/consumer/orders"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
-                        >
-                          <div className="text-sm font-medium">My Orders</div>
-                          <div className="text-xs text-muted-foreground">Track your orders</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/consumer/seasonal"
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-accent/10 hover:text-accent-foreground transition-colors duration-200"
-                        >
-                          <div className="text-sm font-medium">Seasonal Products</div>
-                          <div className="text-xs text-muted-foreground">Discover what's fresh now</div>
-                        </Link>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                
-                <NavigationMenuItem>
-                  <Link to="/dashboard/analytics">
-                    <NavigationMenuLink 
-                      className={cn(
-                        navigationMenuTriggerStyle(),
-                        activeSection === "analytics" && "bg-accent/20 text-accent-foreground font-medium"
-                      )}
-                    >
-                      {t('nav.analytics')}
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                
-                <NavigationMenuItem>
-                  <Link to="/dashboard/admin">
-                    <NavigationMenuLink 
-                      className={cn(
-                        navigationMenuTriggerStyle(),
-                        activeSection === "admin" && "bg-accent/20 text-accent-foreground font-medium",
-                        "flex items-center gap-1"
-                      )}
-                    >
-                      <Shield className="h-4 w-4" />
-                      Admin
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger 
-                    className={cn(
-                      activeSection === "services" && "bg-accent/20 text-accent-foreground font-medium"
-                    )}
-                  >
-                    Services
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-2 p-4 md:grid-cols-2">
-                      <li className="md:col-span-2">
-                        <div className="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-                          Our Services
-                        </div>
-                      </li>
-                      <li>
-                        <Link
-                          to="/services/logistics"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
-                        >
-                          <div className="text-sm font-medium leading-none">Logistics & Delivery</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Fast and reliable transportation for your produce
-                          </p>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/services/farm-consulting"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
-                        >
-                          <div className="text-sm font-medium leading-none">Farm Consulting</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Expert advice to improve your agricultural practices
-                          </p>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/services/certifications"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
-                        >
-                          <div className="text-sm font-medium leading-none">Certifications</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Get organic and quality certifications for your produce
-                          </p>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/services/financial"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
-                        >
-                          <div className="text-sm font-medium leading-none">Financial Services</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Loans, insurance, and other financial tools for farmers
-                          </p>
-                        </Link>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger 
-                    className={cn(
-                      activeSection === "about" && "bg-accent/20 text-accent-foreground font-medium"
-                    )}
-                  >
-                    About
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-2 p-4 md:grid-cols-2">
-                      <li>
-                        <Link
-                          to="/about"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
-                        >
-                          <div className="text-sm font-medium leading-none">About Us</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Learn about our mission and vision
-                          </p>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/team"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
-                        >
-                          <div className="text-sm font-medium leading-none">Our Team</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Meet the team behind Annadata
-                          </p>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/contact"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
-                        >
-                          <div className="text-sm font-medium leading-none">Contact</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Get in touch with us
-                          </p>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/faq"
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground"
-                        >
-                          <div className="text-sm font-medium leading-none">FAQ</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Frequently asked questions
-                          </p>
-                        </Link>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavMenu>
+          <div className="hidden md:flex items-center space-x-1">
+            {navLinks.map((link, index) => (
+              <Link 
+                key={index}
+                to={link.path}
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  location.pathname === link.path
+                    ? 'text-[#138808] font-semibold'
+                    : 'text-gray-700 hover:text-[#138808]'
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
           </div>
-          
-          <div className="hidden md:flex space-x-4">
-            <Button 
-              variant="outline" 
-              className="flex items-center space-x-2 bg-white hover:bg-gray-50 transition-all duration-200"
-              aria-label="Download App"
-            >
-              <Download className="w-4 h-4" />
-              <span>Download App</span>
-            </Button>
-            <Button 
-              className="bg-[#138808] hover:bg-[#0d6b06] text-white flex items-center space-x-2 shadow-sm hover:shadow-md transition-all duration-200"
-              aria-label="Join Movement"
-            >
-              <UserPlus className="w-4 h-4" />
-              <span>Join Movement</span>
-            </Button>
+
+          {/* User Actions */}
+          <div className="hidden md:flex items-center space-x-4">
+            {isLoggedIn ? (
+              <>
+                {/* Notifications */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="relative">
+                      <Bell className="h-5 w-5" />
+                      {notifications > 0 && (
+                        <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500">
+                          {notifications}
+                        </Badge>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-80">
+                    <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <div className="flex flex-col">
+                        <span className="font-medium">New order received</span>
+                        <span className="text-xs text-gray-500">2 minutes ago</span>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <div className="flex flex-col">
+                        <span className="font-medium">Price alert: Tomatoes</span>
+                        <span className="text-xs text-gray-500">1 hour ago</span>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <div className="flex flex-col">
+                        <span className="font-medium">Payment received</span>
+                        <span className="text-xs text-gray-500">Yesterday</span>
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* Cart */}
+                {userRole === 'consumer' && (
+                  <Link to="/checkout" className="relative">
+                    <Button variant="ghost" size="icon">
+                      <ShoppingCart className="h-5 w-5" />
+                      {cartItems > 0 && (
+                        <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-[#138808]">
+                          {cartItems}
+                        </Badge>
+                      )}
+                    </Button>
+                  </Link>
+                )}
+
+                {/* User Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative flex items-center gap-2 h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src="/placeholder-user.jpg" />
+                        <AvatarFallback>
+                          <User className="h-4 w-4" />
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to={dashboardLink()}>Dashboard</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile">Profile</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/settings">Settings</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost">{t('auth.login')}</Button>
+                </Link>
+                <Link to="/register">
+                  <Button variant="default" className="bg-[#138808] hover:bg-[#0c6606]">
+                    {t('auth.register')}
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
-          
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <Button 
-              onClick={() => setIsOpen(!isOpen)} 
-              variant="ghost"
-              className="text-gray-600 p-2 focus:outline-none"
-              aria-expanded={isOpen}
-              aria-label="Toggle menu"
-              aria-controls="mobile-menu"
+
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-[#138808] focus:outline-none"
             >
-              {isOpen ? (
-                <X size={24} className="text-gray-800" aria-hidden="true" />
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
               ) : (
-                <Menu size={24} aria-hidden="true" />
+                <Menu className="h-6 w-6" />
               )}
-              <span className="sr-only">Toggle Menu</span>
-            </Button>
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden pt-4 pb-3 space-y-1">
+            {navLinks.map((link, index) => (
+              <Link
+                key={index}
+                to={link.path}
+                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                  location.pathname === link.path
+                    ? 'text-[#138808] font-semibold'
+                    : 'text-gray-700 hover:text-[#138808]'
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
+            
+            <div className="pt-4 border-t border-gray-200">
+              {isLoggedIn ? (
+                <>
+                  <Link
+                    to={dashboardLink()}
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#138808]"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/profile"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#138808]"
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#138808]"
+                  >
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#138808]"
+                  >
+                    {t('auth.login')}
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-[#138808]"
+                  >
+                    {t('auth.register')}
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
-      
-      {/* Mobile Menu */}
-      <div 
-        id="mobile-menu"
-        className={`md:hidden overflow-hidden transition-all duration-200 ${
-          isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
-        }`}
-        aria-hidden={!isOpen}
-      >
-        <div className="px-4 py-3 space-y-2 bg-white shadow-lg rounded-b-xl max-h-[80vh] overflow-y-auto">
-          <Link 
-            to="/" 
-            className={cn(
-              "block px-3 py-2 hover:bg-gray-50 rounded-md transition-colors duration-150",
-              activeSection === "home" ? "text-[#138808] font-medium" : "text-gray-700"
-            )}
-            onClick={() => setIsOpen(false)}
-          >
-            Home
-          </Link>
-          
-          {/* Mobile Farmers Dropdown */}
-          <div className="space-y-1">
-            <div className={cn(
-              "font-medium px-3 py-2",
-              activeSection === "farmers" ? "text-[#138808]" : "text-gray-700"
-            )}>Farmers</div>
-            <Link 
-              to="/dashboard/farmer" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Farmer Dashboard
-            </Link>
-            <Link 
-              to="/farmer/products" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Products
-            </Link>
-            <Link 
-              to="/agriculture/crop-health"
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Crop Health
-            </Link>
-            <Link 
-              to="/market-prices"
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Market Prices
-            </Link>
-          </div>
-          
-          {/* Mobile Vendors Dropdown */}
-          <div className="space-y-1">
-            <div className={cn(
-              "font-medium px-3 py-2",
-              activeSection === "vendors" ? "text-[#138808]" : "text-gray-700"
-            )}>Vendors</div>
-            <Link 
-              to="/dashboard/vendor" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Vendor Dashboard
-            </Link>
-            <Link 
-              to="/vendor/marketplace" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Marketplace
-            </Link>
-            <Link 
-              to="/vendor/analytics" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Sales Analytics
-            </Link>
-            <Link 
-              to="/vendor/resources" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Resources
-            </Link>
-          </div>
-          
-          {/* Mobile Consumers Dropdown */}
-          <div className="space-y-1">
-            <div className={cn(
-              "font-medium px-3 py-2",
-              activeSection === "consumers" ? "text-[#138808]" : "text-gray-700"
-            )}>Consumers</div>
-            <Link 
-              to="/dashboard/consumer" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Consumer Dashboard
-            </Link>
-            <Link 
-              to="/consumer/nearby-vendors" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Nearby Vendors
-            </Link>
-            <Link 
-              to="/consumer/orders" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              My Orders
-            </Link>
-            <Link 
-              to="/consumer/seasonal" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Seasonal Products
-            </Link>
-          </div>
-          
-          <Link 
-            to="/dashboard/analytics" 
-            className={cn(
-              "block px-3 py-2 hover:bg-gray-50 rounded-md transition-colors duration-150",
-              activeSection === "analytics" ? "text-[#138808] font-medium" : "text-gray-700"
-            )}
-            onClick={() => setIsOpen(false)}
-          >
-            Market Analytics
-          </Link>
-          
-          {/* Admin Dashboard in mobile menu */}
-          <Link 
-            to="/dashboard/admin" 
-            className={cn(
-              "block px-3 py-2 hover:bg-gray-50 rounded-md transition-colors duration-150 flex items-center gap-1",
-              activeSection === "admin" ? "text-[#138808] font-medium" : "text-gray-700"
-            )}
-            onClick={() => setIsOpen(false)}
-          >
-            <Shield className="h-4 w-4" />
-            <span>Admin Dashboard</span>
-          </Link>
-          
-          {/* Services section in mobile view */}
-          <div className="space-y-1">
-            <div className={cn(
-              "font-medium px-3 py-2",
-              activeSection === "services" ? "text-[#138808]" : "text-gray-700"
-            )}>Services</div>
-            <Link 
-              to="/services/logistics" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Logistics & Delivery
-            </Link>
-            <Link 
-              to="/services/farm-consulting" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Farm Consulting
-            </Link>
-            <Link 
-              to="/services/certifications" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Certifications
-            </Link>
-            <Link 
-              to="/services/financial" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Financial Services
-            </Link>
-          </div>
-          
-          {/* About section in mobile view */}
-          <div className="space-y-1">
-            <div className={cn(
-              "font-medium px-3 py-2",
-              activeSection === "about" ? "text-[#138808]" : "text-gray-700"
-            )}>About</div>
-            <Link 
-              to="/about" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              About Us
-            </Link>
-            <Link 
-              to="/team" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Our Team
-            </Link>
-            <Link 
-              to="/contact" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              Contact
-            </Link>
-            <Link 
-              to="/faq" 
-              className="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-150"
-              onClick={() => setIsOpen(false)}
-            >
-              FAQ
-            </Link>
-          </div>
-          
-          <div className="pt-2 space-y-3">
-            <Button variant="outline" className="w-full flex items-center justify-center space-x-2 transition-all duration-200">
-              <Download className="w-4 h-4" />
-              <span>Download App</span>
-            </Button>
-            <Button className="w-full bg-[#138808] hover:bg-[#0d6b06] text-white flex items-center justify-center space-x-2 shadow-sm hover:shadow-md transition-all duration-200">
-              <UserPlus className="w-4 h-4" />
-              <span>Join Movement</span>
-            </Button>
-          </div>
-        </div>
-      </div>
-    </header>
+    </nav>
   );
 };
 
