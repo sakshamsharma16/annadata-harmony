@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(), // Simplified react plugin configuration
+    react(), // Using the default SWC configuration for React
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
@@ -27,5 +27,9 @@ export default defineConfig(({ mode }) => ({
     commonjsOptions: {
       include: [/node_modules/],
     },
+  },
+  // Explicitly define React configuration
+  esbuild: {
+    jsxInject: `import React from 'react'`
   }
 }));

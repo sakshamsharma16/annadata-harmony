@@ -79,11 +79,6 @@ const mountApp = () => {
     // Show loading indicator
     showLoadingIndicator();
     
-    // Ensure React is loaded
-    if (!React || typeof React.createElement !== 'function') {
-      throw new Error('React is not properly loaded');
-    }
-    
     const rootElement = document.getElementById('root');
     if (!rootElement) {
       throw new Error('Root element not found');
@@ -92,7 +87,13 @@ const mountApp = () => {
     // Create root with React 18 createRoot
     const root = createRoot(rootElement);
     
-    // Render app
+    // Explicitly check that React is available
+    if (!React || typeof React.createElement !== 'function') {
+      console.error('React is not properly loaded');
+      throw new Error('React initialization issue');
+    }
+    
+    // Render app with explicit React reference
     root.render(
       <React.StrictMode>
         <App />
@@ -123,6 +124,11 @@ const mountApp = () => {
     }
   }
 };
+
+// Make sure React is defined in the global scope
+if (typeof window !== 'undefined') {
+  window.React = React;
+}
 
 // Register service worker
 if ('serviceWorker' in navigator) {
