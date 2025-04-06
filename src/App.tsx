@@ -1,5 +1,5 @@
 
-import { Suspense, lazy, useState, useEffect } from "react";
+import React, { Suspense, lazy, useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -36,12 +36,25 @@ const TeamPage = lazy(() => import("./pages/Team"));
 const ContactPage = lazy(() => import("./pages/Contact"));
 const FaqPage = lazy(() => import("./pages/FAQ"));
 const ServicesPage = lazy(() => import("./pages/Services"));
+const WelcomePage = lazy(() => import("./components/WelcomePage"));
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center min-h-screen">
     <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-[#138808] border-t-transparent"></div>
   </div>
 );
+
+// Create and configure query client with caching strategy
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // Data remains fresh for 1 minute
+      gcTime: 5 * 60 * 1000, // Cache persists for 5 minutes (replaced cacheTime with gcTime)
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 const AppLayout = () => {
   const location = useLocation();
@@ -117,7 +130,8 @@ const AppLayout = () => {
         <main className={!isAuthRoute ? "pt-20" : ""}>
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<WelcomePage />} />
+              <Route path="/home" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/dashboard/farmer" element={<FarmerDashboard />} />
@@ -155,23 +169,11 @@ const AppLayout = () => {
   );
 };
 
-// Create and configure query client with caching strategy
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000, // Data remains fresh for 1 minute
-      gcTime: 5 * 60 * 1000, // Cache persists for 5 minutes (replaced cacheTime with gcTime)
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
-
 // Create basic placeholder pages for new sections
 const App = () => {
-  const [useGeminiAssistant, setUseGeminiAssistant] = useState(true);
+  const [useGeminiAssistant, setUseGeminiAssistant] = React.useState(true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const preference = localStorage.getItem('preferredChatbot');
     if (preference === 'krishiMitra') {
       setUseGeminiAssistant(false);
@@ -200,23 +202,25 @@ const App = () => {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <HelmetProvider>
-        <LanguageProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AppLayout />
-            </BrowserRouter>
-            
-            {!useGeminiAssistant && (
-              <KrishiMitra />
-            )}
-          </TooltipProvider>
-        </LanguageProvider>
-      </HelmetProvider>
-    </QueryClientProvider>
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <HelmetProvider>
+          <LanguageProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <AppLayout />
+              </BrowserRouter>
+              
+              {!useGeminiAssistant && (
+                <KrishiMitra />
+              )}
+            </TooltipProvider>
+          </LanguageProvider>
+        </HelmetProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
   );
 };
 

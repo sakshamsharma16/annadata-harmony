@@ -14,7 +14,7 @@
     
     <!-- Preload critical CSS and JavaScript -->
     <link rel="preload" href="/src/index.css" as="style">
-    <link rel="preload" href="/src/main.tsx" as="script">
+    <link rel="stylesheet" href="/src/index.css">
     
     <meta name="author" content="ANNADATA" />
     <meta property="og:image" content="/og-image.png" />
@@ -24,9 +24,11 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- Required Lovable script tag for the "Select" feature -->
+    
+    <!-- Script for the "Select" feature -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <!-- Load React first to ensure it's properly initialized before our app -->
+    
+    <!-- Load main.tsx which handles React initialization -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
