@@ -1,3 +1,4 @@
+
 import { Suspense, lazy, useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -6,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { HelmetProvider } from "react-helmet-async";
+import MotionProvider from "./components/MotionProvider";
 import SEOHead from "./components/SEOHead";
 import AppNavbar from "./components/AppNavbar";
 import EnhancedFooter from "./components/EnhancedFooter";
@@ -190,15 +192,17 @@ const App = () => {
       <HelmetProvider>
         <LanguageProvider>
           <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AppLayout />
-            </BrowserRouter>
-            
-            {useFastBots && (
-              <FastBotsChat botId="cm4bojr9l0j5zsvbm6faemmyn" />
-            )}
+            <MotionProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <AppLayout />
+              </BrowserRouter>
+              
+              {useFastBots && (
+                <FastBotsChat botId="cm4bojr9l0j5zsvbm6faemmyn" />
+              )}
+            </MotionProvider>
           </TooltipProvider>
         </LanguageProvider>
       </HelmetProvider>
