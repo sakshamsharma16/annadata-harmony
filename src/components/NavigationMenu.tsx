@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronDown, User, ShoppingCart, Bell } from 'lucide-react';
@@ -31,9 +32,9 @@ const NavigationMenu = () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
         setIsLoggedIn(true);
-        // Fetch user role from profiles table
+        // Fetch user role from users table
         const { data: userData } = await supabase
-          .from('profiles')
+          .from('users')
           .select('role')
           .eq('id', data.session.user.id)
           .single();

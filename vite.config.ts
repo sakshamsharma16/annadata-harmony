@@ -13,7 +13,6 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react({
       // Ensure React is available in scope for all components
-      fastRefresh: true,
       swc: {
         jsc: {
           transform: {

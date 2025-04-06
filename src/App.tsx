@@ -1,4 +1,3 @@
-
 import { Suspense, lazy, useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -30,8 +29,8 @@ const CropHealthDashboard = lazy(() => import("./pages/agriculture/CropHealthDas
 const Login = lazy(() => import("./pages/auth/Login"));
 const Register = lazy(() => import("./pages/auth/Register"));
 const AdminDashboard = lazy(() => import("./components/AdminDashboard"));
+const SupabaseTest = lazy(() => import("./pages/SupabaseTest"));
 
-// Route-based code splitting helps reduce initial load time
 const AboutPage = lazy(() => import("./pages/About"));
 const TeamPage = lazy(() => import("./pages/Team"));
 const ContactPage = lazy(() => import("./pages/Contact"));
@@ -51,20 +50,16 @@ const AppLayout = () => {
   const [pageDescription, setPageDescription] = useState("");
   
   useEffect(() => {
-    // Check if we have a cached version of this page to show immediately
     const cachedContent = getCacheItem(`page-content-${location.pathname}`);
     if (cachedContent) {
       setIsLoading(false);
     } else {
-      // Add artificial delay to show loading spinner (can be removed in production)
-      const timer = setTimeout(() => setIsLoading(false), 300); // Reduced from 500ms to 300ms for faster transitions
+      const timer = setTimeout(() => setIsLoading(false), 300);
       return () => clearTimeout(timer);
     }
   }, [location.pathname]);
   
-  // Update page metadata based on current route
   useEffect(() => {
-    // Set title and description based on current path
     const path = location.pathname;
     
     if (path === "/") {
@@ -93,11 +88,9 @@ const AppLayout = () => {
       setPageDescription("Explore our range of services for the agricultural ecosystem");
     }
     
-    // Cache current path after navigation
     setCacheItem(`last-visited-${path}`, new Date().toISOString());
   }, [location]);
   
-  // Check if we're on an authentication route
   const isAuthRoute = location.pathname === "/login" || 
                      location.pathname === "/register" || 
                      location.pathname === "/forgot-password";
@@ -132,14 +125,13 @@ const AppLayout = () => {
               <Route path="/consumer/nearby-vendors" element={<NearbyVendors />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/market-prices" element={<MarketAnalytics />} />
+              <Route path="/supabase-test" element={<SupabaseTest />} />
               
-              {/* Routes for About section */}
               <Route path="/about" element={<AboutPage />} />
               <Route path="/team" element={<TeamPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/faq" element={<FaqPage />} />
               
-              {/* Routes for Services section */}
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/services/:service" element={<ServicesPage />} />
               
@@ -156,19 +148,17 @@ const AppLayout = () => {
   );
 };
 
-// Create and configure query client with caching strategy
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60 * 1000, // Data remains fresh for 1 minute
-      gcTime: 5 * 60 * 1000, // Cache persists for 5 minutes (replaced cacheTime with gcTime)
+      staleTime: 60 * 1000,
+      gcTime: 5 * 60 * 1000,
       refetchOnWindowFocus: false,
       retry: 1,
     },
   },
 });
 
-// Create basic placeholder pages for new sections
 const App = () => {
   const [useFastBots, setUseFastBots] = useState(true);
 
@@ -181,13 +171,11 @@ const App = () => {
       localStorage.setItem('preferredChatbot', 'fastBots');
     }
     
-    // Preload important resources
     const preloadLinks = [
       { href: '/og-image.png', as: 'image' },
       { href: 'https://app.fastbots.ai/embed.js', as: 'script' }
     ];
     
-    // Add preload links to document head
     preloadLinks.forEach(link => {
       const preloadLink = document.createElement('link');
       preloadLink.rel = 'preload';

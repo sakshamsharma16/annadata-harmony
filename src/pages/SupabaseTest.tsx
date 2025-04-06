@@ -15,13 +15,18 @@ const SupabaseTest = () => {
   }
 
   async function testInsert() {
-    const { data, error } = await supabase.from('users').insert([
-      {
-        full_name: 'Test Farmer',
-        phone_number: '9999999999',
-        role: 'farmer'
-      }
-    ]).select();
+    // Create user object matching the expected schema
+    const userData = {
+      full_name: 'Test Farmer',
+      phone_number: '9999999999',
+      role: 'farmer'
+    };
+    
+    const { data, error } = await supabase
+      .from('users')
+      .insert(userData)
+      .select();
+      
     logResult(error ? '❌ ' + JSON.stringify(error, null, 2) : '✅ ' + JSON.stringify(data, null, 2));
   }
 
