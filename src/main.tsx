@@ -1,3 +1,4 @@
+
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
@@ -186,17 +187,18 @@ const mountApp = async () => {
     const preloadPromise = preloadResources();
     
     // Create root with performance optimizations
-    const rootElement = document.getElementById("root")!;
+    const rootElement = document.getElementById("root");
+    if (!rootElement) {
+      throw new Error("Root element not found");
+    }
     
     // Enable hardware acceleration
     rootElement.style.setProperty('transform', 'translateZ(0)');
     rootElement.style.setProperty('backface-visibility', 'hidden');
     rootElement.style.setProperty('will-change', 'transform');
     
-    // Create root with concurrent mode 
+    // Create root with concurrent mode - ensure single React instance
     const root = createRoot(rootElement);
-    
-    // Render app
     root.render(<App />);
     
     // Enable local storage caching for React components
@@ -225,7 +227,7 @@ const mountApp = async () => {
     // Wait for resources to load, but with a timeout
     Promise.race([
       preloadPromise,
-      new Promise(resolve => setTimeout(resolve, 600)) // Slightly shorter timeout for faster perceived performance
+      new Promise(resolve => setTimeout(resolve, 600)) 
     ]).then(() => {
       // Remove loading indicator
       requestAnimationFrame(() => {

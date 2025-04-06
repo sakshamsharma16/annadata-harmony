@@ -2,8 +2,9 @@
 import { CircleUserRound, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import React from 'react';
 
-const WelcomePage = () => {
+const WelcomePage: React.FC = () => {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
