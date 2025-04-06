@@ -11,10 +11,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react({
-      jsxImportSource: 'react',
-      fastRefresh: true,
-    }),
+    react(), // Simplified react plugin configuration
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
