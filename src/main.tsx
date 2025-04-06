@@ -1,4 +1,3 @@
-
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
@@ -192,12 +191,13 @@ const mountApp = async () => {
       throw new Error("Root element not found");
     }
     
+    console.log("Creating React root...");
+    
     // Enable hardware acceleration
     rootElement.style.setProperty('transform', 'translateZ(0)');
     rootElement.style.setProperty('backface-visibility', 'hidden');
     rootElement.style.setProperty('will-change', 'transform');
     
-    console.log("Creating React root...");
     // Create root with proper error handling
     const root = createRoot(rootElement);
     
@@ -246,6 +246,22 @@ const mountApp = async () => {
   } catch (error) {
     console.error('Error mounting app:', error);
     removeLoadingIndicator();
+    
+    // Display user-friendly error
+    const rootElement = document.getElementById("root");
+    if (rootElement) {
+      rootElement.innerHTML = `
+        <div style="padding: 20px; font-family: system-ui, sans-serif; text-align: center;">
+          <h2 style="color: #d32f2f;">Something went wrong</h2>
+          <p>We're sorry, but the application couldn't be loaded.</p>
+          <button onclick="location.reload()" 
+                  style="background: #138808; color: white; border: none; padding: 10px 20px; 
+                         border-radius: 4px; cursor: pointer; margin-top: 20px;">
+            Try Again
+          </button>
+        </div>
+      `;
+    }
   }
 };
 
@@ -263,7 +279,5 @@ if ('serviceWorker' in navigator) {
 }
 
 // Start mounting immediately with requestAnimationFrame for smoother loading
-requestAnimationFrame(() => {
-  console.log("Starting app mount process...");
-  mountApp();
-});
+console.log("Starting app mount process...");
+mountApp();
