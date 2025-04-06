@@ -1,3 +1,5 @@
+
+import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
@@ -203,7 +205,14 @@ const mountApp = async () => {
     
     // Render with error boundary
     console.log("Rendering App component...");
-    root.render(<App />);
+    
+    // Make sure React is properly defined before rendering
+    if (!React || !React.createElement) {
+      throw new Error("React is not properly loaded");
+    }
+    
+    // Explicit React.createElement to ensure React is used correctly
+    root.render(React.createElement(App));
     
     // Enable local storage caching for React components
     if (window.localStorage) {
@@ -278,6 +287,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Start mounting immediately with requestAnimationFrame for smoother loading
+// Start mounting immediately
 console.log("Starting app mount process...");
 mountApp();

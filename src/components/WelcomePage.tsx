@@ -1,5 +1,5 @@
 
-import React from 'react';
+import * as React from 'react';
 import { CircleUserRound, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";

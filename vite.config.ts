@@ -11,20 +11,35 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
+    react({
+      jsxImportSource: 'react',
+      fastRefresh: true,
+    }),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "react": path.resolve(__dirname, "node_modules/react"), // Ensure single React instance
-      "react-dom": path.resolve(__dirname, "node_modules/react-dom"), // Ensure single ReactDOM instance
+      "react": path.resolve(__dirname, "node_modules/react"),
+      "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
     },
-    dedupe: ['react', 'react-dom'], // Deduplicate React to prevent multiple instances
+    dedupe: ['react', 'react-dom'],
   },
   optimizeDeps: {
     include: ['react', 'react-dom'],
-    force: true // Force optimization of dependencies
+    force: true
+  },
+  build: {
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+        },
+      },
+    },
   }
 }));
