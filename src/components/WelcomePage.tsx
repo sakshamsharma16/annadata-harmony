@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { CircleUserRound } from "lucide-react";
 import LanguageSelector from "./LanguageSelector";
 

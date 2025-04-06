@@ -1,7 +1,12 @@
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
-import mapboxgl from 'mapbox-gl'
+
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App.tsx';
+import './index.css';
+import mapboxgl from 'mapbox-gl';
+
+// Ensure React is available globally
+window.React = React;
 
 // Create a loading indicator
 const showLoadingIndicator = () => {
@@ -196,8 +201,12 @@ const mountApp = async () => {
     // Create root with concurrent mode 
     const root = createRoot(rootElement);
     
-    // Render app
-    root.render(<App />);
+    // Render app with React context properly established
+    root.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
     
     // Enable local storage caching for React components
     if (window.localStorage) {
