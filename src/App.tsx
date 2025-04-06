@@ -1,5 +1,5 @@
 
-import React, { Suspense, lazy, useState, useEffect } from "react";
+import { Suspense, lazy, useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,7 +11,7 @@ import SEOHead from "./components/SEOHead";
 import AppNavbar from "./components/AppNavbar";
 import EnhancedFooter from "./components/EnhancedFooter";
 import KrishiMitra from "./components/KrishiMitra";
-import GeminiChat from "./components/GeminiChat";
+import FastBotsChat from "./components/FastBotsChat";
 import NavigationMenu from "./components/NavigationMenu";
 import { getCacheItem, setCacheItem } from "./utils/cacheUtils";
 
@@ -36,25 +36,12 @@ const TeamPage = lazy(() => import("./pages/Team"));
 const ContactPage = lazy(() => import("./pages/Contact"));
 const FaqPage = lazy(() => import("./pages/FAQ"));
 const ServicesPage = lazy(() => import("./pages/Services"));
-const WelcomePage = lazy(() => import("./components/WelcomePage"));
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center min-h-screen">
     <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-[#138808] border-t-transparent"></div>
   </div>
 );
-
-// Create and configure query client with caching strategy
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000, // Data remains fresh for 1 minute
-      gcTime: 5 * 60 * 1000, // Cache persists for 5 minutes (replaced cacheTime with gcTime)
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
 
 const AppLayout = () => {
   const location = useLocation();
@@ -130,8 +117,7 @@ const AppLayout = () => {
         <main className={!isAuthRoute ? "pt-20" : ""}>
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
-              <Route path="/" element={<WelcomePage />} />
-              <Route path="/home" element={<Index />} />
+              <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/dashboard/farmer" element={<FarmerDashboard />} />
@@ -162,33 +148,41 @@ const AppLayout = () => {
         </main>
         {!isAuthRoute && <EnhancedFooter />}
         
-        {/* Use the new Gemini chatbot instead of FastBotsChat */}
-        <GeminiChat />
+        <KrishiMitra />
       </div>
     </>
   );
 };
 
+// Create and configure query client with caching strategy
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // Data remains fresh for 1 minute
+      gcTime: 5 * 60 * 1000, // Cache persists for 5 minutes (replaced cacheTime with gcTime)
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
 // Create basic placeholder pages for new sections
 const App = () => {
-  const [useGeminiAssistant, setUseGeminiAssistant] = React.useState(true);
+  const [useFastBots, setUseFastBots] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const preference = localStorage.getItem('preferredChatbot');
     if (preference === 'krishiMitra') {
-      setUseGeminiAssistant(false);
-    } else if (preference === 'gemini' || !preference) {
-      setUseGeminiAssistant(true);
-      localStorage.setItem('preferredChatbot', 'gemini');
+      setUseFastBots(false);
+    } else if (preference === 'fastBots' || !preference) {
+      setUseFastBots(true);
+      localStorage.setItem('preferredChatbot', 'fastBots');
     }
     
     // Preload important resources
     const preloadLinks = [
       { href: '/og-image.png', as: 'image' },
-      { href: '/image1.jpg', as: 'image' },
-      { href: '/image2.jpg', as: 'image' },
-      { href: '/image3.jpg', as: 'image' },
-      { href: '/image4.jpg', as: 'image' }
+      { href: 'https://app.fastbots.ai/embed.js', as: 'script' }
     ];
     
     // Add preload links to document head
@@ -202,25 +196,23 @@ const App = () => {
   }, []);
 
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <HelmetProvider>
-          <LanguageProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <AppLayout />
-              </BrowserRouter>
-              
-              {!useGeminiAssistant && (
-                <KrishiMitra />
-              )}
-            </TooltipProvider>
-          </LanguageProvider>
-        </HelmetProvider>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <HelmetProvider>
+        <LanguageProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppLayout />
+            </BrowserRouter>
+            
+            {useFastBots && (
+              <FastBotsChat botId="cm4bojr9l0j5zsvbm6faemmyn" />
+            )}
+          </TooltipProvider>
+        </LanguageProvider>
+      </HelmetProvider>
+    </QueryClientProvider>
   );
 };
 
