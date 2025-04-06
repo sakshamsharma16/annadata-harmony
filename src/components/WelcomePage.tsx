@@ -1,9 +1,15 @@
 
 import { CircleUserRound } from "lucide-react";
+import LanguageSelector from "./LanguageSelector";
 
 const WelcomePage = () => {
   return (
     <div className="min-h-screen gradient-background flex flex-col items-center justify-between p-6">
+      {/* Language Selector - added at the top right */}
+      <div className="self-end">
+        <LanguageSelector />
+      </div>
+      
       <div className="w-full max-w-lg mx-auto flex flex-col items-center justify-center flex-grow gap-8">
         {/* Logo and Header */}
         <div className="text-center space-y-4 animate-fade-up">
