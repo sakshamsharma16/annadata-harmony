@@ -89,7 +89,7 @@ const AppRoutes: React.FC = () => {
                 </ProtectedRoute>
               } />
               
-              {/* Separate route for admin dashboard */}
+              {/* Admin route - strictly only accessible to users with admin role */}
               <Route path="/admin" element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminDashboard />
