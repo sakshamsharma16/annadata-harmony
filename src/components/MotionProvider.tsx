@@ -6,7 +6,7 @@ interface MotionProviderProps {
   children: ReactNode;
 }
 
-const MotionProvider = ({ children }: MotionProviderProps) => {
+const MotionProvider: React.FC<MotionProviderProps> = ({ children }) => {
   return (
     <MotionConfig reducedMotion="user">
       {children}

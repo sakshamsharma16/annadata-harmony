@@ -1,11 +1,9 @@
-
-import { Suspense, lazy, useState, useEffect } from "react";
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { LanguageProvider } from "./contexts/LanguageContext";
 import { HelmetProvider } from "react-helmet-async";
 import MotionProvider from "./components/MotionProvider";
 import SEOHead from "./components/SEOHead";
@@ -13,6 +11,7 @@ import NavigationMenu from "./components/NavigationMenu";
 import SupabaseTestLink from "./components/SupabaseTestLink";
 import { getCacheItem, setCacheItem } from "./utils/cacheUtils";
 import { supabase } from "@/integrations/supabase/client";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -42,7 +41,6 @@ const LoadingSpinner = () => (
   </div>
 );
 
-// Route guard for authenticated routes
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState(null);
@@ -55,7 +53,6 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
       if (data.session) {
         setIsAuthenticated(true);
         
-        // Get user role
         const { data: userData } = await supabase
           .from('users')
           .select('role')
@@ -160,7 +157,6 @@ const AppLayout = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               
-              {/* Protected routes with role-based access */}
               <Route path="/dashboard/farmer" element={
                 <ProtectedRoute allowedRoles={['farmer']}>
                   <FarmerDashboard />
@@ -227,7 +223,6 @@ const AppLayout = () => {
                 </ProtectedRoute>
               } />
               
-              {/* Public accessible pages */}
               <Route path="/about" element={<AboutPage />} />
               <Route path="/team" element={<TeamPage />} />
               <Route path="/contact" element={<ContactPage />} />
@@ -262,17 +257,17 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <HelmetProvider>
-        <LanguageProvider>
-          <TooltipProvider>
-            <MotionProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
+        <BrowserRouter>
+          <LanguageProvider>
+            <TooltipProvider>
+              <MotionProvider>
+                <Toaster />
+                <Sonner />
                 <AppLayout />
-              </BrowserRouter>
-            </MotionProvider>
-          </TooltipProvider>
-        </LanguageProvider>
+              </MotionProvider>
+            </TooltipProvider>
+          </LanguageProvider>
+        </BrowserRouter>
       </HelmetProvider>
     </QueryClientProvider>
   );

@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 // Available languages
@@ -230,6 +231,17 @@ const translations: Translations = {
     hindi: 'शुरू करें',
     punjabi: 'ਸ਼ੁਰੂ ਕਰੋ',
   },
+  // Auth
+  'auth.login': {
+    english: 'Login',
+    hindi: 'लॉगिन',
+    punjabi: 'ਲਾਗਇਨ',
+  },
+  'auth.register': {
+    english: 'Register',
+    hindi: 'रजिस्टर',
+    punjabi: 'ਰਜਿਸਟਰ',
+  }
 };
 
 // Context interface
@@ -300,4 +312,10 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 };
 
 // Custom hook for using the language context
-export const useLanguage = () => useContext(LanguageContext);
+export const useLanguage = (): LanguageContextType => {
+  const context = useContext(LanguageContext);
+  if (context === undefined) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+};
