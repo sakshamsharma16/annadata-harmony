@@ -1,6 +1,6 @@
 
 import React, { ReactNode } from 'react';
-import { MotionConfig } from 'framer-motion';
+import { MotionConfig, LazyMotion, domAnimation } from 'framer-motion';
 
 interface MotionProviderProps {
   children: ReactNode;
@@ -8,9 +8,11 @@ interface MotionProviderProps {
 
 const MotionProvider: React.FC<MotionProviderProps> = ({ children }) => {
   return (
-    <MotionConfig reducedMotion="user">
-      {children}
-    </MotionConfig>
+    <LazyMotion features={domAnimation}>
+      <MotionConfig reducedMotion="user">
+        {children}
+      </MotionConfig>
+    </LazyMotion>
   );
 };
 

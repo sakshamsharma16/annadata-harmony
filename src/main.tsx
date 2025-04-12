@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
@@ -158,7 +159,8 @@ const preloadResources = () => {
     checkCacheAndLoad(url);
   });
   
-  if (typeof mapboxgl !== 'undefined') {
+  // Fix for mapboxgl UMD global reference
+  if (typeof window.mapboxgl !== 'undefined') {
     resources.push(
       checkCacheAndLoad('https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js')
     );
