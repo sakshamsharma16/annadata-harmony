@@ -1,3 +1,4 @@
+
 import { Suspense, lazy, useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -13,6 +14,7 @@ import { getCacheItem, setCacheItem } from "./utils/cacheUtils";
 import { supabase } from "@/integrations/supabase/client";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
+// Lazy-loaded components
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const FarmerDashboard = lazy(() => import("./pages/dashboards/FarmerDashboard"));
@@ -53,6 +55,7 @@ const queryClient = new QueryClient({
   },
 });
 
+// Protected route component 
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState(null);
@@ -97,6 +100,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   return children;
 };
 
+// Routes component
 const AppRoutes = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
@@ -254,24 +258,26 @@ const AppRoutes = () => {
   );
 };
 
-// App component that sets up providers in the correct order
+// App component with properly ordered providers
 const App = () => {
   return (
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <LanguageProvider>
+    <React.StrictMode>
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
             <TooltipProvider>
-              <MotionProvider>
-                <Toaster />
-                <Sonner />
-                <AppRoutes />
-              </MotionProvider>
+              <LanguageProvider>
+                <MotionProvider>
+                  <Toaster />
+                  <Sonner />
+                  <AppRoutes />
+                </MotionProvider>
+              </LanguageProvider>
             </TooltipProvider>
-          </LanguageProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </HelmetProvider>
+          </BrowserRouter>
+        </QueryClientProvider>
+      </HelmetProvider>
+    </React.StrictMode>
   );
 };
 

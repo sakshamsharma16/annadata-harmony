@@ -141,35 +141,22 @@ const Login = () => {
                   {/* User Type Selection */}
                   <div className="space-y-3">
                     <Label>I am a</Label>
-                    <RadioGroup
-                      value={userType}
-                      onValueChange={handleUserTypeChange}
-                      className="grid grid-cols-3 gap-4"
-                    >
-                      <div className={`flex flex-col items-center justify-center border rounded-lg p-4 cursor-pointer transition-colors ${userType === "farmer" ? "border-[#138808] bg-[#138808]/5" : "border-gray-200"}`}>
-                        <RadioGroupItem value="farmer" id="login-farmer" className="sr-only" />
-                        <Label htmlFor="login-farmer" className="cursor-pointer flex flex-col items-center gap-2">
-                          <Leaf className="h-8 w-8 text-[#138808]" />
-                          <span>Farmer</span>
-                        </Label>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className={`flex flex-col items-center justify-center border rounded-lg p-4 cursor-pointer transition-colors ${userType === "farmer" ? "border-[#138808] bg-[#138808]/5" : "border-gray-200"}`} onClick={() => handleUserTypeChange("farmer")}>
+                        <Leaf className="h-8 w-8 text-[#138808]" />
+                        <span>Farmer</span>
                       </div>
                       
-                      <div className={`flex flex-col items-center justify-center border rounded-lg p-4 cursor-pointer transition-colors ${userType === "vendor" ? "border-[#FF9933] bg-[#FF9933]/5" : "border-gray-200"}`}>
-                        <RadioGroupItem value="vendor" id="login-vendor" className="sr-only" />
-                        <Label htmlFor="login-vendor" className="cursor-pointer flex flex-col items-center gap-2">
-                          <ShoppingCart className="h-8 w-8 text-[#FF9933]" />
-                          <span>Vendor</span>
-                        </Label>
+                      <div className={`flex flex-col items-center justify-center border rounded-lg p-4 cursor-pointer transition-colors ${userType === "vendor" ? "border-[#FF9933] bg-[#FF9933]/5" : "border-gray-200"}`} onClick={() => handleUserTypeChange("vendor")}>
+                        <ShoppingCart className="h-8 w-8 text-[#FF9933]" />
+                        <span>Vendor</span>
                       </div>
                       
-                      <div className={`flex flex-col items-center justify-center border rounded-lg p-4 cursor-pointer transition-colors ${userType === "consumer" ? "border-[#0000FF] bg-[#0000FF]/5" : "border-gray-200"}`}>
-                        <RadioGroupItem value="consumer" id="login-consumer" className="sr-only" />
-                        <Label htmlFor="login-consumer" className="cursor-pointer flex flex-col items-center gap-2">
-                          <Users className="h-8 w-8 text-[#0000FF]" />
-                          <span>Consumer</span>
-                        </Label>
+                      <div className={`flex flex-col items-center justify-center border rounded-lg p-4 cursor-pointer transition-colors ${userType === "consumer" ? "border-[#0000FF] bg-[#0000FF]/5" : "border-gray-200"}`} onClick={() => handleUserTypeChange("consumer")}>
+                        <Users className="h-8 w-8 text-[#0000FF]" />
+                        <span>Consumer</span>
                       </div>
-                    </RadioGroup>
+                    </div>
                   </div>
 
                   <div className="space-y-2">

@@ -97,10 +97,7 @@ showLoadingIndicator();
 // Setup caching
 setupAppCache();
 
-// Explicitly provide React globally
-window.React = React;
-
-// Mount function
+// Mount function - Ensure React is properly initialized
 const mountApp = () => {
   try {
     const rootElement = document.getElementById('root');
