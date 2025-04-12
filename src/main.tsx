@@ -97,6 +97,9 @@ showLoadingIndicator();
 // Setup caching
 setupAppCache();
 
+// Ensure React is available globally
+window.React = React;
+
 // Preload resources function
 const preloadResources = () => {
   const resources = [];
@@ -176,7 +179,12 @@ const mountApp = async () => {
   try {
     const preloadPromise = preloadResources();
     
-    const rootElement = document.getElementById("root")!;
+    const rootElement = document.getElementById("root");
+    
+    if (!rootElement) {
+      console.error("Root element not found");
+      return;
+    }
     
     rootElement.style.setProperty('transform', 'translateZ(0)');
     rootElement.style.setProperty('backface-visibility', 'hidden');
@@ -237,6 +245,15 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-requestAnimationFrame(() => {
-  mountApp();
-});
+// Ensure we wait for the DOM to be fully loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    requestAnimationFrame(() => {
+      mountApp();
+    });
+  });
+} else {
+  requestAnimationFrame(() => {
+    mountApp();
+  });
+}

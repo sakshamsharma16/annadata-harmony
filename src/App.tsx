@@ -1,4 +1,3 @@
-
 import { Suspense, lazy, useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -243,6 +242,7 @@ const AppLayout = () => {
   );
 };
 
+// Create React Query client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -254,6 +254,7 @@ const queryClient = new QueryClient({
   },
 });
 
+// App component that sets up providers
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
