@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, HelpCircle, Phone, Mail, MessageCircle } from "lucide-react";
-import { motion } from "framer-motion";
+import { LazyMotion, domAnimation, m } from "framer-motion";
 
 // FAQ data
 const faqs = [
@@ -115,7 +115,7 @@ const FAQPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-16 md:py-24">
-      <motion.div 
+      <m.div 
         className="max-w-4xl mx-auto text-center mb-12"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -137,17 +137,17 @@ const FAQPage = () => {
             <span className="sr-only">Search</span>
           </Button>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* FAQ Sections by Category */}
-      <motion.div 
+      <m.div 
         className="max-w-4xl mx-auto space-y-10"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         {faqs.map((category, index) => (
-          <motion.div key={index} variants={itemVariants}>
+          <m.div key={index} variants={itemVariants}>
             <h2 className="text-2xl font-bold mb-6 text-gray-800">{category.category}</h2>
             <Accordion type="single" collapsible className="mb-8">
               {category.questions.map((faq, faqIndex) => (
@@ -164,12 +164,12 @@ const FAQPage = () => {
                 </AccordionItem>
               ))}
             </Accordion>
-          </motion.div>
+          </m.div>
         ))}
-      </motion.div>
+      </m.div>
 
       {/* Contact Cards */}
-      <motion.div 
+      <m.div 
         className="max-w-4xl mx-auto mt-16"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -222,7 +222,7 @@ const FAQPage = () => {
             </CardContent>
           </Card>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

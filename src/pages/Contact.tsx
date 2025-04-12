@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
-import { motion } from "framer-motion";
+import { LazyMotion, domAnimation, m } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 
 const Contact = () => {
@@ -67,7 +67,7 @@ const Contact = () => {
 
   return (
     <div className="container mx-auto px-4 py-16 md:py-24">
-      <motion.div 
+      <m.div 
         className="max-w-4xl mx-auto text-center mb-16"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -77,23 +77,23 @@ const Contact = () => {
         <p className="text-lg text-gray-600">
           Have a question or feedback? We're here to help. Reach out to our team.
         </p>
-      </motion.div>
+      </m.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-        <motion.div
+        <m.div
           className="space-y-8"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          <motion.div variants={itemVariants}>
+          <m.div variants={itemVariants}>
             <h2 className="text-2xl font-bold mb-6 text-gray-800">Get In Touch</h2>
             <p className="text-gray-600 mb-8">
               Our team is ready to assist you with any questions about our platform, services, or how to get started.
             </p>
-          </motion.div>
+          </m.div>
           
-          <motion.div variants={itemVariants}>
+          <m.div variants={itemVariants}>
             <Card className="border-none shadow-sm bg-white">
               <CardContent className="p-6">
                 <div className="flex space-x-4">
@@ -107,9 +107,9 @@ const Contact = () => {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </m.div>
           
-          <motion.div variants={itemVariants}>
+          <m.div variants={itemVariants}>
             <Card className="border-none shadow-sm bg-white">
               <CardContent className="p-6">
                 <div className="flex space-x-4">
@@ -124,9 +124,9 @@ const Contact = () => {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </m.div>
           
-          <motion.div variants={itemVariants}>
+          <m.div variants={itemVariants}>
             <Card className="border-none shadow-sm bg-white">
               <CardContent className="p-6">
                 <div className="flex space-x-4">
@@ -141,9 +141,9 @@ const Contact = () => {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </m.div>
           
-          <motion.div variants={itemVariants}>
+          <m.div variants={itemVariants}>
             <Card className="border-none shadow-sm bg-white">
               <CardContent className="p-6">
                 <div className="flex space-x-4">
@@ -158,10 +158,10 @@ const Contact = () => {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
         
-        <motion.div
+        <m.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
@@ -254,12 +254,12 @@ const Contact = () => {
               </form>
             </CardContent>
           </Card>
-        </motion.div>
+        </m.div>
       </div>
       
       {/* Map Section */}
       <div className="mt-20">
-        <motion.h2 
+        <m.h2 
           className="text-2xl font-bold mb-6 text-center text-gray-800"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -267,8 +267,8 @@ const Contact = () => {
           transition={{ duration: 0.5 }}
         >
           Find Us on the Map
-        </motion.h2>
-        <motion.div 
+        </m.h2>
+        <m.div 
           className="aspect-[16/9] max-h-[400px] rounded-xl overflow-hidden shadow-md"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -280,12 +280,12 @@ const Contact = () => {
             width="100%"
             height="100%"
             style={{ border: 0 }}
-            allowFullScreen={true} // Fixed: changed string "true" to boolean true
+            allowFullScreen={true}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             title="Our Location"
           ></iframe>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

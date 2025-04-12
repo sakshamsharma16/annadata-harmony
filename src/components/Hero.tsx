@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useRef, memo } from "react";
 import { ArrowRight, ArrowLeft, ArrowRightCircle } from "lucide-react";
+import { LazyMotion, domAnimation, m } from "framer-motion";
 
 const heroSlides = [
   {
@@ -133,66 +134,68 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative overflow-hidden min-h-[600px] flex items-center">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 z-10">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
-          {/* Left Content */}
-          <div className="flex-1 text-center lg:text-left space-y-6 z-10">
-            {heroSlides.map((slide, index) => (
-              <HeroSlide key={index} slide={slide} isActive={currentSlide === index} />
-            ))}
-          </div>
-
-          {/* Right Image */}
-          <div className="flex-1 animate-fade-up relative mt-8 lg:mt-0" style={{ animationDelay: "0.2s" }}>
-            <div ref={carouselRef} className="carousel-container relative h-[400px] w-full">
+    <LazyMotion features={domAnimation}>
+      <section className="relative overflow-hidden min-h-[600px] flex items-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 z-10">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            {/* Left Content */}
+            <div className="flex-1 text-center lg:text-left space-y-6 z-10">
               {heroSlides.map((slide, index) => (
-                <HeroImage key={index} slide={slide} isActive={currentSlide === index} />
+                <HeroSlide key={index} slide={slide} isActive={currentSlide === index} />
               ))}
-              
-              {/* Navigation Buttons */}
-              <button
-                onClick={prevSlide}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/70 rounded-full shadow-lg hover:bg-white transition-colors z-10"
-                aria-label="Previous slide"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-800" />
-              </button>
-              <button
-                onClick={nextSlide}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/70 rounded-full shadow-lg hover:bg-white transition-colors z-10"
-                aria-label="Next slide"
-              >
-                <ArrowRight className="w-5 h-5 text-gray-800" />
-              </button>
             </div>
+
+            {/* Right Image */}
+            <div className="flex-1 animate-fade-up relative mt-8 lg:mt-0" style={{ animationDelay: "0.2s" }}>
+              <div ref={carouselRef} className="carousel-container relative h-[400px] w-full">
+                {heroSlides.map((slide, index) => (
+                  <HeroImage key={index} slide={slide} isActive={currentSlide === index} />
+                ))}
+                
+                {/* Navigation Buttons */}
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/70 rounded-full shadow-lg hover:bg-white transition-colors z-10"
+                  aria-label="Previous slide"
+                >
+                  <ArrowLeft className="w-5 h-5 text-gray-800" />
+                </button>
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/70 rounded-full shadow-lg hover:bg-white transition-colors z-10"
+                  aria-label="Next slide"
+                >
+                  <ArrowRight className="w-5 h-5 text-gray-800" />
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Slide Indicators */}
+          <div className="flex justify-center mt-8">
+            {heroSlides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-3 h-3 mx-1 rounded-full transition-colors ${
+                  currentSlide === index ? "bg-[#138808]" : "bg-gray-300"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
           </div>
         </div>
         
-        {/* Slide Indicators */}
-        <div className="flex justify-center mt-8">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 mx-1 rounded-full transition-colors ${
-                currentSlide === index ? "bg-[#138808]" : "bg-gray-300"
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      </div>
-      
-      {/* Scroll Down Indicator */}
-      <a 
-        href="#features" 
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center text-gray-600 hover:text-[#138808] transition-colors animate-bounce"
-      >
-        <span className="text-sm font-medium mb-2">Scroll Down</span>
-        <ArrowRightCircle className="w-5 h-5 transform rotate-90" />
-      </a>
-    </section>
+        {/* Scroll Down Indicator */}
+        <a 
+          href="#features" 
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center text-gray-600 hover:text-[#138808] transition-colors animate-bounce"
+        >
+          <span className="text-sm font-medium mb-2">Scroll Down</span>
+          <ArrowRightCircle className="w-5 h-5 transform rotate-90" />
+        </a>
+      </section>
+    </LazyMotion>
   );
 };
 

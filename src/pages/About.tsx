@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Award, TrendingUp, ShieldCheck, Users, Heart } from "lucide-react";
-import { motion } from "framer-motion";
+import { LazyMotion, domAnimation, m } from "framer-motion";
 import { Link } from 'react-router-dom';
 
 const About = () => {
@@ -26,7 +26,7 @@ const About = () => {
 
   return (
     <div className="container mx-auto px-4 py-16 md:py-24">
-      <motion.div 
+      <m.div 
         className="max-w-4xl mx-auto text-center mb-16"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -49,21 +49,21 @@ const About = () => {
             </div>
           </div>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Our Mission */}
-      <motion.section 
+      <m.section 
         className="mb-20"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
       >
-        <motion.div variants={itemVariants}>
+        <m.div variants={itemVariants}>
           <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Our Mission</h2>
-        </motion.div>
+        </m.div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <motion.div variants={itemVariants}>
+          <m.div variants={itemVariants}>
             <h3 className="text-2xl font-semibold mb-4 text-[#138808]">Empowering Farmers</h3>
             <p className="text-gray-600 mb-6">
               Our mission is to transform the agricultural landscape by empowering farmers with technology, 
@@ -90,39 +90,39 @@ const About = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
-          <motion.div variants={itemVariants} className="rounded-xl overflow-hidden shadow-lg">
+          </m.div>
+          <m.div variants={itemVariants} className="rounded-xl overflow-hidden shadow-lg">
             <img 
               src="https://images.unsplash.com/photo-1620656798579-1984d5ed7d97?q=80&w=1470&auto=format&fit=crop" 
               alt="Farmer with crops" 
               className="w-full h-64 object-cover"
               loading="lazy"
             />
-          </motion.div>
+          </m.div>
         </div>
-      </motion.section>
+      </m.section>
 
       {/* Our Vision */}
-      <motion.section 
+      <m.section 
         className="mb-20"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
       >
-        <motion.div variants={itemVariants}>
+        <m.div variants={itemVariants}>
           <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Our Vision</h2>
-        </motion.div>
+        </m.div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <motion.div variants={itemVariants} className="rounded-xl overflow-hidden shadow-lg order-2 md:order-1">
+          <m.div variants={itemVariants} className="rounded-xl overflow-hidden shadow-lg order-2 md:order-1">
             <img 
               src="https://images.unsplash.com/photo-1621844761088-9ed6095be7d0?q=80&w=1528&auto=format&fit=crop" 
               alt="Modern agriculture" 
               className="w-full h-64 object-cover"
               loading="lazy"
             />
-          </motion.div>
-          <motion.div variants={itemVariants} className="order-1 md:order-2">
+          </m.div>
+          <m.div variants={itemVariants} className="order-1 md:order-2">
             <h3 className="text-2xl font-semibold mb-4 text-[#138808]">A Self-Sustaining Ecosystem</h3>
             <p className="text-gray-600 mb-6">
               We envision a future where the agricultural ecosystem is transparent, efficient, and equitable. 
@@ -149,60 +149,60 @@ const About = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
-      </motion.section>
+      </m.section>
 
       {/* Impact Numbers */}
-      <motion.section 
+      <m.section 
         className="py-16 bg-[#138808]/5 rounded-xl mb-20"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
       >
-        <motion.div variants={itemVariants} className="text-center mb-12">
+        <m.div variants={itemVariants} className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4 text-gray-800">Our Impact</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Since our inception, we've made significant strides in transforming agricultural communities across India.
           </p>
-        </motion.div>
+        </m.div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          <motion.div variants={itemVariants} className="text-center">
+          <m.div variants={itemVariants} className="text-center">
             <p className="text-4xl font-bold text-[#138808]">50,000+</p>
             <p className="text-gray-600 mt-2">Farmers Connected</p>
-          </motion.div>
-          <motion.div variants={itemVariants} className="text-center">
+          </m.div>
+          <m.div variants={itemVariants} className="text-center">
             <p className="text-4xl font-bold text-[#138808]">5,000+</p>
             <p className="text-gray-600 mt-2">Vendors Onboarded</p>
-          </motion.div>
-          <motion.div variants={itemVariants} className="text-center">
+          </m.div>
+          <m.div variants={itemVariants} className="text-center">
             <p className="text-4xl font-bold text-[#138808]">200+</p>
             <p className="text-gray-600 mt-2">Districts Covered</p>
-          </motion.div>
-          <motion.div variants={itemVariants} className="text-center">
+          </m.div>
+          <m.div variants={itemVariants} className="text-center">
             <p className="text-4xl font-bold text-[#138808]">35%</p>
             <p className="text-gray-600 mt-2">Average Income Increase</p>
-          </motion.div>
+          </m.div>
         </div>
-      </motion.section>
+      </m.section>
 
       {/* Values */}
-      <motion.section 
+      <m.section 
         className="mb-20"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
       >
-        <motion.div variants={itemVariants} className="text-center mb-12">
+        <m.div variants={itemVariants} className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4 text-gray-800">Our Core Values</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             These principles guide everything we do at Annadata.
           </p>
-        </motion.div>
+        </m.div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <motion.div variants={itemVariants}>
+          <m.div variants={itemVariants}>
             <Card>
               <CardHeader>
                 <div className="bg-[#138808]/10 w-12 h-12 rounded-full flex items-center justify-center mb-4">
@@ -217,8 +217,8 @@ const About = () => {
                 </p>
               </CardContent>
             </Card>
-          </motion.div>
-          <motion.div variants={itemVariants}>
+          </m.div>
+          <m.div variants={itemVariants}>
             <Card>
               <CardHeader>
                 <div className="bg-[#138808]/10 w-12 h-12 rounded-full flex items-center justify-center mb-4">
@@ -233,8 +233,8 @@ const About = () => {
                 </p>
               </CardContent>
             </Card>
-          </motion.div>
-          <motion.div variants={itemVariants}>
+          </m.div>
+          <m.div variants={itemVariants}>
             <Card>
               <CardHeader>
                 <div className="bg-[#138808]/10 w-12 h-12 rounded-full flex items-center justify-center mb-4">
@@ -249,19 +249,19 @@ const About = () => {
                 </p>
               </CardContent>
             </Card>
-          </motion.div>
+          </m.div>
         </div>
-      </motion.section>
+      </m.section>
 
       {/* Call to Action */}
-      <motion.section 
+      <m.section 
         className="text-center"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
       >
-        <motion.div variants={itemVariants}>
+        <m.div variants={itemVariants}>
           <h2 className="text-3xl font-bold mb-4 text-gray-800">Join Our Movement</h2>
           <p className="text-gray-600 max-w-2xl mx-auto mb-8">
             Be part of the revolution transforming agriculture in India. Together, we can create a more sustainable and prosperous future.
@@ -278,8 +278,8 @@ const About = () => {
               </Link>
             </Button>
           </div>
-        </motion.div>
-      </motion.section>
+        </m.div>
+      </m.section>
     </div>
   );
 };

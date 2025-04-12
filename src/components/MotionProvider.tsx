@@ -1,6 +1,6 @@
 
 import React, { ReactNode } from 'react';
-import { MotionConfig, LazyMotion, domAnimation } from 'framer-motion';
+import { LazyMotion, domAnimation, MotionConfig } from 'framer-motion';
 
 interface MotionProviderProps {
   children: ReactNode;

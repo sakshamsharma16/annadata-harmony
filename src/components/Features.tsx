@@ -8,6 +8,7 @@ import {
   Smartphone 
 } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { LazyMotion, domAnimation, m } from "framer-motion";
 
 const features = [
   {
@@ -71,37 +72,42 @@ const Features = () => {
   }, []);
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-12 reveal reveal-up">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Why Choose Annadata</h2>
-          <p className="text-lg text-gray-600">
-            Our platform offers unique benefits to farmers, vendors, and consumers alike
-          </p>
-        </div>
+    <LazyMotion features={domAnimation}>
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-12 reveal reveal-up">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Why Choose Annadata</h2>
+            <p className="text-lg text-gray-600">
+              Our platform offers unique benefits to farmers, vendors, and consumers alike
+            </p>
+          </div>
 
-        <div
-          ref={featuresRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="feature-card glass-card p-6 transition-all duration-300 hover:shadow-xl opacity-0"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div className="flex flex-col items-center text-center">
-                <div className="mb-4 p-3 rounded-full bg-white shadow-md">
-                  {feature.icon}
+          <div
+            ref={featuresRef}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            {features.map((feature, index) => (
+              <m.div
+                key={index}
+                className="feature-card glass-card p-6 transition-all duration-300 hover:shadow-xl opacity-0"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="mb-4 p-3 rounded-full bg-white shadow-md">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-gray-600">{feature.description}</p>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </div>
-            </div>
-          ))}
+              </m.div>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </LazyMotion>
   );
 };
 

@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Linkedin, Twitter, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion, MotionConfig } from "framer-motion";
+import { LazyMotion, domAnimation, m } from "framer-motion";
 
 // Team member data
 const teamMembers = [
@@ -100,7 +99,7 @@ const itemVariants = {
 
 const TeamMember = ({ member }) => {
   return (
-    <motion.div variants={itemVariants}>
+    <m.div variants={itemVariants}>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
         <CardContent className="p-0">
           <div className="aspect-square overflow-hidden">
@@ -145,55 +144,53 @@ const TeamMember = ({ member }) => {
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </m.div>
   );
 };
 
 const TeamPage = () => {
   return (
-    <MotionConfig reducedMotion="user">
-      <div className="container mx-auto px-4 py-16 md:py-24">
-        <motion.div 
-          className="max-w-4xl mx-auto text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-800">Meet Our Team</h1>
-          <p className="text-lg text-gray-600">
-            Passionate professionals dedicated to transforming the agricultural ecosystem.
-          </p>
-        </motion.div>
+    <div className="container mx-auto px-4 py-16 md:py-24">
+      <m.div 
+        className="max-w-4xl mx-auto text-center mb-16"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-800">Meet Our Team</h1>
+        <p className="text-lg text-gray-600">
+          Passionate professionals dedicated to transforming the agricultural ecosystem.
+        </p>
+      </m.div>
 
-        <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          {teamMembers.map((member) => (
-            <TeamMember key={member.id} member={member} />
-          ))}
-        </motion.div>
+      <m.div 
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {teamMembers.map((member) => (
+          <TeamMember key={member.id} member={member} />
+        ))}
+      </m.div>
 
-        <motion.div 
-          className="max-w-3xl mx-auto text-center bg-[#138808]/5 rounded-xl p-8 md:p-12"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5, duration: 0.7 }}
-        >
-          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800">Join Our Team</h2>
-          <p className="text-gray-600 mb-6">
-            We're always looking for talented individuals who are passionate about agriculture and technology.
-            If you're interested in making a difference, we'd love to hear from you.
-          </p>
-          <Button className="bg-[#138808] hover:bg-[#0d6b06]">
-            View Open Positions
-          </Button>
-        </motion.div>
-      </div>
-    </MotionConfig>
+      <m.div 
+        className="max-w-3xl mx-auto text-center bg-[#138808]/5 rounded-xl p-8 md:p-12"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.5, duration: 0.7 }}
+      >
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800">Join Our Team</h2>
+        <p className="text-gray-600 mb-6">
+          We're always looking for talented individuals who are passionate about agriculture and technology.
+          If you're interested in making a difference, we'd love to hear from you.
+        </p>
+        <Button className="bg-[#138808] hover:bg-[#0d6b06]">
+          View Open Positions
+        </Button>
+      </m.div>
+    </div>
   );
 };
 
