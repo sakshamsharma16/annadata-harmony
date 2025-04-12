@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown, User, ShoppingCart, Bell } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, ChevronDown, User, ShoppingCart, Bell, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
@@ -15,6 +15,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 
 const NavigationMenu = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,6 +25,7 @@ const NavigationMenu = () => {
   const [notifications, setNotifications] = useState(3);
   const [cartItems, setCartItems] = useState(2);
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useLanguage();
 
   // Check authentication status on mount
@@ -42,6 +44,9 @@ const NavigationMenu = () => {
         if (userData) {
           setUserRole(userData.role);
         }
+      } else {
+        setIsLoggedIn(false);
+        setUserRole(null);
       }
     };
     
@@ -68,22 +73,36 @@ const NavigationMenu = () => {
   }, [location.pathname]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setIsLoggedIn(false);
-    setUserRole(null);
-    // Redirect to home page
-    window.location.href = '/';
+    try {
+      await supabase.auth.signOut();
+      setIsLoggedIn(false);
+      setUserRole(null);
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your account.",
+      });
+      // Redirect to home page
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const navLinks = [
+  // Public navigation links (exploration phase)
+  const publicNavLinks = [
     { name: t('nav.home'), path: '/' },
     { name: t('nav.about'), path: '/about' },
     { name: t('nav.services'), path: '/services' },
-    { name: t('nav.contact'), path: '/contact' },
-    { name: t('nav.supabaseTest'), path: '/supabase-test' }
+    { name: t('nav.contact'), path: '/contact' }
   ];
 
-  const dashboardLink = () => {
+  // Get appropriate dashboard link based on user role
+  const getDashboardLink = () => {
     switch(userRole) {
       case 'farmer':
         return '/dashboard/farmer';
@@ -118,7 +137,8 @@ const NavigationMenu = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            {navLinks.map((link, index) => (
+            {/* Only show public links when not logged in */}
+            {!isLoggedIn && publicNavLinks.map((link, index) => (
               <Link 
                 key={index}
                 to={link.path}
@@ -131,6 +151,78 @@ const NavigationMenu = () => {
                 {link.name}
               </Link>
             ))}
+            
+            {/* Show role-specific links when logged in */}
+            {isLoggedIn && userRole === 'farmer' && (
+              <>
+                <Link 
+                  to="/dashboard/farmer"
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    location.pathname === '/dashboard/farmer' ? 'text-[#138808] font-semibold' : 'text-gray-700 hover:text-[#138808]'
+                  }`}
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  to="/farmer/products"
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    location.pathname === '/farmer/products' ? 'text-[#138808] font-semibold' : 'text-gray-700 hover:text-[#138808]'
+                  }`}
+                >
+                  My Products
+                </Link>
+                <Link 
+                  to="/agriculture/crop-health"
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    location.pathname === '/agriculture/crop-health' ? 'text-[#138808] font-semibold' : 'text-gray-700 hover:text-[#138808]'
+                  }`}
+                >
+                  Crop Health
+                </Link>
+              </>
+            )}
+            
+            {isLoggedIn && userRole === 'vendor' && (
+              <>
+                <Link 
+                  to="/dashboard/vendor"
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    location.pathname === '/dashboard/vendor' ? 'text-[#138808] font-semibold' : 'text-gray-700 hover:text-[#138808]'
+                  }`}
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  to="/vendor/marketplace"
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    location.pathname === '/vendor/marketplace' ? 'text-[#138808] font-semibold' : 'text-gray-700 hover:text-[#138808]'
+                  }`}
+                >
+                  Marketplace
+                </Link>
+              </>
+            )}
+            
+            {isLoggedIn && userRole === 'consumer' && (
+              <>
+                <Link 
+                  to="/dashboard/consumer"
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    location.pathname === '/dashboard/consumer' ? 'text-[#138808] font-semibold' : 'text-gray-700 hover:text-[#138808]'
+                  }`}
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  to="/consumer/nearby-vendors"
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    location.pathname === '/consumer/nearby-vendors' ? 'text-[#138808] font-semibold' : 'text-gray-700 hover:text-[#138808]'
+                  }`}
+                >
+                  Nearby Vendors
+                </Link>
+              </>
+            )}
           </div>
 
           {/* User Actions */}
@@ -173,7 +265,7 @@ const NavigationMenu = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Cart */}
+                {/* Cart - only for consumers */}
                 {userRole === 'consumer' && (
                   <Link to="/checkout" className="relative">
                     <Button variant="ghost" size="icon">
@@ -201,9 +293,12 @@ const NavigationMenu = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuItem className="font-medium text-sm capitalize">
+                      Role: {userRole || 'User'}
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to={dashboardLink()}>Dashboard</Link>
+                      <Link to={getDashboardLink()}>Dashboard</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/profile">Profile</Link>
@@ -212,7 +307,8 @@ const NavigationMenu = () => {
                       <Link to="/settings">Settings</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                      <LogOut className="mr-2 h-4 w-4" />
                       Log out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -250,7 +346,8 @@ const NavigationMenu = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden pt-4 pb-3 space-y-1">
-            {navLinks.map((link, index) => (
+            {/* Only show public links when not logged in */}
+            {!isLoggedIn && publicNavLinks.map((link, index) => (
               <Link
                 key={index}
                 to={link.path}
@@ -264,15 +361,79 @@ const NavigationMenu = () => {
               </Link>
             ))}
             
+            {/* Show role-specific links when logged in */}
+            {isLoggedIn && (
+              <>
+                <Link
+                  to={getDashboardLink()}
+                  className={`block px-3 py-2 rounded-md text-base font-medium ${
+                    location.pathname === getDashboardLink()
+                      ? 'text-[#138808] font-semibold'
+                      : 'text-gray-700 hover:text-[#138808]'
+                  }`}
+                >
+                  Dashboard
+                </Link>
+                
+                {userRole === 'farmer' && (
+                  <>
+                    <Link
+                      to="/farmer/products"
+                      className={`block px-3 py-2 rounded-md text-base font-medium ${
+                        location.pathname === '/farmer/products'
+                          ? 'text-[#138808] font-semibold'
+                          : 'text-gray-700 hover:text-[#138808]'
+                      }`}
+                    >
+                      My Products
+                    </Link>
+                    <Link
+                      to="/agriculture/crop-health"
+                      className={`block px-3 py-2 rounded-md text-base font-medium ${
+                        location.pathname === '/agriculture/crop-health'
+                          ? 'text-[#138808] font-semibold'
+                          : 'text-gray-700 hover:text-[#138808]'
+                      }`}
+                    >
+                      Crop Health
+                    </Link>
+                  </>
+                )}
+                
+                {userRole === 'vendor' && (
+                  <Link
+                    to="/vendor/marketplace"
+                    className={`block px-3 py-2 rounded-md text-base font-medium ${
+                      location.pathname === '/vendor/marketplace'
+                        ? 'text-[#138808] font-semibold'
+                        : 'text-gray-700 hover:text-[#138808]'
+                    }`}
+                  >
+                    Marketplace
+                  </Link>
+                )}
+                
+                {userRole === 'consumer' && (
+                  <Link
+                    to="/consumer/nearby-vendors"
+                    className={`block px-3 py-2 rounded-md text-base font-medium ${
+                      location.pathname === '/consumer/nearby-vendors'
+                        ? 'text-[#138808] font-semibold'
+                        : 'text-gray-700 hover:text-[#138808]'
+                    }`}
+                  >
+                    Nearby Vendors
+                  </Link>
+                )}
+              </>
+            )}
+            
             <div className="pt-4 border-t border-gray-200">
               {isLoggedIn ? (
                 <>
-                  <Link
-                    to={dashboardLink()}
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#138808]"
-                  >
-                    Dashboard
-                  </Link>
+                  <div className="px-3 py-2 text-sm font-medium text-gray-500">
+                    Role: <span className="capitalize">{userRole || 'User'}</span>
+                  </div>
                   <Link
                     to="/profile"
                     className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#138808]"
@@ -281,8 +442,9 @@ const NavigationMenu = () => {
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#138808]"
+                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-700"
                   >
+                    <LogOut className="inline mr-2 h-4 w-4" />
                     Log out
                   </button>
                 </>

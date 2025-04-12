@@ -4,18 +4,15 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { HelmetProvider } from "react-helmet-async";
 import MotionProvider from "./components/MotionProvider";
 import SEOHead from "./components/SEOHead";
-import AppNavbar from "./components/AppNavbar";
-import EnhancedFooter from "./components/EnhancedFooter";
-import KrishiMitra from "./components/KrishiMitra";
-import FastBotsChat from "./components/FastBotsChat";
 import NavigationMenu from "./components/NavigationMenu";
 import SupabaseTestLink from "./components/SupabaseTestLink";
 import { getCacheItem, setCacheItem } from "./utils/cacheUtils";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -44,6 +41,52 @@ const LoadingSpinner = () => (
     <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-[#138808] border-t-transparent"></div>
   </div>
 );
+
+// Route guard for authenticated routes
+const ProtectedRoute = ({ children, allowedRoles = [] }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      
+      if (data.session) {
+        setIsAuthenticated(true);
+        
+        // Get user role
+        const { data: userData } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', data.session.user.id)
+          .single();
+        
+        if (userData) {
+          setUserRole(userData.role);
+        }
+      }
+      
+      setLoading(false);
+    };
+    
+    checkAuth();
+  }, []);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles.length > 0 && !allowedRoles.includes(userRole)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
 
 const AppLayout = () => {
   const location = useLocation();
@@ -116,34 +159,88 @@ const AppLayout = () => {
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/dashboard/farmer" element={<FarmerDashboard />} />
-              <Route path="/dashboard/vendor" element={<VendorDashboard />} />
-              <Route path="/dashboard/consumer" element={<ConsumerDashboard />} />
-              <Route path="/dashboard/analytics" element={<MarketAnalytics />} />
-              <Route path="/dashboard/admin" element={<AdminDashboard />} />
-              <Route path="/agriculture/crop-health" element={<CropHealthDashboard />} />
-              <Route path="/farmer/products" element={<ManageProducts />} />
-              <Route path="/vendor/marketplace" element={<Marketplace />} />
-              <Route path="/consumer/nearby-vendors" element={<NearbyVendors />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/market-prices" element={<MarketAnalytics />} />
-              <Route path="/supabase-test" element={<SupabaseTest />} />
               
+              {/* Protected routes with role-based access */}
+              <Route path="/dashboard/farmer" element={
+                <ProtectedRoute allowedRoles={['farmer']}>
+                  <FarmerDashboard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/dashboard/vendor" element={
+                <ProtectedRoute allowedRoles={['vendor']}>
+                  <VendorDashboard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/dashboard/consumer" element={
+                <ProtectedRoute allowedRoles={['consumer']}>
+                  <ConsumerDashboard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/dashboard/analytics" element={
+                <ProtectedRoute allowedRoles={['farmer', 'vendor', 'admin']}>
+                  <MarketAnalytics />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/dashboard/admin" element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/agriculture/crop-health" element={
+                <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                  <CropHealthDashboard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/farmer/products" element={
+                <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                  <ManageProducts />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/vendor/marketplace" element={
+                <ProtectedRoute allowedRoles={['vendor', 'admin']}>
+                  <Marketplace />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/consumer/nearby-vendors" element={
+                <ProtectedRoute allowedRoles={['consumer', 'admin']}>
+                  <NearbyVendors />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/checkout" element={
+                <ProtectedRoute allowedRoles={['consumer']}>
+                  <Checkout />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/market-prices" element={
+                <ProtectedRoute>
+                  <MarketAnalytics />
+                </ProtectedRoute>
+              } />
+              
+              {/* Public accessible pages */}
               <Route path="/about" element={<AboutPage />} />
               <Route path="/team" element={<TeamPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/faq" element={<FaqPage />} />
-              
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/services/:service" element={<ServicesPage />} />
+              <Route path="/supabase-test" element={<SupabaseTest />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </main>
-        {!isAuthRoute && <EnhancedFooter />}
         
-        <KrishiMitra />
         <SupabaseTestLink />
       </div>
     </>
@@ -162,31 +259,6 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  const [useFastBots, setUseFastBots] = useState(true);
-
-  useEffect(() => {
-    const preference = localStorage.getItem('preferredChatbot');
-    if (preference === 'krishiMitra') {
-      setUseFastBots(false);
-    } else if (preference === 'fastBots' || !preference) {
-      setUseFastBots(true);
-      localStorage.setItem('preferredChatbot', 'fastBots');
-    }
-    
-    const preloadLinks = [
-      { href: '/og-image.png', as: 'image' },
-      { href: 'https://app.fastbots.ai/embed.js', as: 'script' }
-    ];
-    
-    preloadLinks.forEach(link => {
-      const preloadLink = document.createElement('link');
-      preloadLink.rel = 'preload';
-      preloadLink.href = link.href;
-      preloadLink.as = link.as;
-      document.head.appendChild(preloadLink);
-    });
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <HelmetProvider>
@@ -198,10 +270,6 @@ const App = () => {
               <BrowserRouter>
                 <AppLayout />
               </BrowserRouter>
-              
-              {useFastBots && (
-                <FastBotsChat botId="cm4bojr9l0j5zsvbm6faemmyn" />
-              )}
             </MotionProvider>
           </TooltipProvider>
         </LanguageProvider>
