@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronDown, User, ShoppingCart, Bell, LogOut } from 'lucide-react';
+import { Menu, X, ChevronDown, User, ShoppingCart, Bell, LogOut, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
@@ -13,7 +13,6 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 
@@ -26,7 +25,6 @@ const NavigationMenu = () => {
   const [cartItems, setCartItems] = useState(2);
   const location = useLocation();
   const navigate = useNavigate();
-  const { t } = useLanguage();
 
   // Check authentication status on mount
   useEffect(() => {
@@ -95,10 +93,10 @@ const NavigationMenu = () => {
 
   // Public navigation links (exploration phase)
   const publicNavLinks = [
-    { name: t('nav.home'), path: '/' },
-    { name: t('nav.about'), path: '/about' },
-    { name: t('nav.services'), path: '/services' },
-    { name: t('nav.contact'), path: '/contact' }
+    { name: 'Home', path: '/' },
+    { name: 'About', path: '/about' },
+    { name: 'Services', path: '/services' },
+    { name: 'Contact', path: '/contact' }
   ];
 
   // Get appropriate dashboard link based on user role
@@ -111,7 +109,7 @@ const NavigationMenu = () => {
       case 'consumer':
         return '/dashboard/consumer';
       case 'admin':
-        return '/dashboard/admin';
+        return '/admin';
       default:
         return '/login';
     }
@@ -120,7 +118,7 @@ const NavigationMenu = () => {
   return (
     <nav 
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'
+        isScrolled ? 'bg-white/90 backdrop-blur-md shadow-md py-2' : 'bg-transparent py-4'
       }`}
     >
       <div className="container mx-auto px-4">
@@ -223,6 +221,30 @@ const NavigationMenu = () => {
                 </Link>
               </>
             )}
+            
+            {isLoggedIn && userRole === 'admin' && (
+              <>
+                <Link 
+                  to="/admin"
+                  className={`px-3 py-2 rounded-md text-sm font-medium flex items-center ${
+                    location.pathname === '/admin' ? 'text-[#138808] font-semibold' : 'text-gray-700 hover:text-[#138808]'
+                  }`}
+                >
+                  <ShieldAlert className="h-4 w-4 mr-1" /> Admin Dashboard
+                </Link>
+              </>
+            )}
+            
+            {isLoggedIn && (
+              <Link 
+                to="/dashboard/analytics" 
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  location.pathname === '/dashboard/analytics' ? 'text-[#138808] font-semibold' : 'text-gray-700 hover:text-[#138808]'
+                }`}
+              >
+                Market Analytics
+              </Link>
+            )}
           </div>
 
           {/* User Actions */}
@@ -317,11 +339,11 @@ const NavigationMenu = () => {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost">{t('auth.login')}</Button>
+                  <Button variant="ghost">Login</Button>
                 </Link>
                 <Link to="/register">
                   <Button variant="default" className="bg-[#138808] hover:bg-[#0c6606]">
-                    {t('auth.register')}
+                    Register
                   </Button>
                 </Link>
               </>
@@ -374,6 +396,19 @@ const NavigationMenu = () => {
                 >
                   Dashboard
                 </Link>
+                
+                {userRole === 'admin' && (
+                  <Link
+                    to="/admin"
+                    className={`block px-3 py-2 rounded-md text-base font-medium flex items-center ${
+                      location.pathname === '/admin'
+                        ? 'text-[#138808] font-semibold'
+                        : 'text-gray-700 hover:text-[#138808]'
+                    }`}
+                  >
+                    <ShieldAlert className="h-4 w-4 mr-1" /> Admin Dashboard
+                  </Link>
+                )}
                 
                 {userRole === 'farmer' && (
                   <>
@@ -454,13 +489,13 @@ const NavigationMenu = () => {
                     to="/login"
                     className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#138808]"
                   >
-                    {t('auth.login')}
+                    Login
                   </Link>
                   <Link
                     to="/register"
                     className="block px-3 py-2 rounded-md text-base font-medium text-[#138808]"
                   >
-                    {t('auth.register')}
+                    Register
                   </Link>
                 </>
               )}

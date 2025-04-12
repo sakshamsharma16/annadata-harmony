@@ -1,3 +1,4 @@
+
 import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,8 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Users, Leaf, ShoppingCart, Truck, LineChart, Shield, Globe, MessageCircle, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import Hero from "@/components/Hero";
-import LanguageSelector from "@/components/LanguageSelector";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 // Lazy load non-critical components
 const Features = lazy(() => import("@/components/Features"));
@@ -88,11 +87,6 @@ const PlatformFeatures = [
     icon: <Truck className="h-6 w-6 text-orange-600" />
   },
   {
-    title: "Multilingual Support",
-    description: "Platform available in multiple regional languages",
-    icon: <Globe className="h-6 w-6 text-green-600" />
-  },
-  {
     title: "Community Forums",
     description: "Connect with other users to share knowledge and best practices",
     icon: <MessageCircle className="h-6 w-6 text-pink-600" />
@@ -105,23 +99,17 @@ const PlatformFeatures = [
 ];
 
 const Index = () => {
-  const { t } = useLanguage();
-  
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="absolute top-4 right-4 z-10">
-        <LanguageSelector />
-      </div>
-      
       <Hero />
       
-      <section className="py-20 px-4 md:px-8 bg-gray-50">
+      <section className="py-20 px-4 md:px-8 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
-            <Badge className="mb-2" variant="outline">{t('roles.title')}</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('roles.title')}</h2>
+            <Badge className="mb-2" variant="outline">Choose Your Role</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Select Your Portal</h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              {t('hero.subtitle')}
+              Annadata offers specialized interfaces for farmers, vendors, and consumers in the agricultural ecosystem.
             </p>
           </div>
           
@@ -131,9 +119,9 @@ const Index = () => {
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
                     {role.icon}
-                    <Badge variant="outline">{t(`roles.${role.title.toLowerCase()}`)}</Badge>
+                    <Badge variant="outline">{role.title}</Badge>
                   </div>
-                  <CardTitle className="text-xl mt-2">{t(`roles.${role.title.toLowerCase()}`)} Portal</CardTitle>
+                  <CardTitle className="text-xl mt-2">{role.title} Portal</CardTitle>
                   <CardDescription>{role.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="pb-6">
@@ -152,7 +140,7 @@ const Index = () => {
                   
                   <Link to={role.path}>
                     <Button className={`w-full ${role.buttonColor}`}>
-                      Enter {t(`roles.${role.title.toLowerCase()}`)} Dashboard
+                      Enter {role.title} Dashboard
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
@@ -167,7 +155,7 @@ const Index = () => {
         <Features />
       </Suspense>
       
-      <section className="py-20 px-4 md:px-8 bg-white">
+      <section className="py-20 px-4 md:px-8 bg-gradient-to-b from-white to-gray-50">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <Badge className="mb-2" variant="outline">Platform Features</Badge>
@@ -179,8 +167,8 @@ const Index = () => {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {PlatformFeatures.map((feature, index) => (
-              <div key={index} className="bg-gray-50 p-6 rounded-lg border border-gray-100 hover:shadow-md transition-shadow">
-                <div className="rounded-full bg-white p-3 inline-block mb-4 shadow-sm">
+              <div key={index} className="bg-white p-6 rounded-lg border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="rounded-full bg-gray-50 p-3 inline-block mb-4 shadow-sm">
                   {feature.icon}
                 </div>
                 <h3 className="text-lg font-medium mb-2">{feature.title}</h3>

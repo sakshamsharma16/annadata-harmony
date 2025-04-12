@@ -22,7 +22,7 @@ const Checkout = lazy(() => import("../pages/checkout/Checkout"));
 const CropHealthDashboard = lazy(() => import("../pages/agriculture/CropHealthDashboard"));
 const Login = lazy(() => import("../pages/auth/Login"));
 const Register = lazy(() => import("../pages/auth/Register"));
-const AdminDashboard = lazy(() => import("../components/AdminDashboard"));
+const AdminDashboard = lazy(() => import("../pages/admin/AdminDashboard"));
 const SupabaseTest = lazy(() => import("../pages/SupabaseTest"));
 
 const AboutPage = lazy(() => import("../pages/About"));
@@ -56,7 +56,7 @@ const AppRoutes: React.FC = () => {
   return (
     <>
       <SEOHandler />
-      <div className="bg-[#F2FCE2] min-h-screen">
+      <div className="bg-gradient-to-br from-[#F8FFF2] via-[#F2FCE2] to-[#EDFAD7] min-h-screen">
         {!isAuthRoute && <NavigationMenu />}
         <main className={!isAuthRoute ? "pt-20" : ""}>
           <Suspense fallback={<LoadingSpinner />}>
@@ -89,7 +89,8 @@ const AppRoutes: React.FC = () => {
                 </ProtectedRoute>
               } />
               
-              <Route path="/dashboard/admin" element={
+              {/* Separate route for admin dashboard */}
+              <Route path="/admin" element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminDashboard />
                 </ProtectedRoute>
@@ -143,8 +144,6 @@ const AppRoutes: React.FC = () => {
             </Routes>
           </Suspense>
         </main>
-        
-        <SupabaseTestLink />
       </div>
     </>
   );
