@@ -1,7 +1,7 @@
 
+import React from "react";
 import { Truck, FileSpreadsheet, Award, BadgeDollarSign } from "lucide-react";
 import { ServicesDataType } from "./types";
-import React from "react";
 
 // Services data
 const servicesData: ServicesDataType = {
@@ -16,7 +16,7 @@ const servicesData: ServicesDataType = {
       "Careful handling and packaging to prevent damage",
       "Insurance coverage for goods in transit"
     ],
-    icon: <Truck className="h-8 w-8 text-[#138808]" />,
+    icon: React.createElement(Truck, { className: "h-8 w-8 text-[#138808]" }),
     image: "https://images.unsplash.com/photo-1633174524827-db00a6b7bc74?q=80&w=1516&auto=format&fit=crop",
     plans: [
       {
@@ -69,7 +69,7 @@ const servicesData: ServicesDataType = {
       "Irrigation optimization to conserve water",
       "Sustainable farming practices implementation"
     ],
-    icon: <FileSpreadsheet className="h-8 w-8 text-[#138808]" />,
+    icon: React.createElement(FileSpreadsheet, { className: "h-8 w-8 text-[#138808]" }),
     image: "https://images.unsplash.com/photo-1581112293288-8070df524f40?q=80&w=1374&auto=format&fit=crop",
     plans: [
       {
@@ -125,7 +125,7 @@ const servicesData: ServicesDataType = {
       "Representation during audits",
       "Renewal and maintenance support"
     ],
-    icon: <Award className="h-8 w-8 text-[#138808]" />,
+    icon: React.createElement(Award, { className: "h-8 w-8 text-[#138808]" }),
     image: "https://images.unsplash.com/photo-1594980596870-8aa52063865a?q=80&w=1470&auto=format&fit=crop",
     plans: [
       {
@@ -181,7 +181,7 @@ const servicesData: ServicesDataType = {
       "Risk management strategies",
       "Access to government subsidies and schemes"
     ],
-    icon: <BadgeDollarSign className="h-8 w-8 text-[#138808]" />,
+    icon: React.createElement(BadgeDollarSign, { className: "h-8 w-8 text-[#138808]" }),
     image: "https://images.unsplash.com/photo-1554774853-719586f82d77?q=80&w=1470&auto=format&fit=crop",
     plans: [
       {
