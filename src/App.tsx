@@ -1,5 +1,4 @@
-
-import { Suspense, lazy, useState, useEffect } from "react";
+import React, { Suspense, lazy, useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -258,7 +257,6 @@ const AppRoutes = () => {
   );
 };
 
-// App component with properly ordered providers
 const App = () => {
   return (
     <React.StrictMode>
