@@ -97,135 +97,33 @@ showLoadingIndicator();
 // Setup caching
 setupAppCache();
 
-// Ensure React is available globally
+// Explicitly provide React globally
 window.React = React;
 
-// Preload resources function
-const preloadResources = () => {
-  const resources = [];
-  
-  const checkCacheAndLoad = (url) => {
-    if ('caches' in window) {
-      return caches.match(url).then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(url, { cache: 'force-cache' }).then(res => {
-          if (res.ok) {
-            const cloneRes = res.clone();
-            caches.open('annadata-app-cache-v1').then(cache => {
-              cache.put(url, cloneRes);
-            });
-          }
-          return res;
-        });
-      });
-    } else {
-      return fetch(url, { cache: 'force-cache' });
-    }
-  };
-  
-  const fontPreloadLinks = [
-    { href: '/fonts/font1.woff2', type: 'font/woff2', crossOrigin: 'anonymous' },
-    { href: '/fonts/font2.woff2', type: 'font/woff2', crossOrigin: 'anonymous' }
-  ];
-
-  fontPreloadLinks.forEach(font => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'font';
-    link.href = font.href;
-    link.type = font.type;
-    link.crossOrigin = font.crossOrigin;
-    document.head.appendChild(link);
-    
-    resources.push(new Promise(resolve => {
-      link.onload = resolve;
-      link.onerror = resolve;
-    }));
-  });
-  
-  const preloadImages = [
-    'https://images.unsplash.com/photo-1517022812141-23620dba5c23',
-    'https://images.unsplash.com/photo-1523741543316-beb7fc7023d8',
-    'https://img.icons8.com/fluency/48/shop.png'
-  ];
-  
-  preloadImages.forEach(url => {
-    const img = new Image();
-    resources.push(new Promise(resolve => {
-      img.onload = resolve;
-      img.onerror = resolve;
-      img.src = url;
-    }));
-    
-    checkCacheAndLoad(url);
-  });
-  
-  // Fix for mapboxgl UMD global reference
-  if (typeof window.mapboxgl !== 'undefined') {
-    resources.push(
-      checkCacheAndLoad('https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js')
-    );
-  }
-  
-  return Promise.all(resources);
-};
-
-// Mount app with optimized performance
-const mountApp = async () => {
-  const startTime = performance.now();
-  
+// Mount function
+const mountApp = () => {
   try {
-    const preloadPromise = preloadResources();
-    
-    const rootElement = document.getElementById("root");
+    const rootElement = document.getElementById('root');
     
     if (!rootElement) {
-      console.error("Root element not found");
+      console.error('Root element not found');
       return;
     }
     
-    rootElement.style.setProperty('transform', 'translateZ(0)');
-    rootElement.style.setProperty('backface-visibility', 'hidden');
-    rootElement.style.setProperty('will-change', 'transform');
-    
+    // Create React root using the new API
     const root = createRoot(rootElement);
     
+    // Render app with strict mode
     root.render(
       <React.StrictMode>
         <App />
       </React.StrictMode>
     );
     
-    if (window.localStorage) {
-      const CACHE_EXPIRATION = 24 * 60 * 60 * 1000; 
-      
-      window.addEventListener('beforeunload', () => {
-        localStorage.setItem('annadata-cache-timestamp', Date.now().toString());
-      });
-      
-      const timestamp = localStorage.getItem('annadata-cache-timestamp');
-      if (timestamp && (Date.now() - parseInt(timestamp, 10)) > CACHE_EXPIRATION) {
-        Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('annadata-cache-')) {
-            localStorage.removeItem(key);
-          }
-        });
-      }
-    }
-    
-    Promise.race([
-      preloadPromise,
-      new Promise(resolve => setTimeout(resolve, 600))
-    ]).then(() => {
-      requestAnimationFrame(() => {
-        removeLoadingIndicator();
-      });
-    });
-    
-    const renderTime = performance.now() - startTime;
-    console.log(`App render time: ${renderTime.toFixed(2)}ms`);
+    // Remove loading indicator after a short delay
+    setTimeout(() => {
+      removeLoadingIndicator();
+    }, 300);
     
   } catch (error) {
     console.error('Error mounting app:', error);
@@ -233,6 +131,14 @@ const mountApp = async () => {
   }
 };
 
+// Mount when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', mountApp);
+} else {
+  mountApp();
+}
+
+// Register service worker if available
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
@@ -242,18 +148,5 @@ if ('serviceWorker' in navigator) {
       .catch(error => {
         console.log('ServiceWorker registration failed:', error);
       });
-  });
-}
-
-// Ensure we wait for the DOM to be fully loaded
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    requestAnimationFrame(() => {
-      mountApp();
-    });
-  });
-} else {
-  requestAnimationFrame(() => {
-    mountApp();
   });
 }

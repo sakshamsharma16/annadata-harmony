@@ -41,6 +41,18 @@ const LoadingSpinner = () => (
   </div>
 );
 
+// Create React Query client outside of component to avoid recreation
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000,
+      gcTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState(null);
@@ -85,7 +97,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   return children;
 };
 
-const AppLayout = () => {
+const AppRoutes = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [pageTitle, setPageTitle] = useState("Home");
@@ -242,36 +254,24 @@ const AppLayout = () => {
   );
 };
 
-// Create React Query client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000,
-      gcTime: 5 * 60 * 1000,
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
-
-// App component that sets up providers
+// App component that sets up providers in the correct order
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <HelmetProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <LanguageProvider>
             <TooltipProvider>
               <MotionProvider>
                 <Toaster />
                 <Sonner />
-                <AppLayout />
+                <AppRoutes />
               </MotionProvider>
             </TooltipProvider>
           </LanguageProvider>
         </BrowserRouter>
-      </HelmetProvider>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 };
 

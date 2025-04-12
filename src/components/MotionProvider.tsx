@@ -8,7 +8,7 @@ interface MotionProviderProps {
 
 const MotionProvider: React.FC<MotionProviderProps> = ({ children }) => {
   return (
-    <LazyMotion features={domAnimation}>
+    <LazyMotion features={domAnimation} strict>
       <MotionConfig reducedMotion="user">
         {children}
       </MotionConfig>
