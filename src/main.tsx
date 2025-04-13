@@ -108,7 +108,11 @@ const mountApp = () => {
   const root = createRoot(rootElement);
   
   // Render the app
-  root.render(<App />);
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
   
   // Remove loading indicator after the app has rendered
   setTimeout(() => {

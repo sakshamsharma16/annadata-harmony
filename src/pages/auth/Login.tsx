@@ -13,6 +13,7 @@ import { Eye, EyeOff, Lock, Mail, Smartphone, ArrowRight, Leaf, ShoppingCart, Us
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const Login = () => {
+  // Initialize navigate only if we're in a browser environment and inside Router context
   const navigate = useNavigate();
   const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
   const [showPassword, setShowPassword] = useState(false);
