@@ -1,18 +1,18 @@
 
-import React, { StrictMode } from "react";
+import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import AppProviders from "./providers/AppProviders";
 import AppRoutes from "./routes/AppRoutes";
 
 const App: React.FC = () => {
   return (
-    <StrictMode>
+    <React.StrictMode>
       <Router>
         <AppProviders>
           <AppRoutes />
         </AppProviders>
       </Router>
-    </StrictMode>
+    </React.StrictMode>
   );
 };
 

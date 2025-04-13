@@ -110,7 +110,7 @@ const mountApp = () => {
     // Create React root using the new API
     const root = createRoot(rootElement);
     
-    // Render app with StrictMode at the top level
+    // Render app
     root.render(
       <App />
     );
