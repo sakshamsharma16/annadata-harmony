@@ -3,7 +3,7 @@ import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Users, Leaf, ShoppingCart, Truck, LineChart, Shield, Globe, MessageCircle, BookOpen } from "lucide-react";
+import { ArrowRight, Users, Leaf, ShoppingCart, Truck, LineChart, Shield, Globe, MessageCircle, BookOpen, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import Hero from "@/components/Hero";
 
@@ -115,7 +115,10 @@ const Index = () => {
           
           <div className="grid md:grid-cols-3 gap-8">
             {UserRoles.map((role, index) => (
-              <Card key={index} className={`overflow-hidden transition-all hover:shadow-lg ${role.color}`}>
+              <Card 
+                key={index} 
+                className={`overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${role.color}`}
+              >
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
                     {role.icon}
@@ -139,7 +142,7 @@ const Index = () => {
                   </ul>
                   
                   <Link to={role.path}>
-                    <Button className={`w-full ${role.buttonColor}`}>
+                    <Button className={`w-full ${role.buttonColor} transition-all duration-300`}>
                       Enter {role.title} Dashboard
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -147,6 +150,14 @@ const Index = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+          
+          {/* Admin Portal Link */}
+          <div className="mt-8 text-center">
+            <Link to="/admin-login" className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors duration-300">
+              <Lock className="h-4 w-4 mr-1" />
+              <span>Admin Portal</span>
+            </Link>
           </div>
         </div>
       </section>
@@ -167,7 +178,10 @@ const Index = () => {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {PlatformFeatures.map((feature, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg border border-gray-100 hover:shadow-md transition-shadow">
+              <div 
+                key={index} 
+                className="bg-white p-6 rounded-lg border border-gray-100 hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+              >
                 <div className="rounded-full bg-gray-50 p-3 inline-block mb-4 shadow-sm">
                   {feature.icon}
                 </div>
@@ -179,7 +193,7 @@ const Index = () => {
           
           <div className="mt-12 text-center">
             <Link to="/how-it-works">
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" className="transition-transform duration-300 hover:scale-105">
                 Learn How It Works
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>

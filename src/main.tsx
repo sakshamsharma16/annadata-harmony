@@ -110,7 +110,7 @@ const mountApp = () => {
     // Create React root using the new API
     const root = createRoot(rootElement);
     
-    // Render app WITHOUT StrictMode - this can sometimes help resolve hook issues
+    // Render app WITHOUT StrictMode to resolve hook issues
     root.render(<App />);
     
     // Remove loading indicator after a short delay

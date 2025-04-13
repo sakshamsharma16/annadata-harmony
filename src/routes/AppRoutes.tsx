@@ -21,6 +21,7 @@ const Checkout = lazy(() => import("../pages/checkout/Checkout"));
 const CropHealthDashboard = lazy(() => import("../pages/agriculture/CropHealthDashboard"));
 const Login = lazy(() => import("../pages/auth/Login"));
 const Register = lazy(() => import("../pages/auth/Register"));
+const AdminLogin = lazy(() => import("../pages/auth/AdminLogin"));
 const AdminDashboard = lazy(() => import("../pages/admin/AdminDashboard"));
 const SupabaseTest = lazy(() => import("../pages/SupabaseTest"));
 
@@ -46,6 +47,7 @@ const AppRoutes: React.FC = () => {
   
   const isAuthRoute = location.pathname === "/login" || 
                       location.pathname === "/register" || 
+                      location.pathname === "/admin-login" ||
                       location.pathname === "/forgot-password";
   
   if (isLoading) {
@@ -63,6 +65,7 @@ const AppRoutes: React.FC = () => {
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
               
               <Route path="/dashboard/farmer" element={
                 <ProtectedRoute allowedRoles={['farmer']}>
