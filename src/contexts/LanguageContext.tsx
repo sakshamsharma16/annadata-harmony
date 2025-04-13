@@ -251,45 +251,54 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-// Create the context
+// Create the context with default values
 const LanguageContext = createContext<LanguageContextType>({
   language: 'english',
   setLanguage: () => {},
   t: () => '',
 });
 
-// Provider component
+// Provider component - Make sure it's defined as a proper function component
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>('english');
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load saved language preference from localStorage on initial render
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('language') as Language;
-    if (savedLanguage && ['english', 'hindi', 'punjabi'].includes(savedLanguage)) {
-      setLanguage(savedLanguage);
+    try {
+      const savedLanguage = localStorage.getItem('language') as Language;
+      if (savedLanguage && ['english', 'hindi', 'punjabi'].includes(savedLanguage)) {
+        setLanguage(savedLanguage);
+      }
+      setIsLoaded(true);
+    } catch (error) {
+      console.error('Error loading language preference:', error);
+      setIsLoaded(true);
     }
-    setIsLoaded(true);
   }, []);
 
   // Save language preference to localStorage when it changes
   useEffect(() => {
     if (!isLoaded) return;
     
-    localStorage.setItem('language', language);
-    
-    // Update HTML lang attribute
-    document.documentElement.lang = language === 'english' ? 'en' : language === 'hindi' ? 'hi' : 'pa';
-    
-    // Update direction attribute if needed (all these languages are LTR so not changing)
-    document.documentElement.dir = 'ltr';
-    
-    // Add a class to the body to allow language-specific styling
-    document.body.classList.remove('lang-english', 'lang-hindi', 'lang-punjabi');
-    document.body.classList.add(`lang-${language}`);
-    
-    // Dispatch a custom event so other components can respond to language changes
-    window.dispatchEvent(new CustomEvent('language-changed', { detail: { language } }));
+    try {
+      localStorage.setItem('language', language);
+      
+      // Update HTML lang attribute
+      document.documentElement.lang = language === 'english' ? 'en' : language === 'hindi' ? 'hi' : 'pa';
+      
+      // Update direction attribute if needed (all these languages are LTR so not changing)
+      document.documentElement.dir = 'ltr';
+      
+      // Add a class to the body to allow language-specific styling
+      document.body.classList.remove('lang-english', 'lang-hindi', 'lang-punjabi');
+      document.body.classList.add(`lang-${language}`);
+      
+      // Dispatch a custom event so other components can respond to language changes
+      window.dispatchEvent(new CustomEvent('language-changed', { detail: { language } }));
+    } catch (error) {
+      console.error('Error saving language preference:', error);
+    }
   }, [language, isLoaded]);
 
   // Translation function
@@ -304,8 +313,15 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     return key;
   };
 
+  // Create the context value object
+  const contextValue = {
+    language,
+    setLanguage,
+    t
+  };
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={contextValue}>
       {children}
     </LanguageContext.Provider>
   );

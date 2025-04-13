@@ -110,7 +110,7 @@ const mountApp = () => {
     // Create React root using the new API
     const root = createRoot(rootElement);
     
-    // Render app with strict mode
+    // Render app without additional StrictMode (it's already in App.tsx)
     root.render(<App />);
     
     // Remove loading indicator after a short delay
