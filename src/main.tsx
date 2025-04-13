@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { StrictMode } from 'react';
 import App from './App.tsx';
 import './index.css';
 
@@ -110,9 +111,11 @@ const mountApp = () => {
     // Create React root using the new API
     const root = createRoot(rootElement);
     
-    // Render app
+    // Render app with StrictMode
     root.render(
-      <App />
+      <StrictMode>
+        <App />
+      </StrictMode>
     );
     
     // Remove loading indicator after a short delay

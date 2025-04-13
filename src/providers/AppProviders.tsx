@@ -1,5 +1,5 @@
 
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,8 +13,8 @@ interface AppProvidersProps {
 }
 
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
-  // Create queryClient with useMemo to ensure it's not recreated on every render
-  const queryClient = useMemo(() => new QueryClient({
+  // Create queryClient with useState instead of useMemo to ensure proper initialization
+  const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
         staleTime: 60 * 1000,
@@ -23,7 +23,7 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
         retry: 1,
       },
     },
-  }), []);
+  }));
 
   return (
     <HelmetProvider>
