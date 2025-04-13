@@ -1,25 +1,23 @@
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { LazyMotion, domAnimation } from "framer-motion";
+import { m } from "framer-motion";
 import ServicesOverview from './ServicesOverview';
 import ServiceDetail from './ServiceDetail';
 import servicesData from './servicesData';
 
 const Services = () => {
-  const { service } = useParams();
+  const { service } = useParams<{ service?: string }>();
   
   const selectedService = service && servicesData[service] ? servicesData[service] : null;
 
   return (
     <div className="min-h-screen">
-      <LazyMotion features={domAnimation}>
-        {selectedService ? (
-          <ServiceDetail service={selectedService} servicesData={servicesData} />
-        ) : (
-          <ServicesOverview servicesData={servicesData} />
-        )}
-      </LazyMotion>
+      {selectedService ? (
+        <ServiceDetail service={selectedService} servicesData={servicesData} />
+      ) : (
+        <ServicesOverview servicesData={servicesData} />
+      )}
     </div>
   );
 };
