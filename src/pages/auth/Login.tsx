@@ -9,6 +9,7 @@ import { Eye, EyeOff, Lock, Mail, Smartphone, ArrowRight } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Separator } from "@/components/ui/separator";
 
 const Login = () => {
   // Only initialize navigate if we're in a browser context (not during SSR)
