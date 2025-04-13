@@ -1,91 +1,70 @@
-
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Eye, EyeOff, Lock, Mail, Smartphone, ArrowRight } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Lock, Mail, Smartphone, ArrowRight, Leaf, ShoppingCart, Users } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Login = () => {
-  // Initialize navigate only if we're in a browser environment and inside Router context
-  const navigate = useNavigate();
+  // Only initialize navigate if we're in a browser context (not during SSR)
+  const navigate = typeof window !== 'undefined' ? useNavigate() : null;
   const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [userType, setUserType] = useState<"farmer" | "vendor" | "consumer">("farmer");
-  
+
   const [formData, setFormData] = useState({
     email: "",
     phone: "",
     password: "",
-    rememberMe: false,
   });
-  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-  
-  const handleCheckboxChange = (checked: boolean) => {
-    setFormData(prev => ({ ...prev, rememberMe: checked }));
+
+  const handleLoginMethodChange = (value: "email" | "phone") => {
+    setLoginMethod(value);
   };
 
-  const handleUserTypeChange = (value: string) => {
-    setUserType(value as "farmer" | "vendor" | "consumer");
-  };
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     // Form validation
-    if (loginMethod === "email" && !formData.email) {
+    if ((loginMethod === "email" && !formData.email) || 
+        (loginMethod === "phone" && !formData.phone) || 
+        !formData.password) {
       toast({
         title: "Error",
-        description: "Please enter your email address",
+        description: "Please fill in all required fields",
         variant: "destructive",
       });
       setIsLoading(false);
       return;
     }
-    
-    if (loginMethod === "phone" && !formData.phone) {
-      toast({
-        title: "Error",
-        description: "Please enter your phone number",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
-    }
-    
-    if (!formData.password) {
-      toast({
-        title: "Error",
-        description: "Please enter your password",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
-    }
-    
-    // Simulate authentication process
+
+    // Simulate login process
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       toast({
         title: "Login Successful",
         description: "Welcome back to Annadata Harmony!",
       });
-      
-      // Redirect based on selected user type
-      navigate(`/dashboard/${userType}`);
+
+      // Determine user type - in real app would come from auth response
+      const userType = "farmer"; // For demo purposes
+
+      // Redirect to the appropriate dashboard
+      if (navigate) {
+        navigate(`/dashboard/${userType}`);
+      }
     } catch (error) {
       toast({
         title: "Login Failed",
@@ -96,7 +75,7 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -118,10 +97,16 @@ const Login = () => {
           </Link>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Welcome back
+          Sign in to your account
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Please sign in to your account
+          Or
+          <Link
+            to="/register"
+            className="font-medium text-[#138808] hover:text-[#138808]/80 ml-1"
+          >
+            create a new account
+          </Link>
         </p>
       </div>
 
@@ -139,53 +124,23 @@ const Login = () => {
               </TabsList>
               <TabsContent value="login">
                 <form onSubmit={handleSubmit} className="space-y-6 pt-6">
-                  {/* User Type Selection */}
-                  <div className="space-y-3">
-                    <Label>I am a</Label>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className={`flex flex-col items-center justify-center border rounded-lg p-4 cursor-pointer transition-colors ${userType === "farmer" ? "border-[#138808] bg-[#138808]/5" : "border-gray-200"}`} onClick={() => handleUserTypeChange("farmer")}>
-                        <Leaf className="h-8 w-8 text-[#138808]" />
-                        <span>Farmer</span>
-                      </div>
-                      
-                      <div className={`flex flex-col items-center justify-center border rounded-lg p-4 cursor-pointer transition-colors ${userType === "vendor" ? "border-[#FF9933] bg-[#FF9933]/5" : "border-gray-200"}`} onClick={() => handleUserTypeChange("vendor")}>
-                        <ShoppingCart className="h-8 w-8 text-[#FF9933]" />
-                        <span>Vendor</span>
-                      </div>
-                      
-                      <div className={`flex flex-col items-center justify-center border rounded-lg p-4 cursor-pointer transition-colors ${userType === "consumer" ? "border-[#0000FF] bg-[#0000FF]/5" : "border-gray-200"}`} onClick={() => handleUserTypeChange("consumer")}>
-                        <Users className="h-8 w-8 text-[#0000FF]" />
-                        <span>Consumer</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <button
-                          type="button"
-                          className={`px-3 py-1 text-sm rounded-full ${
-                            loginMethod === "email"
-                              ? "bg-[#138808] text-white"
-                              : "bg-gray-100 text-gray-700"
-                          }`}
-                          onClick={() => setLoginMethod("email")}
-                        >
-                          Email
-                        </button>
-                        <button
-                          type="button"
-                          className={`px-3 py-1 text-sm rounded-full ${
-                            loginMethod === "phone"
-                              ? "bg-[#138808] text-white"
-                              : "bg-gray-100 text-gray-700"
-                          }`}
-                          onClick={() => setLoginMethod("phone")}
-                        >
-                          Phone
-                        </button>
-                      </div>
+                  <div className="space-y-4">
+                    <div className="space-y-3">
+                      <Label>Login with</Label>
+                      <RadioGroup
+                        defaultValue="email"
+                        onValueChange={handleLoginMethodChange}
+                        className="grid grid-cols-2 gap-4"
+                      >
+                        <div className={`flex items-center justify-center border rounded-lg p-4 cursor-pointer transition-colors ${loginMethod === "email" ? "border-[#138808] bg-[#138808]/5" : "border-gray-200"}`}>
+                          <RadioGroupItem value="email" id="email" className="sr-only" />
+                          <Label htmlFor="email" className="cursor-pointer">Email</Label>
+                        </div>
+                        <div className={`flex items-center justify-center border rounded-lg p-4 cursor-pointer transition-colors ${loginMethod === "phone" ? "border-[#138808] bg-[#138808]/5" : "border-gray-200"}`}>
+                          <RadioGroupItem value="phone" id="phone" className="sr-only" />
+                          <Label htmlFor="phone" className="cursor-pointer">Phone</Label>
+                        </div>
+                      </RadioGroup>
                     </div>
 
                     {loginMethod === "email" ? (
@@ -223,57 +178,32 @@ const Login = () => {
                         </div>
                       </div>
                     )}
-                  </div>
 
-                  <div className="space-y-1">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="password"
-                        name="password"
-                        type={showPassword ? "text" : "password"}
-                        autoComplete="current-password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="pl-10 pr-10"
-                        placeholder="Enter your password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3 text-gray-400"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="remember"
-                        checked={formData.rememberMe}
-                        onCheckedChange={handleCheckboxChange}
-                      />
-                      <Label
-                        htmlFor="remember"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Remember me
-                      </Label>
-                    </div>
-                    <div className="text-sm">
-                      <Link
-                        to="/forgot-password"
-                        className="font-medium text-[#138808] hover:text-[#138808]/80"
-                      >
-                        Forgot your password?
-                      </Link>
+                    <div className="space-y-1">
+                      <Label htmlFor="password">Password</Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input
+                          id="password"
+                          name="password"
+                          type={showPassword ? "text" : "password"}
+                          value={formData.password}
+                          onChange={handleChange}
+                          className="pl-10 pr-10"
+                          placeholder="Enter your password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-3 text-gray-400"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -308,7 +238,7 @@ const Login = () => {
                       </>
                     ) : (
                       <>
-                        Sign in
+                        Sign In
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </>
                     )}
@@ -320,7 +250,7 @@ const Login = () => {
                     </div>
                     <div className="relative flex justify-center text-xs">
                       <span className="bg-white px-2 text-gray-500">
-                        Or continue with
+                        Or sign in with
                       </span>
                     </div>
                   </div>
@@ -348,12 +278,11 @@ const Login = () => {
           </CardContent>
           <CardFooter className="flex justify-center">
             <p className="text-sm text-gray-600">
-              Don't have an account?{" "}
               <Link
-                to="/register"
+                to="/forgot-password"
                 className="font-medium text-[#138808] hover:text-[#138808]/80"
               >
-                Sign up
+                Forgot Password?
               </Link>
             </p>
           </CardFooter>
