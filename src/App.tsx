@@ -6,11 +6,13 @@ import AppRoutes from "./routes/AppRoutes";
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <AppProviders>
-        <AppRoutes />
-      </AppProviders>
-    </Router>
+    <React.StrictMode>
+      <Router>
+        <AppProviders>
+          <AppRoutes />
+        </AppProviders>
+      </Router>
+    </React.StrictMode>
   );
 };
 

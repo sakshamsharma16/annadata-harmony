@@ -1,5 +1,5 @@
 
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,7 +13,8 @@ interface AppProvidersProps {
 }
 
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
-  const queryClient = new QueryClient({
+  // Create queryClient with useMemo to ensure it's not recreated on every render
+  const queryClient = useMemo(() => new QueryClient({
     defaultOptions: {
       queries: {
         staleTime: 60 * 1000,
@@ -22,24 +23,22 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
         retry: 1,
       },
     },
-  });
+  }), []);
 
   return (
-    <React.StrictMode>
-      <HelmetProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <LanguageProvider>
-              <MotionProvider>
-                <Toaster />
-                <Sonner />
-                {children}
-              </MotionProvider>
-            </LanguageProvider>
-          </TooltipProvider>
-        </QueryClientProvider>
-      </HelmetProvider>
-    </React.StrictMode>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <LanguageProvider>
+            <MotionProvider>
+              <Toaster />
+              <Sonner />
+              {children}
+            </MotionProvider>
+          </LanguageProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 };
 
