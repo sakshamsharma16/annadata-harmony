@@ -1,19 +1,19 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Lock, Mail, User, Smartphone, ArrowRight, Leaf, ShoppingCart, Users } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
 
 const Register = () => {
-  const navigate = typeof window !== 'undefined' ? useNavigate() : null;
+  // Safely use useNavigate only in a browser context
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -86,9 +86,7 @@ const Register = () => {
       });
       
       // Redirect to the appropriate dashboard only if navigate is available
-      if (navigate) {
-        navigate(`/dashboard/${formData.userType}`);
-      }
+      navigate(`/dashboard/${formData.userType}`);
     } catch (error) {
       toast({
         title: "Registration Failed",

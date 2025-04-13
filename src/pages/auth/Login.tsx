@@ -1,19 +1,17 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, Lock, Mail, Smartphone, ArrowRight } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useLocation, useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 
 const Login = () => {
-  // Only initialize navigate if we're in a browser context (not during SSR)
-  const navigate = typeof window !== 'undefined' ? useNavigate() : null;
+  const navigate = useNavigate();
   const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +35,6 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Form validation
     if ((loginMethod === "email" && !formData.email) || 
         (loginMethod === "phone" && !formData.phone) || 
         !formData.password) {
@@ -50,7 +47,6 @@ const Login = () => {
       return;
     }
 
-    // Simulate login process
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
@@ -59,13 +55,8 @@ const Login = () => {
         description: "Welcome back to Annadata Harmony!",
       });
 
-      // Determine user type - in real app would come from auth response
       const userType = "farmer"; // For demo purposes
-
-      // Redirect to the appropriate dashboard
-      if (navigate) {
-        navigate(`/dashboard/${userType}`);
-      }
+      navigate(`/dashboard/${userType}`);
     } catch (error) {
       toast({
         title: "Login Failed",
