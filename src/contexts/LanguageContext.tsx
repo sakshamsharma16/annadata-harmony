@@ -258,7 +258,7 @@ const LanguageContext = createContext<LanguageContextType>({
   t: () => '',
 });
 
-// Provider component - Make sure it's defined as a proper function component
+// Provider component - Fixed to ensure hooks are used properly
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>('english');
   const [isLoaded, setIsLoaded] = useState(false);
