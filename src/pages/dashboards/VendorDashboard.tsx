@@ -1,367 +1,166 @@
 
-import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
-import { consumers } from "@/data/mockData";
-import { Package, MapPin, Bell, TrendingUp, ShoppingBag, Users, ArrowUpRight, Plus, Edit, Trash2, Check, AlertTriangle } from "lucide-react";
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import NearbyVendorsMap from "@/components/vendor/NearbyVendorsMap";
+import React from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { CalendarDays, Map, ShoppingCart, Users } from "lucide-react";
+import LocationMap from "@/components/maps/LocationMap";
 
+// Mock data for charts
 const salesData = [
-  { day: "Mon", sales: 2800 },
-  { day: "Tue", sales: 3200 },
-  { day: "Wed", sales: 3800 },
-  { day: "Thu", sales: 3500 },
-  { day: "Fri", sales: 4200 },
-  { day: "Sat", sales: 4800 },
-  { day: "Sun", sales: 4100 },
+  { name: "Mon", sales: 4000 },
+  { name: "Tue", sales: 3000 },
+  { name: "Wed", sales: 2000 },
+  { name: "Thu", sales: 2780 },
+  { name: "Fri", sales: 1890 },
+  { name: "Sat", sales: 2390 },
+  { name: "Sun", sales: 3490 },
 ];
 
-const productDistribution = [
-  { name: "Rice", value: 35 },
-  { name: "Wheat", value: 25 },
-  { name: "Vegetables", value: 20 },
-  { name: "Fruits", value: 20 },
+// Mock recent orders
+const recentOrders = [
+  { id: 1, customer: "Rahul Singh", product: "Potatoes", quantity: 25, total: "₹500", status: "Delivered" },
+  { id: 2, customer: "Priya Sharma", product: "Tomatoes", quantity: 15, total: "₹375", status: "Processing" },
+  { id: 3, customer: "Amit Kumar", product: "Onions", quantity: 30, total: "₹750", status: "Pending" },
 ];
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
-
-const VendorDashboard = () => {
-  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [inventory, setInventory] = useState([
-    { id: 1, product: "Rice", quantity: 1000, price: 38, status: "In Stock", threshold: 200 },
-    { id: 2, product: "Wheat", quantity: 180, price: 30, status: "Low Stock", threshold: 200 },
-    { id: 3, product: "Potatoes", quantity: 500, price: 20, status: "In Stock", threshold: 100 },
-    { id: 4, product: "Tomatoes", quantity: 80, price: 22, status: "Low Stock", threshold: 100 },
-    { id: 5, product: "Onions", quantity: 450, price: 18, status: "In Stock", threshold: 100 },
-  ]);
-
-  const [viewMode, setViewMode] = useState("grid");
-  const [showLowStock, setShowLowStock] = useState(false);
-
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const newLocation = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-        setCurrentLocation(newLocation);
-        checkNearbyCustomers(newLocation);
-      });
-    }
-  }, []);
-
-  const checkNearbyCustomers = (location: { lat: number; lng: number }) => {
-    const nearbyCustomers = consumers.filter((consumer) => {
-      const distance = Math.sqrt(
-        Math.pow(consumer.location.lat - location.lat, 2) +
-        Math.pow(consumer.location.lng - location.lng, 2)
-      );
-      return distance < 0.01;
-    });
-
-    nearbyCustomers.forEach((customer) => {
-      toast({
-        title: "Customer Nearby!",
-        description: `${customer.name} is in your area and might be interested in your products.`,
-      });
-    });
-  };
-
-  const handleRestockProduct = (id: number) => {
-    setInventory(prev => prev.map(item => {
-      if (item.id === id) {
-        const newQuantity = item.quantity + 500;
-        return {
-          ...item,
-          quantity: newQuantity,
-          status: newQuantity < item.threshold ? "Low Stock" : "In Stock"
-        };
-      }
-      return item;
-    }));
-
-    toast({
-      title: "Product Restocked",
-      description: "New inventory has been added to your stock.",
-    });
-  };
-
-  const handleDeleteProduct = (id: number) => {
-    setInventory(prev => prev.filter(item => item.id !== id));
-    toast({
-      title: "Product Removed",
-      description: "The product has been removed from inventory.",
-    });
-  };
-
-  const filteredInventory = showLowStock 
-    ? inventory.filter(item => item.status === "Low Stock") 
-    : inventory;
-
-  const lowStockCount = inventory.filter(item => item.status === "Low Stock").length;
-
+const VendorDashboard: React.FC = () => {
   return (
-    <div className="p-8 bg-gray-50">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Vendor Dashboard</h1>
-        <div className="text-sm text-muted-foreground">
-          Last updated: {new Date().toLocaleDateString()}
+    <div className="p-8 bg-gradient-to-br from-[#F8FFF2] via-white to-[#F9FFF4]">
+      <div className="max-w-7xl mx-auto relative">
+        {/* Background decorative elements */}
+        <div className="fixed top-32 -right-20 w-80 h-80 bg-[#FFDEE2] rounded-full blur-3xl opacity-20 animate-pulse"></div>
+        <div className="fixed bottom-20 -left-10 w-64 h-64 bg-[#D3E4FD] rounded-full blur-3xl opacity-20 animate-pulse"></div>
+        
+        {/* Header */}
+        <div className="relative z-10">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Vendor Dashboard</h1>
+          <p className="text-gray-600 mb-8">Manage your inventory and track orders</p>
         </div>
-      </div>
-      
-      <div className="grid gap-6 md:grid-cols-3 mb-8">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Weekly Sales</CardTitle>
-            <TrendingUp className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₹22,450</div>
-            <p className="text-xs text-blue-600 flex items-center gap-1 mt-1">
-              <ArrowUpRight size={12} />
-              +8.2% from last week
-            </p>
-          </CardContent>
-        </Card>
         
-        <Card className="bg-gradient-to-br from-green-50 to-green-100">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Inventory</CardTitle>
-            <Package className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2,300 kg</div>
-            <p className="text-xs text-green-600">Across {inventory.length} products</p>
-          </CardContent>
-        </Card>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-4 mb-8">
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-none hover:shadow-md transition-all">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-700">Total Sales</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">₹24,500</div>
+              <p className="text-xs text-green-600 mt-2">+5% from last week</p>
+              <ShoppingCart className="h-8 w-8 text-purple-500 opacity-20 absolute bottom-2 right-2" />
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-none hover:shadow-md transition-all">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-700">New Customers</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">48</div>
+              <p className="text-xs text-green-600 mt-2">+12% from last month</p>
+              <Users className="h-8 w-8 text-blue-500 opacity-20 absolute bottom-2 right-2" />
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-br from-yellow-50 to-amber-100 border-none hover:shadow-md transition-all">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-700">Active Products</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">28</div>
+              <p className="text-xs text-green-600 mt-2">+2 new this week</p>
+              <ShoppingCart className="h-8 w-8 text-amber-500 opacity-20 absolute bottom-2 right-2" />
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-none hover:shadow-md transition-all">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-700">Pending Orders</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">5</div>
+              <p className="text-xs text-orange-500 mt-2">3 need attention</p>
+              <CalendarDays className="h-8 w-8 text-green-500 opacity-20 absolute bottom-2 right-2" />
+            </CardContent>
+          </Card>
+        </div>
         
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Nearby Customers</CardTitle>
-            <Users className="h-4 w-4 text-purple-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <p className="text-xs text-purple-600">Within 1km radius</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Add the new Nearby Vendors Map section */}
-      <div className="mb-8">
-        <NearbyVendorsMap />
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Weekly Sales Trend</CardTitle>
-            <CardDescription>Daily revenue analysis</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={salesData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {/* Sales Chart */}
+          <Card className="col-span-1 md:col-span-1">
+            <CardHeader>
+              <CardTitle>Weekly Sales</CardTitle>
+              <CardDescription>Sales volume for the past week</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={salesData}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                  <XAxis dataKey="name" />
                   <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="sales" 
-                    stroke="#8884d8" 
-                    strokeWidth={2}
-                    dot={{ stroke: '#8884d8', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 8 }}
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', border: '1px solid #ddd' }}
                   />
-                </LineChart>
+                  <Bar dataKey="sales" fill="#138808" />
+                </BarChart>
               </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Product Distribution</CardTitle>
-            <CardDescription>Inventory by category</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={productDistribution}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {productDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          {/* Nearby Consumers Map */}
+          <LocationMap 
+            title="Nearby Consumers" 
+            description="Connect with consumers in your area"
+            height="350px" 
+          />
+
+          {/* Recent Orders */}
+          <Card className="col-span-1 md:col-span-2">
+            <CardHeader>
+              <CardTitle>Recent Orders</CardTitle>
+              <CardDescription>Monitor and manage your latest orders</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left font-medium p-4 pl-0">Order ID</th>
+                      <th className="text-left font-medium p-4">Customer</th>
+                      <th className="text-left font-medium p-4">Product</th>
+                      <th className="text-left font-medium p-4">Quantity</th>
+                      <th className="text-left font-medium p-4">Total</th>
+                      <th className="text-left font-medium p-4">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentOrders.map((order) => (
+                      <tr key={order.id} className="border-b">
+                        <td className="p-4 pl-0">#{order.id}</td>
+                        <td className="p-4">{order.customer}</td>
+                        <td className="p-4">{order.product}</td>
+                        <td className="p-4">{order.quantity} kg</td>
+                        <td className="p-4">{order.total}</td>
+                        <td className="p-4">
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            order.status === 'Delivered' ? 'bg-green-100 text-green-700' :
+                            order.status === 'Processing' ? 'bg-blue-100 text-blue-700' :
+                            'bg-amber-100 text-amber-700'
+                          }`}>
+                            {order.status}
+                          </span>
+                        </td>
+                      </tr>
                     ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Inventory Management</CardTitle>
-                <CardDescription>Current stock levels and pricing</CardDescription>
+                  </tbody>
+                </table>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <Button 
-                  variant={lowStockCount > 0 ? "destructive" : "outline"} 
-                  size="sm"
-                  onClick={() => setShowLowStock(!showLowStock)}
-                >
-                  <AlertTriangle className="w-4 h-4 mr-2" />
-                  {showLowStock ? "Show All" : `Low Stock (${lowStockCount})`}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setViewMode(viewMode === "grid" ? "table" : "grid")}
-                >
-                  {viewMode === "grid" ? "Table View" : "Grid View"}
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Package className="w-4 h-4 mr-2" />
-                  Add Product
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {viewMode === "grid" ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredInventory.map((item) => (
-                  <div 
-                    key={item.id} 
-                    className={`p-4 rounded-lg border ${
-                      item.status === "Low Stock" 
-                        ? "bg-gradient-to-r from-red-50 to-red-100 border-red-200" 
-                        : "bg-gradient-to-r from-white to-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold">{item.product}</h4>
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        item.status === 'In Stock' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {item.status}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-                      <div>
-                        <p className="text-gray-500">Quantity</p>
-                        <p className="font-medium">{item.quantity} kg</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500">Price/kg</p>
-                        <p className="font-medium">₹{item.price}</p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap justify-end gap-2">
-                      {item.status === "Low Stock" && (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100"
-                          onClick={() => handleRestockProduct(item.id)}
-                        >
-                          <Plus className="h-3 w-3 mr-1" />
-                          Restock
-                        </Button>
-                      )}
-                      <Button variant="outline" size="sm">
-                        <Edit className="h-3 w-3 mr-1" />
-                        Edit
-                      </Button>
-                      <Button 
-                        variant="destructive" 
-                        size="sm"
-                        onClick={() => handleDeleteProduct(item.id)}
-                      >
-                        <Trash2 className="h-3 w-3 mr-1" />
-                        Delete
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Quantity (kg)</TableHead>
-                    <TableHead>Price (₹/kg)</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredInventory.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item.product}</TableCell>
-                      <TableCell>{item.quantity}</TableCell>
-                      <TableCell>₹{item.price}</TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          item.status === 'In Stock' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
-                          {item.status}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          {item.status === "Low Stock" && (
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100"
-                              onClick={() => handleRestockProduct(item.id)}
-                            >
-                              <Plus className="h-3 w-3 mr-1" />
-                              Restock
-                            </Button>
-                          )}
-                          <Button variant="outline" size="sm">
-                            <Edit className="h-3 w-3 mr-1" />
-                            Edit
-                          </Button>
-                          <Button 
-                            variant="destructive" 
-                            size="sm"
-                            onClick={() => handleDeleteProduct(item.id)}
-                          >
-                            <Trash2 className="h-3 w-3 mr-1" />
-                            Delete
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

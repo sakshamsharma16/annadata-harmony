@@ -5,7 +5,6 @@ import NavigationMenu from "../components/NavigationMenu";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ProtectedRoute from "../components/ProtectedRoute";
 import SEOHandler from "../components/SEOHandler";
-import SupabaseTestLink from "../components/SupabaseTestLink";
 import { getCacheItem } from "../utils/cacheUtils";
 
 // Lazy-loaded components
@@ -91,7 +90,7 @@ const AppRoutes: React.FC = () => {
               
               {/* Admin route - strictly only accessible to users with admin role */}
               <Route path="/admin" element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute allowedRoles={['admin']} strictMode={true}>
                   <AdminDashboard />
                 </ProtectedRoute>
               } />
@@ -138,7 +137,6 @@ const AppRoutes: React.FC = () => {
               <Route path="/faq" element={<FaqPage />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/services/:service" element={<ServicesPage />} />
-              <Route path="/supabase-test" element={<SupabaseTest />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
