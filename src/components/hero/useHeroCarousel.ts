@@ -1,12 +1,13 @@
 
 import { useState, useEffect, useRef } from "react";
+import { heroSlides } from "./heroData";
 
 export const useHeroCarousel = (slidesLength: number) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
-
+  
   const nextSlide = () => {
     if (!isAnimating) {
       setIsAnimating(true);
@@ -44,38 +45,32 @@ export const useHeroCarousel = (slidesLength: number) => {
 
   // Image preloading effect
   useEffect(() => {
-    // Preload images with lower priority
+    // Preload images immediately to prevent issues
+    const imageUrls = heroSlides.map(slide => slide.image);
     let loadedCount = 0;
     
-    const preloadImages = (imageUrls: string[]) => {
-      imageUrls.forEach(url => {
+    const preloadImages = (urls: string[]) => {
+      urls.forEach(url => {
         const img = new Image();
         img.src = url;
         img.onload = () => {
           loadedCount++;
-          if (loadedCount === imageUrls.length) {
+          if (loadedCount === urls.length) {
             setImagesLoaded(true);
           }
         };
         img.onerror = () => {
           loadedCount++;
-          if (loadedCount === imageUrls.length) {
+          if (loadedCount === urls.length) {
             setImagesLoaded(true);
           }
         };
       });
     };
     
-    // Get image urls from heroSlides import
-    import('./heroData').then(({ heroSlides }) => {
-      const imageUrls = heroSlides.map(slide => slide.image);
-      preloadImages(imageUrls);
-    }).catch(err => {
-      console.error("Failed to load hero slides:", err);
-      setImagesLoaded(true); // Consider images loaded anyway to prevent blocking
-    });
+    preloadImages(imageUrls);
     
-    // If images take too long, consider them loaded anyway
+    // Fallback timeout to ensure we don't get stuck
     const timeout = setTimeout(() => setImagesLoaded(true), 3000);
     return () => clearTimeout(timeout);
   }, []);

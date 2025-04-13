@@ -112,9 +112,7 @@ const mountApp = () => {
     
     // Render app with StrictMode at the top level
     root.render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
+      <App />
     );
     
     // Remove loading indicator after a short delay

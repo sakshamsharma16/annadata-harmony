@@ -31,9 +31,9 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
         <TooltipProvider>
           <LanguageProvider>
             <MotionProvider>
+              {children}
               <Toaster />
               <Sonner />
-              {children}
             </MotionProvider>
           </LanguageProvider>
         </TooltipProvider>
