@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
@@ -96,36 +97,26 @@ showLoadingIndicator();
 // Setup caching
 setupAppCache();
 
-// Define a function to mount the app to ensure React is properly initialized
-const mountApp = () => {
-  const rootElement = document.getElementById('root');
-  if (!rootElement) {
-    throw new Error('Root element not found');
-  }
-  
-  // Create React root
-  const root = createRoot(rootElement);
-  
-  // Render the app
-  root.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
-  
-  // Remove loading indicator after the app has rendered
-  setTimeout(() => {
-    removeLoadingIndicator();
-  }, 300);
-};
-
-// Mount the app when the document is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', mountApp);
-} else {
-  // Document is already ready, call mountApp directly
-  mountApp();
+// Define the root element to use for mounting the app
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Root element not found');
 }
+
+// Create React root
+const root = createRoot(rootElement);
+
+// Render the app
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+// Remove loading indicator after the app has rendered
+setTimeout(() => {
+  removeLoadingIndicator();
+}, 300);
 
 // Register service worker if available
 if ('serviceWorker' in navigator) {

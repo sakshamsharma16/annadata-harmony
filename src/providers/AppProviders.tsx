@@ -12,7 +12,7 @@ interface AppProvidersProps {
   children: ReactNode;
 }
 
-// Create QueryClient instance outside of the component to avoid re-creation on renders
+// Create QueryClient instance with proper configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
