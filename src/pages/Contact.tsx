@@ -5,11 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
-import { LazyMotion, domAnimation, m } from "framer-motion";
+import { m } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import LocationMap from "../components/maps/LocationMap";
 
-const ContactPage = () => {
+const ContactPage: React.FC = () => {
   const [formData, setFormData] = React.useState({
     name: '',
     email: '',
@@ -20,7 +20,7 @@ const ContactPage = () => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { toast } = useToast();
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -28,7 +28,7 @@ const ContactPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
