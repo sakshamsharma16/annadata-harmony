@@ -1,5 +1,6 @@
 
-import { LazyMotion, domAnimation } from "framer-motion";
+import React from "react";
+import { domAnimation, LazyMotion } from "framer-motion";
 import { heroSlides } from "./hero/heroData";
 import { useHeroCarousel } from "./hero/useHeroCarousel";
 import HeroSlide from "./hero/HeroSlide";
@@ -8,7 +9,7 @@ import HeroNavigationButtons from "./hero/HeroNavigationButtons";
 import HeroSlideIndicators from "./hero/HeroSlideIndicators";
 import HeroScrollIndicator from "./hero/HeroScrollIndicator";
 
-const Hero = () => {
+const Hero: React.FC = () => {
   const { currentSlide, nextSlide, prevSlide, goToSlide, carouselRef } = useHeroCarousel(heroSlides.length);
 
   return (

@@ -31,6 +31,7 @@ export const useHeroCarousel = (slidesLength: number) => {
     }
   };
 
+  // Auto-rotation effect
   useEffect(() => {
     // Only start auto-rotation after images are loaded
     if (!imagesLoaded) return;
@@ -39,8 +40,9 @@ export const useHeroCarousel = (slidesLength: number) => {
       nextSlide();
     }, 5000);
     return () => clearInterval(interval);
-  }, [imagesLoaded]);
+  }, [imagesLoaded, slidesLength]);
 
+  // Image preloading effect
   useEffect(() => {
     // Preload images with lower priority
     let loadedCount = 0;
@@ -68,6 +70,9 @@ export const useHeroCarousel = (slidesLength: number) => {
     import('./heroData').then(({ heroSlides }) => {
       const imageUrls = heroSlides.map(slide => slide.image);
       preloadImages(imageUrls);
+    }).catch(err => {
+      console.error("Failed to load hero slides:", err);
+      setImagesLoaded(true); // Consider images loaded anyway to prevent blocking
     });
     
     // If images take too long, consider them loaded anyway
