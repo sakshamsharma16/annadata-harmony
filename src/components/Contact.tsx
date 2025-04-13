@@ -1,9 +1,9 @@
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Mail, Phone, MessageSquare, Send, CheckCircle } from "lucide-react";
 import { LazyMotion, domAnimation, m } from "framer-motion";
 
-const Contact = () => {
+const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",

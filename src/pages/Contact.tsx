@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,16 +7,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
 import { LazyMotion, domAnimation, m } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import LocationMap from "../components/maps/LocationMap";
 
-const Contact = () => {
-  const [formData, setFormData] = useState({
+const ContactPage = () => {
+  const [formData, setFormData] = React.useState({
     name: '',
     email: '',
     phone: '',
     subject: '',
     message: '',
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { toast } = useToast();
 
   const handleChange = (e) => {
@@ -275,20 +276,14 @@ const Contact = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.2 }}
         >
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d448193.95103881305!2d76.76357427843233!3d28.644287311934744!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd5b347eb62d%3A0x37205b715389640!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1650438174955!5m2!1sen!2sin"
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen={true}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Our Location"
-          ></iframe>
+          <LocationMap 
+            title="Our Office Location" 
+            description="Visit us at our Delhi headquarters"
+          />
         </m.div>
       </div>
     </div>
   );
 };
 
-export default Contact;
+export default ContactPage;
