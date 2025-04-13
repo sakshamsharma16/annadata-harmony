@@ -97,22 +97,32 @@ showLoadingIndicator();
 // Setup caching
 setupAppCache();
 
-// Create the root element first
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error('Root element not found');
+// Define a function to mount the app to ensure React is properly initialized
+const mountApp = () => {
+  const rootElement = document.getElementById('root');
+  if (!rootElement) {
+    throw new Error('Root element not found');
+  }
+  
+  // Create React root
+  const root = createRoot(rootElement);
+  
+  // Render the app
+  root.render(<App />);
+  
+  // Remove loading indicator after the app has rendered
+  setTimeout(() => {
+    removeLoadingIndicator();
+  }, 300);
+};
+
+// Mount the app when the document is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', mountApp);
+} else {
+  // Document is already ready, call mountApp directly
+  mountApp();
 }
-
-// Create React root using the new API
-const root = createRoot(rootElement);
-
-// Render app WITHOUT StrictMode to resolve hook issues
-root.render(<App />);
-
-// Remove loading indicator after a short delay
-setTimeout(() => {
-  removeLoadingIndicator();
-}, 300);
 
 // Register service worker if available
 if ('serviceWorker' in navigator) {
