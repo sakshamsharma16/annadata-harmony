@@ -4,7 +4,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import MotionProvider from "../components/MotionProvider";
 import { LanguageProvider } from "../contexts/LanguageContext";
@@ -14,7 +13,6 @@ interface AppProvidersProps {
 }
 
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
-  // Create the client inside the component function
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -30,17 +28,15 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
     <React.StrictMode>
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <TooltipProvider>
-              <LanguageProvider>
-                <MotionProvider>
-                  <Toaster />
-                  <Sonner />
-                  {children}
-                </MotionProvider>
-              </LanguageProvider>
-            </TooltipProvider>
-          </BrowserRouter>
+          <TooltipProvider>
+            <LanguageProvider>
+              <MotionProvider>
+                <Toaster />
+                <Sonner />
+                {children}
+              </MotionProvider>
+            </LanguageProvider>
+          </TooltipProvider>
         </QueryClientProvider>
       </HelmetProvider>
     </React.StrictMode>

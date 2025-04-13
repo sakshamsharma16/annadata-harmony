@@ -69,7 +69,7 @@ const removeLoadingIndicator = () => {
     loadingEl.style.opacity = '0';
     setTimeout(() => {
       loadingEl.remove();
-    }, 100);
+    }, 300);
   }
 };
 
@@ -111,11 +111,7 @@ const mountApp = () => {
     const root = createRoot(rootElement);
     
     // Render app with strict mode
-    root.render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    );
+    root.render(<App />);
     
     // Remove loading indicator after a short delay
     setTimeout(() => {
