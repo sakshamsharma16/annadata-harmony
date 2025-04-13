@@ -13,19 +13,19 @@ interface AppProvidersProps {
   children: ReactNode;
 }
 
-// Create React Query client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000,
-      gcTime: 5 * 60 * 1000,
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
-
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
+  // Create the client inside the component function
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000,
+        gcTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        retry: 1,
+      },
+    },
+  });
+
   return (
     <React.StrictMode>
       <HelmetProvider>
