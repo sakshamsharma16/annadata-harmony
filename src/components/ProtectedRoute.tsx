@@ -8,11 +8,13 @@ import { toast } from "@/hooks/use-toast";
 interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles?: string[];
+  strictMode?: boolean;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
-  allowedRoles = [] 
+  allowedRoles = [],
+  strictMode = false
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);

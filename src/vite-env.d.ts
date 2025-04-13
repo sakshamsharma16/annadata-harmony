@@ -13,4 +13,20 @@ interface Window {
       [key: string]: any;
     }) => void;
   };
+  
+  // Add Google Maps API type definition
+  google?: {
+    maps: {
+      Map: any;
+      Marker: any;
+      Circle: any;
+      SymbolPath: any;
+      MapTypeControl: boolean;
+      LatLng: any;
+      places: any;
+      Geocoder: any;
+      GeocoderStatus: any;
+      NavigationControl: any;
+    }
+  };
 }

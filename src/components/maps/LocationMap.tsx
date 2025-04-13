@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import ScriptLoader from "@/components/ui/script-loader";
 
 interface LocationMapProps {
   title?: string;
@@ -13,6 +14,13 @@ interface LocationMapProps {
   showLegend?: boolean;
   className?: string;
 }
+
+// Type guard to check if google maps is loaded
+const isGoogleMapsLoaded = (): boolean => {
+  return typeof window !== 'undefined' && 
+         typeof window.google !== 'undefined' && 
+         typeof window.google.maps !== 'undefined';
+};
 
 const LocationMap = ({ 
   title = "Location Map",
@@ -24,42 +32,17 @@ const LocationMap = ({
   const mapRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
 
-  useEffect(() => {
-    // Load the Google Maps script
-    const googleMapScript = document.createElement('script');
-    const apiKey = ''; // For demo purposes, would use ENV var in production
-    googleMapScript.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-    googleMapScript.async = true;
-    googleMapScript.defer = true;
-    
-    // Error handler for missing API key
-    googleMapScript.onerror = () => {
-      setIsLoading(false);
-      toast({
-        title: "Map Error",
-        description: "Could not load the map. Please try again later.",
-        variant: "destructive"
-      });
-    };
-
-    // Initialize map when script is loaded
-    googleMapScript.onload = () => {
-      setIsLoading(false);
-      initMap();
-    };
-
-    document.body.appendChild(googleMapScript);
-
-    return () => {
-      // Clean up by removing the script
-      document.body.removeChild(googleMapScript);
-    };
-  }, [toast]);
+  const handleScriptLoad = () => {
+    setIsScriptLoaded(true);
+    setIsLoading(false);
+    initMap();
+  };
 
   // Initialize the Google Map
   const initMap = () => {
-    if (!mapRef.current || !window.google) return;
+    if (!mapRef.current || !isGoogleMapsLoaded()) return;
 
     // Default location (can be replaced with geolocation)
     const defaultLocation = { lat: 28.6139, lng: 77.2090 }; // Delhi
@@ -106,32 +89,33 @@ const LocationMap = ({
           map.setCenter(userLocation);
 
           // Add a marker for the user's location
-          new window.google.maps.Marker({
-            position: userLocation,
-            map,
-            title: "Your Location",
-            icon: {
-              path: window.google.maps.SymbolPath.CIRCLE,
-              scale: 10,
-              fillColor: "#138808",
-              fillOpacity: 1,
-              strokeColor: "#FFFFFF",
-              strokeWeight: 2
-            }
-          });
+          if (isGoogleMapsLoaded()) {
+            new window.google.maps.Marker({
+              position: userLocation,
+              map,
+              title: "Your Location",
+              icon: {
+                path: window.google.maps.SymbolPath.CIRCLE,
+                scale: 10,
+                fillColor: "#138808",
+                fillOpacity: 1,
+                strokeColor: "#FFFFFF",
+                strokeWeight: 2
+              }
+            });
 
-          // Draw a circle to show search radius
-          new window.google.maps.Circle({
-            strokeColor: "rgba(19, 136, 8, 0.3)",
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: "rgba(19, 136, 8, 0.1)",
-            fillOpacity: 0.35,
-            map,
-            center: userLocation,
-            radius: 3000 // 3km radius
-          });
-
+            // Draw a circle to show search radius
+            new window.google.maps.Circle({
+              strokeColor: "rgba(19, 136, 8, 0.3)",
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: "rgba(19, 136, 8, 0.1)",
+              fillOpacity: 0.35,
+              map,
+              center: userLocation,
+              radius: 3000 // 3km radius
+            });
+          }
         },
         () => {
           toast({
@@ -146,6 +130,12 @@ const LocationMap = ({
 
   return (
     <Card className={`border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300 ${className}`}>
+      {/* Load Google Maps API script */}
+      <ScriptLoader 
+        src={`https://maps.googleapis.com/maps/api/js?key=&libraries=places`}
+        onLoad={handleScriptLoad}
+      />
+      
       {(title || description) && (
         <CardHeader className="border-b bg-gray-50">
           {title && <CardTitle>{title}</CardTitle>}
@@ -166,7 +156,7 @@ const LocationMap = ({
         />
         
         {/* Fallback for when Google Maps doesn't load */}
-        {!window.google && !isLoading && (
+        {!isGoogleMapsLoaded() && !isLoading && (
           <Alert variant="destructive" className="m-4">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
