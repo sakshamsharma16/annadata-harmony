@@ -32,7 +32,6 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
           <LanguageProvider>
             <MotionProvider>
               {children}
-              <Toaster />
               <Sonner />
             </MotionProvider>
           </LanguageProvider>
