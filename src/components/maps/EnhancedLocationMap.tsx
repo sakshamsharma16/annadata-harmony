@@ -33,47 +33,6 @@ interface InfoWindowProps {
   position?: { lat: number; lng: number };
 }
 
-// Create an extended Google Maps API type reference
-interface GoogleMapsApi {
-  Map: any;
-  Marker: any;
-  Circle: any;
-  InfoWindow: any;
-  SymbolPath: {
-    CIRCLE: number;
-  };
-  MapTypeControl: boolean;
-  LatLng: any;
-  LatLngBounds: any;
-  Animation: {
-    DROP: number;
-    BOUNCE: number;
-  };
-  places: {
-    AutocompleteService: any;
-    SearchBox: any;
-  };
-  Geocoder: any;
-  GeocoderStatus: {
-    OK: string;
-  };
-  NavigationControl: any;
-  ControlPosition: {
-    TOP_LEFT: number;
-    TOP_RIGHT: number;
-    RIGHT_BOTTOM: number;
-  };
-}
-
-// When window.google is available, it will have this structure
-declare global {
-  interface Window {
-    google?: {
-      maps: GoogleMapsApi;
-    };
-  }
-}
-
 export interface Location {
   lat: number;
   lng: number;
