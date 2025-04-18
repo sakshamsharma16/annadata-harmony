@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, MapPin, Package, TrendingDown } from "lucide-react";
@@ -13,22 +12,16 @@ import EnhancedLocationMap from "@/components/maps/EnhancedLocationMap";
 // Sample data for mock vendors
 const nearbyVendors = [
   { 
-    lat: 28.6229, 
-    lng: 77.2080, 
+    position: { lat: 28.6229, lng: 77.2080 },
     title: "Fresh Farms Vendor", 
-    type: 'vendor' as const 
   },
   { 
-    lat: 28.6100, 
-    lng: 77.2300, 
+    position: { lat: 28.6100, lng: 77.2300 },
     title: "Green Harvest Market", 
-    type: 'vendor' as const
   },
   { 
-    lat: 28.6350, 
-    lng: 77.2200, 
+    position: { lat: 28.6350, lng: 77.2200 },
     title: "Village Fresh Foods", 
-    type: 'vendor' as const 
   }
 ];
 

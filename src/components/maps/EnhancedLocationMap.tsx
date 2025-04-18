@@ -33,46 +33,67 @@ interface InfoWindowProps {
   position?: { lat: number; lng: number };
 }
 
-// Create a simplified Google Maps API reference
-const googleMapsApi = {
-  Map: undefined,
-  Marker: undefined,
-  Circle: undefined,
-  InfoWindow: undefined,
+// Create an extended Google Maps API type reference
+interface GoogleMapsApi {
+  Map: any;
+  Marker: any;
+  Circle: any;
+  InfoWindow: any;
   SymbolPath: {
-    CIRCLE: 0
-  },
-  MapTypeControl: false,
-  LatLng: undefined,
+    CIRCLE: number;
+  };
+  MapTypeControl: boolean;
+  LatLng: any;
+  LatLngBounds: any;
   Animation: {
-    DROP: 1,
-    BOUNCE: 2
-  },
+    DROP: number;
+    BOUNCE: number;
+  };
   places: {
-    AutocompleteService: undefined
-  },
-  Geocoder: undefined,
+    AutocompleteService: any;
+    SearchBox: any;
+  };
+  Geocoder: any;
   GeocoderStatus: {
-    OK: 'OK'
-  },
-  NavigationControl: undefined
-};
+    OK: string;
+  };
+  NavigationControl: any;
+  ControlPosition: {
+    TOP_LEFT: number;
+    TOP_RIGHT: number;
+    RIGHT_BOTTOM: number;
+  };
+}
 
-interface Location {
+// When window.google is available, it will have this structure
+declare global {
+  interface Window {
+    google?: {
+      maps: GoogleMapsApi;
+    };
+  }
+}
+
+export interface Location {
   lat: number;
   lng: number;
 }
 
+export interface MarkerData {
+  position: Location;
+  title?: string;
+  icon?: string;
+}
+
 interface EnhancedLocationMapProps {
   initialLocation?: Location;
-  markers?: Array<{
-    position: Location;
-    title?: string;
-    icon?: string;
-  }>;
+  markers?: Array<MarkerData>;
   showSearchBar?: boolean;
   onLocationChange?: (location: Location) => void;
   height?: string;
+  title?: string;
+  description?: string;
+  showLegend?: boolean;
 }
 
 const EnhancedLocationMap = ({
@@ -80,7 +101,10 @@ const EnhancedLocationMap = ({
   markers = [],
   showSearchBar = true,
   onLocationChange,
-  height = "400px"
+  height = "400px",
+  title,
+  description,
+  showLegend = false
 }: EnhancedLocationMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<any>(null);
@@ -370,6 +394,13 @@ const EnhancedLocationMap = ({
 
   return (
     <div className="relative rounded-lg overflow-hidden">
+      {title && (
+        <div className="p-4 bg-gray-100 border-b">
+          <h3 className="font-medium">{title}</h3>
+          {description && <p className="text-sm text-gray-600">{description}</p>}
+        </div>
+      )}
+      
       {loading && (
         <div className="absolute inset-0 bg-gray-100 bg-opacity-75 flex items-center justify-center z-10">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -408,6 +439,19 @@ const EnhancedLocationMap = ({
             placeholder="Search for a location"
             className="map-search-input"
           />
+        </div>
+      )}
+      
+      {showLegend && (
+        <div className="absolute bottom-4 right-4 bg-white p-2 rounded-md shadow-md text-xs">
+          <div className="flex items-center mb-1">
+            <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+            <span>Your Location</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+            <span>Point of Interest</span>
+          </div>
         </div>
       )}
     </div>

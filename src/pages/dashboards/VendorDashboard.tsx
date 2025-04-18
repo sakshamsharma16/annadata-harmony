@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -7,7 +6,6 @@ import EnhancedLocationMap from "@/components/maps/EnhancedLocationMap";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
-// Mock data for charts
 const salesData = [
   { name: "Mon", sales: 4000 },
   { name: "Tue", sales: 3000 },
@@ -18,32 +16,24 @@ const salesData = [
   { name: "Sun", sales: 3490 },
 ];
 
-// Mock recent orders
 const recentOrders = [
   { id: 1, customer: "Rahul Singh", product: "Potatoes", quantity: 25, total: "₹500", status: "Delivered" },
   { id: 2, customer: "Priya Sharma", product: "Tomatoes", quantity: 15, total: "₹375", status: "Processing" },
   { id: 3, customer: "Amit Kumar", product: "Onions", quantity: 30, total: "₹750", status: "Pending" },
 ];
 
-// Sample data for mock consumers
 const nearbyConsumers = [
   { 
-    lat: 28.6229, 
-    lng: 77.2080, 
+    position: { lat: 28.6229, lng: 77.2080 },
     title: "Rahul Singh", 
-    type: 'consumer' as const
   },
   { 
-    lat: 28.6100, 
-    lng: 77.2300, 
+    position: { lat: 28.6100, lng: 77.2300 },
     title: "Priya Sharma", 
-    type: 'consumer' as const
   },
   { 
-    lat: 28.6350, 
-    lng: 77.2200, 
+    position: { lat: 28.6350, lng: 77.2200 },
     title: "Amit Kumar", 
-    type: 'consumer' as const 
   }
 ];
 
@@ -71,17 +61,14 @@ const VendorDashboard: React.FC = () => {
   return (
     <div className="p-8 bg-gradient-to-br from-[#F8FFF2] via-white to-[#F9FFF4]">
       <div className="max-w-7xl mx-auto relative">
-        {/* Background decorative elements */}
         <div className="fixed top-32 -right-20 w-80 h-80 bg-[#FFDEE2] rounded-full blur-3xl opacity-20 animate-pulse"></div>
         <div className="fixed bottom-20 -left-10 w-64 h-64 bg-[#D3E4FD] rounded-full blur-3xl opacity-20 animate-pulse"></div>
         
-        {/* Header */}
         <div className="relative z-10">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Vendor Dashboard</h1>
           <p className="text-gray-600 mb-8">Manage your inventory and track orders</p>
         </div>
         
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-4 mb-8">
           <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-none hover:shadow-md transition-all">
             <CardHeader className="pb-2">
@@ -128,9 +115,7 @@ const VendorDashboard: React.FC = () => {
           </Card>
         </div>
         
-        {/* Main Content Grid */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {/* Sales Chart */}
           <Card className="col-span-1 md:col-span-1">
             <CardHeader>
               <CardTitle>Weekly Sales</CardTitle>
@@ -154,7 +139,6 @@ const VendorDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Nearby Consumers Map */}
           <Card>
             <CardHeader className="border-b">
               <CardTitle>Nearby Consumers</CardTitle>
@@ -169,7 +153,6 @@ const VendorDashboard: React.FC = () => {
             </CardContent>
           </Card>
           
-          {/* Send Nudges to Consumers */}
           <Card className="col-span-1 md:col-span-1">
             <CardHeader className="border-b">
               <div className="flex items-center gap-2">
@@ -208,7 +191,6 @@ const VendorDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Recent Orders */}
           <Card className="col-span-1 md:col-span-2">
             <CardHeader>
               <CardTitle>Recent Orders</CardTitle>

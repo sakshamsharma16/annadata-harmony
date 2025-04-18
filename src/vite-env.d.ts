@@ -23,10 +23,22 @@ interface Window {
       SymbolPath: any;
       MapTypeControl: boolean;
       LatLng: any;
+      LatLngBounds: any;
       places: any;
       Geocoder: any;
       GeocoderStatus: any;
       NavigationControl: any;
+      Animation: {
+        DROP: number;
+        BOUNCE: number;
+      };
+      InfoWindow: any;
+      ControlPosition: {
+        TOP_LEFT: number;
+        TOP_RIGHT: number;
+        BOTTOM_RIGHT: number;
+        RIGHT_BOTTOM: number;
+      };
     }
   };
 }
