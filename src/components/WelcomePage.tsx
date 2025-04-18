@@ -1,52 +1,66 @@
 
 import React from 'react';
-import { CircleUserRound } from "lucide-react";
+import { Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { CircleUserRound, Leaf } from "lucide-react";
 import LanguageSelector from "./LanguageSelector";
+import HeroBanner from './homepage/HeroBanner';
+import UserRolesSection from './homepage/UserRolesSection';
+import HowItWorksSection from './homepage/HowItWorksSection';
+import FeaturesSection from './homepage/FeaturesSection';
 
 const WelcomePage = () => {
   return (
-    <div className="min-h-screen gradient-background flex flex-col items-center justify-between p-6">
-      {/* Language Selector - added at the top right */}
-      <div className="self-end">
-        <LanguageSelector />
-      </div>
-      
-      <div className="w-full max-w-lg mx-auto flex flex-col items-center justify-center flex-grow gap-8">
-        {/* Logo and Header */}
-        <div className="text-center space-y-4 animate-fade-up">
-          <img 
-            src="/logo-placeholder.svg" 
-            alt="Annadata Logo" 
-            className="w-32 h-32 mx-auto annadata-logo"
-          />
-          <h1 className="text-4xl font-bold">WELCOME TO ANNADATA</h1>
-        </div>
-
-        {/* QR Code Section */}
-        <div className="glass-card p-6 w-full animate-fade-up" style={{ animationDelay: "0.2s" }}>
-          <div className="w-48 h-48 mx-auto mb-4 bg-gray-200 rounded-lg"></div>
-          <div className="flex items-center justify-center gap-2 text-xl">
-            <CircleUserRound className="w-6 h-6" />
-            <span>SCAN ME</span>
+    <div className="min-h-screen bg-gradient-to-b from-[#F8FFF2] to-white flex flex-col">
+      {/* Navigation / Header */}
+      <header className="w-full py-4 px-6 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <div className="w-10 h-10 bg-[#138808] rounded-full flex items-center justify-center">
+            <Leaf className="h-6 w-6 text-white" />
           </div>
+          <h1 className="text-2xl font-bold text-[#138808]">ANNADATA</h1>
         </div>
+        <div className="flex items-center gap-4">
+          <LanguageSelector />
+          <Link to="/login">
+            <Button variant="outline" className="border-[#138808] text-[#138808] hover:bg-[#138808] hover:text-white">
+              Login
+            </Button>
+          </Link>
+          <Link to="/register">
+            <Button className="bg-[#FF9933] hover:bg-[#FF9933]/90 text-white">
+              Register
+            </Button>
+          </Link>
+        </div>
+      </header>
 
-        {/* Description */}
-        <p className="text-center text-lg max-w-md animate-fade-up" style={{ animationDelay: "0.3s" }}>
-          Join the platform that connects farmers directly with consumers, eliminating middlemen and ensuring fair pricing for all.
-        </p>
+      {/* Hero Section */}
+      <HeroBanner 
+        title="Connecting <span class='text-[#138808]'>Farmers</span>, <span class='text-[#FF9933]'>Vendors</span>, and <span class='text-[#0000FF]'>Consumers</span>"
+        description="ANNADATA empowers rural Indian farmers by establishing direct connections to vendors and consumers, eliminating middlemen and ensuring fair pricing for everyone in the agricultural ecosystem."
+        primaryButtonText="Explore Market"
+        primaryButtonLink="/market-prices"
+        secondaryButtonText="Learn More"
+        secondaryButtonLink="/about"
+      />
 
-        {/* Continue Button */}
-        <button className="btn-primary mt-4 animate-fade-up" style={{ animationDelay: "0.4s" }}>
-          Continue
+      {/* User Roles Section */}
+      <UserRolesSection />
+
+      {/* How It Works Section */}
+      <HowItWorksSection />
+
+      {/* Features Highlight */}
+      <FeaturesSection />
+      
+      {/* Need Help Button */}
+      <div className="fixed bottom-8 right-8">
+        <button className="bg-[#138808] text-white rounded-full px-6 py-3 flex items-center gap-2 shadow-lg hover:bg-[#138808]/90 transition-colors">
+          <CircleUserRound className="w-5 h-5" />
+          NEED HELP?
         </button>
       </div>
-
-      {/* Need Help Button */}
-      <button className="need-help-button animate-fade-up" style={{ animationDelay: "0.5s" }}>
-        <CircleUserRound className="w-6 h-6" />
-        NEED HELP ?
-      </button>
     </div>
   );
 };
