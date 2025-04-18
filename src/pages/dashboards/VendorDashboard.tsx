@@ -1,9 +1,11 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { CalendarDays, Map, ShoppingCart, Users } from "lucide-react";
-import LocationMap from "@/components/maps/LocationMap";
+import { CalendarDays, Map, ShoppingCart, Users, Bell, Tag } from "lucide-react";
+import EnhancedLocationMap from "@/components/maps/EnhancedLocationMap";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock data for charts
 const salesData = [
@@ -23,7 +25,49 @@ const recentOrders = [
   { id: 3, customer: "Amit Kumar", product: "Onions", quantity: 30, total: "₹750", status: "Pending" },
 ];
 
+// Sample data for mock consumers
+const nearbyConsumers = [
+  { 
+    lat: 28.6229, 
+    lng: 77.2080, 
+    title: "Rahul Singh", 
+    type: 'consumer' as const
+  },
+  { 
+    lat: 28.6100, 
+    lng: 77.2300, 
+    title: "Priya Sharma", 
+    type: 'consumer' as const
+  },
+  { 
+    lat: 28.6350, 
+    lng: 77.2200, 
+    title: "Amit Kumar", 
+    type: 'consumer' as const 
+  }
+];
+
 const VendorDashboard: React.FC = () => {
+  const { toast } = useToast();
+  
+  const [pendingNudges, setPendingNudges] = useState([
+    { id: 1, consumer: "Rahul Singh", product: "Potatoes", sent: false },
+    { id: 2, consumer: "Priya Sharma", product: "Tomatoes", sent: false },
+  ]);
+  
+  const sendNudge = (id: number) => {
+    setPendingNudges(prev => 
+      prev.map(nudge => 
+        nudge.id === id ? { ...nudge, sent: true } : nudge
+      )
+    );
+    
+    toast({
+      title: "Nudge Sent",
+      description: "Your special offer has been sent to the consumer.",
+    });
+  };
+
   return (
     <div className="p-8 bg-gradient-to-br from-[#F8FFF2] via-white to-[#F9FFF4]">
       <div className="max-w-7xl mx-auto relative">
@@ -111,11 +155,58 @@ const VendorDashboard: React.FC = () => {
           </Card>
 
           {/* Nearby Consumers Map */}
-          <LocationMap 
-            title="Nearby Consumers" 
-            description="Connect with consumers in your area"
-            height="350px" 
-          />
+          <Card>
+            <CardHeader className="border-b">
+              <CardTitle>Nearby Consumers</CardTitle>
+              <CardDescription>Connect with consumers in your area</CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <EnhancedLocationMap
+                height="350px"
+                markers={nearbyConsumers}
+                showLegend={true}
+              />
+            </CardContent>
+          </Card>
+          
+          {/* Send Nudges to Consumers */}
+          <Card className="col-span-1 md:col-span-1">
+            <CardHeader className="border-b">
+              <div className="flex items-center gap-2">
+                <Tag className="h-5 w-5 text-amber-500" />
+                <CardTitle>Send Special Offers</CardTitle>
+              </div>
+              <CardDescription>Send special offers to nearby consumers</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="space-y-4">
+                {pendingNudges.map((nudge) => (
+                  <div key={nudge.id} className="p-4 rounded-lg border bg-gradient-to-r from-amber-50 to-amber-100 shadow-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium">{nudge.consumer}</h4>
+                      <span className="text-xs text-gray-500">1.3km away</span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Frequently purchases: <span className="font-medium">{nudge.product}</span>
+                    </p>
+                    <div className="flex justify-between items-center">
+                      <div className="text-sm text-amber-600">
+                        <Bell className="h-4 w-4 inline-block mr-1" />
+                        Recommended offer
+                      </div>
+                      <Button 
+                        size="sm" 
+                        disabled={nudge.sent}
+                        onClick={() => sendNudge(nudge.id)}
+                      >
+                        {nudge.sent ? "Sent" : "Send Special Offer"}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Recent Orders */}
           <Card className="col-span-1 md:col-span-2">

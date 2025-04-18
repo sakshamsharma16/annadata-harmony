@@ -4,11 +4,33 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, MapPin, Package, TrendingDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import StatusCard from "@/components/consumer/StatusCard";
-import VendorNudges from "@/components/consumer/VendorNudges";
+import EnhancedVendorNudges from "@/components/consumer/EnhancedVendorNudges";
 import OrderHistory from "@/components/consumer/OrderHistory";
 import ProductShop from "@/components/consumer/ProductShop";
 import { useConsumerCart } from "@/hooks/use-consumer-cart";
-import LocationMap from "@/components/maps/LocationMap";
+import EnhancedLocationMap from "@/components/maps/EnhancedLocationMap";
+
+// Sample data for mock vendors
+const nearbyVendors = [
+  { 
+    lat: 28.6229, 
+    lng: 77.2080, 
+    title: "Fresh Farms Vendor", 
+    type: 'vendor' as const 
+  },
+  { 
+    lat: 28.6100, 
+    lng: 77.2300, 
+    title: "Green Harvest Market", 
+    type: 'vendor' as const
+  },
+  { 
+    lat: 28.6350, 
+    lng: 77.2200, 
+    title: "Village Fresh Foods", 
+    type: 'vendor' as const 
+  }
+];
 
 const orderHistory = [
   { date: "2024-02-20", product: "Rice", quantity: 25, amount: 875 },
@@ -17,8 +39,26 @@ const orderHistory = [
 ];
 
 const recentNudges = [
-  { id: 1, vendorName: "Fresh Farms", product: "Organic Rice", price: 40, discount: "10% off" },
-  { id: 2, vendorName: "Green Harvest", product: "Seasonal Vegetables Mix", price: 120, discount: "Buy 1 Get 1" },
+  { 
+    id: 1, 
+    vendorName: "Fresh Farms", 
+    product: "Organic Rice", 
+    price: 40, 
+    discount: "10% off",
+    distance: "2.1 km",
+    location: { lat: 28.6229, lng: 77.2080 },
+    phone: "+9199999999"
+  },
+  { 
+    id: 2, 
+    vendorName: "Green Harvest", 
+    product: "Seasonal Vegetables Mix", 
+    price: 120, 
+    discount: "Buy 1 Get 1",
+    distance: "3.4 km",
+    location: { lat: 28.6100, lng: 77.2300 },
+    phone: "+9188888888"
+  },
 ];
 
 const initialProducts = [
@@ -35,6 +75,14 @@ const ConsumerDashboard = () => {
   ]);
   
   const { products, setProducts, getTotalCartItems, getTotalCartValue } = useConsumerCart(initialProducts);
+  
+  const [selectedVendorLocation, setSelectedVendorLocation] = useState<{lat: number, lng: number} | null>(null);
+  
+  const handleViewVendorLocation = (location: {lat: number, lng: number}) => {
+    setSelectedVendorLocation(location);
+    // Scroll to map
+    document.getElementById('vendorMap')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <div className="p-8 bg-gradient-to-br from-[#F8FFF2] via-[#F2FCE2] to-[#EDFAD7]">
@@ -77,7 +125,7 @@ const ConsumerDashboard = () => {
           
           <StatusCard 
             title="Nearby Vendors"
-            value="2"
+            value="3"
             description="Within 5km radius"
             icon={MapPin}
             iconColor="text-blue-600"
@@ -96,12 +144,19 @@ const ConsumerDashboard = () => {
 
         {/* Map and Nudges Section */}
         <div className="grid gap-6 md:grid-cols-2 mb-8">
-          <LocationMap 
-            title="Nearby Vendors Map" 
-            description="Find vendors in your area for quick purchases" 
-            height="350px"
+          <div id="vendorMap">
+            <EnhancedLocationMap 
+              title="Nearby Vendors" 
+              description="Find vendors in your area for quick purchases" 
+              height="350px"
+              markers={nearbyVendors}
+              showLegend={true}
+            />
+          </div>
+          <EnhancedVendorNudges 
+            nudges={recentNudges} 
+            onViewLocation={handleViewVendorLocation} 
           />
-          <VendorNudges nudges={recentNudges} />
         </div>
         
         {/* Orders and Products Section */}
