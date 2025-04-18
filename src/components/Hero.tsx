@@ -18,7 +18,7 @@ const Hero: React.FC = () => {
           {/* Left Content */}
           <div className="flex-1 text-center lg:text-left space-y-6 z-10">
             {heroSlides.map((slide, index) => (
-              <HeroSlide key={index} slide={slide} isActive={currentSlide === index} />
+              <HeroSlide key={`slide-${index}`} slide={slide} isActive={currentSlide === index} />
             ))}
           </div>
 
@@ -26,7 +26,7 @@ const Hero: React.FC = () => {
           <div className="flex-1 animate-fade-up relative mt-8 lg:mt-0" style={{ animationDelay: "0.2s" }}>
             <div ref={carouselRef} className="carousel-container relative h-[400px] w-full">
               {heroSlides.map((slide, index) => (
-                <HeroImage key={index} slide={slide} isActive={currentSlide === index} />
+                <HeroImage key={`image-${index}`} slide={slide} isActive={currentSlide === index} />
               ))}
               
               {/* Navigation Buttons */}
