@@ -25,18 +25,20 @@ const queryClient = new QueryClient({
 
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <LanguageProvider>
-            <MotionProvider>
-              {children}
-              <Sonner />
-            </MotionProvider>
-          </LanguageProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </HelmetProvider>
+    <React.StrictMode>
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <LanguageProvider>
+              <MotionProvider>
+                {children}
+                <Sonner />
+              </MotionProvider>
+            </LanguageProvider>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </HelmetProvider>
+    </React.StrictMode>
   );
 };
 

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
@@ -107,11 +106,7 @@ if (!rootElement) {
 const root = createRoot(rootElement);
 
 // Render the app
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+root.render(<App />);
 
 // Remove loading indicator after the app has rendered
 setTimeout(() => {
