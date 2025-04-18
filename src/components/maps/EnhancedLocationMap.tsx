@@ -1,304 +1,416 @@
 
 import { useEffect, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, AlertTriangle, MapPin, Navigation } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useToast } from "@/hooks/use-toast";
-import ScriptLoader from "@/components/ui/script-loader";
+import { Loader2 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
-interface Marker {
+// To avoid TypeScript errors without google maps types
+interface GoogleMapProps {
+  center: { lat: number; lng: number };
+  zoom: number;
+  mapTypeControl: boolean;
+}
+
+interface MarkerProps {
+  position: { lat: number; lng: number };
+  title?: string;
+  icon?: string;
+  animation?: number;
+}
+
+interface CircleProps {
+  center: { lat: number; lng: number };
+  radius: number;
+  strokeColor: string;
+  strokeOpacity: number;
+  strokeWeight: number;
+  fillColor: string;
+  fillOpacity: number;
+}
+
+interface InfoWindowProps {
+  content: string;
+  position?: { lat: number; lng: number };
+}
+
+// Create a simplified Google Maps API reference
+const googleMapsApi = {
+  Map: undefined,
+  Marker: undefined,
+  Circle: undefined,
+  InfoWindow: undefined,
+  SymbolPath: {
+    CIRCLE: 0
+  },
+  MapTypeControl: false,
+  LatLng: undefined,
+  Animation: {
+    DROP: 1,
+    BOUNCE: 2
+  },
+  places: {
+    AutocompleteService: undefined
+  },
+  Geocoder: undefined,
+  GeocoderStatus: {
+    OK: 'OK'
+  },
+  NavigationControl: undefined
+};
+
+interface Location {
   lat: number;
   lng: number;
-  title: string;
-  type: 'vendor' | 'consumer' | 'current';
 }
 
 interface EnhancedLocationMapProps {
-  title?: string;
-  description?: string;
+  initialLocation?: Location;
+  markers?: Array<{
+    position: Location;
+    title?: string;
+    icon?: string;
+  }>;
+  showSearchBar?: boolean;
+  onLocationChange?: (location: Location) => void;
   height?: string;
-  showLegend?: boolean;
-  className?: string;
-  markers?: Marker[];
-  useRealLocation?: boolean;
 }
 
-// Type guard to check if google maps is loaded
-const isGoogleMapsLoaded = (): boolean => {
-  return typeof window !== 'undefined' && 
-         typeof window.google !== 'undefined' && 
-         typeof window.google.maps !== 'undefined';
-};
-
-const EnhancedLocationMap = ({ 
-  title = "Location Map",
-  description = "View your current location",
-  height = "400px",
-  showLegend = true,
-  className = "",
+const EnhancedLocationMap = ({
+  initialLocation = { lat: 28.6139, lng: 77.2090 }, // Default to Delhi
   markers = [],
-  useRealLocation = true
+  showSearchBar = true,
+  onLocationChange,
+  height = "400px"
 }: EnhancedLocationMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
-  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
-  const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [map, setMap] = useState<any>(null);
+  const [mapMarkers, setMapMarkers] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  const handleScriptLoad = () => {
-    setIsScriptLoaded(true);
-    setIsLoading(false);
-    initMap();
+  useEffect(() => {
+    // Load Google Maps API script
+    if (!document.getElementById('google-maps-script')) {
+      const script = document.createElement('script');
+      script.id = 'google-maps-script';
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY'}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.onload = initializeMap;
+      script.onerror = () => {
+        setLoadError('Failed to load Google Maps API. Check your API key and internet connection.');
+        setLoading(false);
+      };
+      document.head.appendChild(script);
+    } else if (window.google && window.google.maps) {
+      initializeMap();
+    }
+
+    return () => {
+      // Clean up markers
+      mapMarkers.forEach(marker => {
+        if (marker) marker.setMap(null);
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    // Update markers when props change
+    if (map) {
+      updateMarkers();
+    }
+  }, [markers, map]);
+
+  const initializeMap = () => {
+    try {
+      if (!mapRef.current || !window.google || !window.google.maps) return;
+
+      const mapOptions = {
+        center: initialLocation,
+        zoom: 14,
+        mapTypeControl: true,
+        fullscreenControl: true,
+        streetViewControl: true,
+        zoomControl: true,
+      };
+
+      const newMap = new window.google.maps.Map(mapRef.current, mapOptions);
+      setMap(newMap);
+
+      // Add markers
+      updateMarkers(newMap);
+
+      // Add geolocation button and functionality
+      addGeolocationControl(newMap);
+
+      // Add search functionality
+      if (showSearchBar && window.google.maps.places) {
+        setupSearchBox(newMap);
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error('Error initializing map:', error);
+      setLoadError('Failed to initialize map. Please try again later.');
+      setLoading(false);
+    }
   };
 
-  // Initialize the Google Map
-  const initMap = () => {
-    if (!mapRef.current || !isGoogleMapsLoaded()) return;
+  const updateMarkers = (targetMap = map) => {
+    if (!targetMap || !window.google || !window.google.maps) return;
 
-    // Default location (can be replaced with geolocation)
-    const defaultLocation = { lat: 28.6139, lng: 77.2090 }; // Delhi
+    // Clear existing markers
+    mapMarkers.forEach(marker => {
+      if (marker) marker.setMap(null);
+    });
 
-    // Options for the map
-    const mapOptions = {
-      center: defaultLocation,
-      zoom: 13,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: true,
-      styles: [
-        {
-          featureType: "all",
-          elementType: "geometry",
-          stylers: [{ color: "#f5f5f5" }]
-        },
-        {
-          featureType: "water",
-          elementType: "geometry",
-          stylers: [{ color: "#c9e9f6" }]
-        },
-        {
-          featureType: "poi.park",
-          elementType: "geometry",
-          stylers: [{ color: "#d5eac9" }]
-        }
-      ]
-    };
+    // Add new markers
+    const newMarkers = markers.map(marker => {
+      const mapMarker = new window.google.maps.Marker({
+        position: marker.position,
+        map: targetMap,
+        title: marker.title || '',
+        icon: marker.icon,
+        animation: window.google.maps.Animation.DROP
+      });
 
-    // Create the map
-    const map = new window.google.maps.Map(mapRef.current, mapOptions);
-    setMapInstance(map);
+      // Add info window if title is provided
+      if (marker.title) {
+        const infoWindow = new window.google.maps.InfoWindow({
+          content: `
+            <div style="padding:10px;max-width:200px;">
+              <h3 style="margin-top:0;margin-bottom:5px;font-size:16px;color:#333;">${marker.title}</h3>
+            </div>
+          `
+        });
 
-    // Try to get user's current location if needed
-    if (useRealLocation && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const userLocation = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
+        mapMarker.addListener('click', () => {
+          infoWindow.open(targetMap, mapMarker);
+        });
+      }
 
-          setCurrentLocation(userLocation);
-          // Center the map on the user's location
-          map.setCenter(userLocation);
+      return mapMarker;
+    });
 
-          // Add a marker for the user's location
-          if (isGoogleMapsLoaded()) {
+    setMapMarkers(newMarkers);
+  };
+
+  const addGeolocationControl = (targetMap: any) => {
+    if (!targetMap || !window.google || !window.google.maps) return;
+
+    // Create custom control
+    const locationButton = document.createElement("button");
+    locationButton.textContent = "📍";
+    locationButton.title = "Get Current Location";
+    locationButton.className = "custom-map-control-button";
+    locationButton.style.backgroundColor = "white";
+    locationButton.style.border = "none";
+    locationButton.style.borderRadius = "2px";
+    locationButton.style.boxShadow = "0 1px 4px rgba(0,0,0,0.3)";
+    locationButton.style.cursor = "pointer";
+    locationButton.style.margin = "10px";
+    locationButton.style.padding = "0 5px";
+    locationButton.style.height = "40px";
+    locationButton.style.width = "40px";
+    locationButton.style.textAlign = "center";
+    locationButton.style.fontSize = "21px";
+
+    locationButton.addEventListener("click", () => {
+      // Get user's location
+      if (navigator.geolocation) {
+        setLoading(true);
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            
+            // Center map on user's location
+            targetMap.setCenter(userLocation);
+            
+            // Add a marker at user's location
             new window.google.maps.Marker({
               position: userLocation,
-              map,
+              map: targetMap,
               title: "Your Location",
               icon: {
                 path: window.google.maps.SymbolPath.CIRCLE,
                 scale: 10,
-                fillColor: "#138808",
+                fillColor: "#4285F4",
                 fillOpacity: 1,
-                strokeColor: "#FFFFFF",
-                strokeWeight: 2
-              }
+                strokeColor: "#ffffff",
+                strokeWeight: 2,
+              },
             });
-
-            // Draw a circle to show search radius
-            new window.google.maps.Circle({
-              strokeColor: "rgba(19, 136, 8, 0.3)",
-              strokeOpacity: 0.8,
-              strokeWeight: 2,
-              fillColor: "rgba(19, 136, 8, 0.1)",
-              fillOpacity: 0.35,
-              map,
-              center: userLocation,
-              radius: 3000 // 3km radius
+            
+            // Notify parent component about location change
+            if (onLocationChange) {
+              onLocationChange(userLocation);
+            }
+            
+            setLoading(false);
+          },
+          (error) => {
+            console.error("Geolocation error:", error);
+            toast({
+              title: "Location error",
+              description: "Unable to retrieve your location. Please check your permissions.",
+              variant: "destructive",
             });
-          }
-          
-          // Add custom markers if provided
-          addMarkersToMap(map, markers, userLocation);
-        },
-        () => {
-          toast({
-            title: "Location Error",
-            description: "Unable to get your location. Showing default location instead.",
-            variant: "destructive"
-          });
-          // Add markers using default location instead
-          addMarkersToMap(map, markers, defaultLocation);
-        }
-      );
-    } else {
-      // Just add markers if user location isn't required
-      addMarkersToMap(map, markers, defaultLocation);
-    }
-  };
-
-  // Function to add markers to the map
-  const addMarkersToMap = (map: google.maps.Map, markers: Marker[], currentLocation: {lat: number, lng: number}) => {
-    if (!isGoogleMapsLoaded()) return;
-    
-    markers.forEach(marker => {
-      const iconConfig = getMarkerIcon(marker.type);
-      
-      const mapMarker = new window.google.maps.Marker({
-        position: { lat: marker.lat, lng: marker.lng },
-        map,
-        title: marker.title,
-        animation: window.google.maps.Animation.DROP,
-        icon: iconConfig
-      });
-      
-      // Add info window
-      const infoWindow = new window.google.maps.InfoWindow({
-        content: `
-          <div class="p-2">
-            <h3 class="font-medium">${marker.title}</h3>
-            <p class="text-sm text-gray-500">${marker.type.charAt(0).toUpperCase() + marker.type.slice(1)}</p>
-            ${currentLocation ? 
-              `<p class="text-xs mt-1">Distance: ${calculateDistance(
-                currentLocation.lat, 
-                currentLocation.lng, 
-                marker.lat, 
-                marker.lng
-              ).toFixed(1)} km</p>` : ''}
-          </div>
-        `
-      });
-      
-      mapMarker.addListener("click", () => {
-        infoWindow.open(map, mapMarker);
-      });
+            setLoading(false);
+          },
+          { enableHighAccuracy: true }
+        );
+      } else {
+        toast({
+          title: "Geolocation not supported",
+          description: "Your browser doesn't support geolocation.",
+          variant: "destructive",
+        });
+      }
     });
+
+    // Add the control to the map
+    targetMap.controls[window.google.maps.ControlPosition.RIGHT_BOTTOM].push(
+      locationButton
+    );
   };
-  
-  // Get marker icon based on type
-  const getMarkerIcon = (type: 'vendor' | 'consumer' | 'current') => {
-    if (!isGoogleMapsLoaded()) return null;
-    
-    switch (type) {
-      case 'vendor':
-        return {
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: "#FF9933",
-          fillOpacity: 1,
-          strokeColor: "#FFFFFF",
-          strokeWeight: 2
-        };
-      case 'consumer':
-        return {
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: "#0000FF",
-          fillOpacity: 1,
-          strokeColor: "#FFFFFF",
-          strokeWeight: 2
-        };
-      case 'current':
-        return {
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 10,
-          fillColor: "#138808",
-          fillOpacity: 1,
-          strokeColor: "#FFFFFF",
-          strokeWeight: 2
-        };
-      default:
-        return null;
-    }
-  };
-  
-  // Calculate distance between two coordinates in kilometers
-  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371; // Radius of the earth in km
-    const dLat = deg2rad(lat2 - lat1);
-    const dLon = deg2rad(lon2 - lon1);
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2); 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    const distance = R * c; // Distance in km
-    return distance;
-  };
-  
-  const deg2rad = (deg: number) => {
-    return deg * (Math.PI/180);
+
+  const setupSearchBox = (targetMap: any) => {
+    if (!targetMap || !window.google || !window.google.maps || !window.google.maps.places) return;
+
+    const searchInput = document.createElement("input");
+    searchInput.placeholder = "Search locations";
+    searchInput.className = "map-search-box";
+    searchInput.style.width = "250px";
+    searchInput.style.height = "40px";
+    searchInput.style.margin = "10px";
+    searchInput.style.padding = "0 12px";
+    searchInput.style.borderRadius = "3px";
+    searchInput.style.border = "1px solid #ccc";
+    searchInput.style.fontSize = "14px";
+    searchInput.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
+
+    targetMap.controls[window.google.maps.ControlPosition.TOP_LEFT].push(searchInput);
+
+    // Create the search box and link it to the UI element
+    const searchBox = new window.google.maps.places.SearchBox(searchInput);
+
+    // Bias the SearchBox results towards current map's viewport
+    targetMap.addListener("bounds_changed", () => {
+      searchBox.setBounds(targetMap.getBounds() as any);
+    });
+
+    // Listen for the event fired when the user selects a prediction and retrieve
+    // more details for that place
+    searchBox.addListener("places_changed", () => {
+      const places = searchBox.getPlaces();
+
+      if (places && places.length === 0) {
+        return;
+      }
+
+      if (!places) return;
+
+      // For each place, get the icon, name and location
+      const bounds = new window.google.maps.LatLngBounds();
+      
+      places.forEach((place) => {
+        if (!place.geometry || !place.geometry.location) {
+          console.log("Returned place contains no geometry");
+          return;
+        }
+
+        // Add marker for the selected place
+        const marker = new window.google.maps.Marker({
+          map: targetMap,
+          title: place.name,
+          position: place.geometry.location,
+          animation: window.google.maps.Animation.DROP,
+        });
+
+        setMapMarkers(prev => [...prev, marker]);
+
+        // Create info window
+        const infoWindow = new window.google.maps.InfoWindow({
+          content: `
+            <div style="padding:10px;max-width:200px;">
+              <h3 style="margin-top:0;margin-bottom:5px;font-size:16px;">${place.name}</h3>
+              <p style="margin:0;font-size:13px;color:#666;">${place.formatted_address}</p>
+            </div>
+          `
+        });
+
+        // Open info window when marker is clicked
+        marker.addListener('click', () => {
+          infoWindow.open(targetMap, marker);
+        });
+
+        // Notify parent component about location change
+        if (onLocationChange) {
+          onLocationChange({
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng(),
+          });
+        }
+
+        if (place.geometry.viewport) {
+          // Only geocodes have viewport
+          bounds.union(place.geometry.viewport);
+        } else {
+          bounds.extend(place.geometry.location);
+        }
+      });
+      
+      targetMap.fitBounds(bounds);
+    });
   };
 
   return (
-    <Card className={`border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300 ${className}`}>
-      {/* Load Google Maps API script */}
-      <ScriptLoader 
-        src={`https://maps.googleapis.com/maps/api/js?key=&libraries=places`}
-        onLoad={handleScriptLoad}
+    <div className="relative rounded-lg overflow-hidden">
+      {loading && (
+        <div className="absolute inset-0 bg-gray-100 bg-opacity-75 flex items-center justify-center z-10">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      )}
+      
+      {loadError && (
+        <div className="absolute inset-0 bg-gray-100 flex flex-col items-center justify-center p-4 text-center">
+          <p className="text-red-500 mb-2">{loadError}</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            variant="outline"
+            size="sm"
+          >
+            Retry
+          </Button>
+        </div>
+      )}
+
+      <div 
+        ref={mapRef} 
+        style={{ 
+          height, 
+          width: "100%", 
+          borderRadius: "0.5rem" 
+        }}
+        className="bg-gray-100"
       />
       
-      {(title || description) && (
-        <CardHeader className="border-b bg-gray-50">
-          {title && <CardTitle>{title}</CardTitle>}
-          {description && <CardDescription>{description}</CardDescription>}
-        </CardHeader>
+      {showSearchBar && (
+        <div className="hidden">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search for a location"
+            className="map-search-input"
+          />
+        </div>
       )}
-      <CardContent className="p-0 relative">
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 z-10">
-            <Loader2 className="h-8 w-8 animate-spin text-[#138808]" />
-          </div>
-        )}
-        
-        <div 
-          ref={mapRef} 
-          style={{ height }} 
-          className="w-full"
-        />
-        
-        {/* Fallback for when Google Maps doesn't load */}
-        {!isGoogleMapsLoaded() && !isLoading && (
-          <Alert variant="destructive" className="m-4">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              Could not load the map. Please check your internet connection and try again.
-            </AlertDescription>
-          </Alert>
-        )}
-        
-        {showLegend && (
-          <div className="absolute bottom-2 right-2 bg-white rounded-md shadow-md p-2 text-xs">
-            <div className="flex items-center mb-1">
-              <div className="w-3 h-3 rounded-full bg-[#138808] mr-2"></div>
-              <span>You</span>
-            </div>
-            <div className="flex items-center mb-1">
-              <div className="w-3 h-3 rounded-full bg-[#FF9933] mr-2"></div>
-              <span>Vendors</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 rounded-full bg-[#0000FF] mr-2"></div>
-              <span>Consumers</span>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    </div>
   );
 };
 
