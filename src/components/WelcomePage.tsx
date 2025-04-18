@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { CircleUserRound, Leaf } from "lucide-react";
 import LanguageSelector from "./LanguageSelector";
@@ -22,16 +21,19 @@ const WelcomePage = () => {
         </div>
         <div className="flex items-center gap-4">
           <LanguageSelector />
-          <Link to="/login">
-            <Button variant="outline" className="border-[#138808] text-[#138808] hover:bg-[#138808] hover:text-white">
-              Login
-            </Button>
-          </Link>
-          <Link to="/register">
-            <Button className="bg-[#FF9933] hover:bg-[#FF9933]/90 text-white">
-              Register
-            </Button>
-          </Link>
+          <Button 
+            variant="outline" 
+            className="border-[#138808] text-[#138808] hover:bg-[#138808] hover:text-white"
+            onClick={() => window.location.href = "/login"}
+          >
+            Login
+          </Button>
+          <Button 
+            className="bg-[#FF9933] hover:bg-[#FF9933]/90 text-white"
+            onClick={() => window.location.href = "/register"}
+          >
+            Register
+          </Button>
         </div>
       </header>
 

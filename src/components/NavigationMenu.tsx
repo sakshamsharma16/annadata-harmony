@@ -77,9 +77,9 @@ const NavigationMenu: React.FC = () => {
       <div className="container mx-auto px-4">
         <nav className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
             <span className="font-bold text-xl text-[#138808]">ANNADATA</span>
-          </Link>
+          </div>
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
@@ -103,27 +103,25 @@ const NavigationMenu: React.FC = () => {
           <div className="hidden md:flex items-center space-x-2">
             <LanguageSelector />
             
-            <Link to="/login">
-              <Button 
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1"
-              >
-                <User className="h-4 w-4" />
-                <span>Login</span>
-              </Button>
-            </Link>
+            <Button 
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1"
+              onClick={() => window.location.href = "/login"}
+            >
+              <User className="h-4 w-4" />
+              <span>Login</span>
+            </Button>
             
-            <Link to="/admin-login">
-              <Button 
-                variant="ghost"
-                size="sm"
-                className="flex items-center gap-1 text-gray-600 hover:text-gray-900"
-              >
-                <ShieldAlert className="h-4 w-4" />
-                <span>Admin</span>
-              </Button>
-            </Link>
+            <Button 
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-1 text-gray-600 hover:text-gray-900"
+              onClick={() => window.location.href = "/admin-login"}
+            >
+              <ShieldAlert className="h-4 w-4" />
+              <span>Admin</span>
+            </Button>
           </div>
           
           {/* Mobile Menu Button */}
@@ -152,42 +150,44 @@ const NavigationMenu: React.FC = () => {
               <div className="flex flex-col space-y-3">
                 {navItems.map((item) => (
                   <m.div key={item.name} variants={itemVariants}>
-                    <Link
-                      to={item.path}
+                    <div
+                      onClick={() => window.location.href = item.path}
                       className={cn(
-                        "block px-3 py-2 rounded-md text-base font-medium",
+                        "block px-3 py-2 rounded-md text-base font-medium cursor-pointer",
                         isActive(item.path)
                           ? "text-[#138808] bg-[#138808]/10"
                           : "text-gray-700 hover:text-[#138808] hover:bg-[#138808]/5"
                       )}
                     >
                       {item.name}
-                    </Link>
+                    </div>
                   </m.div>
                 ))}
                 
                 <m.div variants={itemVariants} className="pt-2">
-                  <Link to="/login" className="block">
+                  <div className="block">
                     <Button 
                       className="w-full flex items-center gap-1"
                       variant="outline"
+                      onClick={() => window.location.href = "/login"}
                     >
                       <User className="h-4 w-4" />
                       <span>Login</span>
                     </Button>
-                  </Link>
+                  </div>
                 </m.div>
                 
                 <m.div variants={itemVariants}>
-                  <Link to="/admin-login" className="block">
+                  <div className="block">
                     <Button 
                       className="w-full flex items-center gap-1"
                       variant="ghost"
+                      onClick={() => window.location.href = "/admin-login"}
                     >
                       <ShieldAlert className="h-4 w-4" />
                       <span>Admin Portal</span>
                     </Button>
-                  </Link>
+                  </div>
                 </m.div>
               </div>
             </m.div>
