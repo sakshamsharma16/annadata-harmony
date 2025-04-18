@@ -15,12 +15,10 @@ const router = createBrowserRouter([
 
 const App: React.FC = () => {
   return (
-    <React.StrictMode>
-      <AppProviders>
-        <RouterProvider router={router} />
-        <Toaster />
-      </AppProviders>
-    </React.StrictMode>
+    <AppProviders>
+      <RouterProvider router={router} />
+      <Toaster />
+    </AppProviders>
   );
 };
 

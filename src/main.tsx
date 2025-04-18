@@ -1,9 +1,16 @@
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-// Create a loading indicator
+// Define the root element to use for mounting the app
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Root element not found');
+}
+
+// Create loading indicator
 const showLoadingIndicator = () => {
   const loadingEl = document.createElement('div');
   loadingEl.id = 'initial-loading';
@@ -72,7 +79,10 @@ const removeLoadingIndicator = () => {
   }
 };
 
-// Set up application cache
+// Show loading indicator
+showLoadingIndicator();
+
+// Setup caching
 const setupAppCache = () => {
   if ('caches' in window) {
     caches.open('annadata-app-cache-v1').then(cache => {
@@ -90,23 +100,15 @@ const setupAppCache = () => {
   }
 };
 
-// Show loading indicator
-showLoadingIndicator();
-
-// Setup caching
 setupAppCache();
 
-// Define the root element to use for mounting the app
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error('Root element not found');
-}
-
-// Create React root
+// Create React root and render app
 const root = createRoot(rootElement);
-
-// Render the app
-root.render(<App />);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
 
 // Remove loading indicator after the app has rendered
 setTimeout(() => {
