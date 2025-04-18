@@ -1,20 +1,25 @@
 
 import React from "react";
-import { BrowserRouter as Router } from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import AppProviders from "./providers/AppProviders";
 import AppRoutes from "./routes/AppRoutes";
 import SupabaseTestLink from "./components/SupabaseTestLink";
 import { Toaster } from "./components/ui/toaster";
 
+const router = createBrowserRouter([
+  {
+    path: "*",
+    element: <AppRoutes />
+  }
+]);
+
 const App: React.FC = () => {
   return (
-    <Router>
-      <AppProviders>
-        <AppRoutes />
-        <SupabaseTestLink />
-        <Toaster />
-      </AppProviders>
-    </Router>
+    <AppProviders>
+      <RouterProvider router={router} />
+      <SupabaseTestLink />
+      <Toaster />
+    </AppProviders>
   );
 };
 

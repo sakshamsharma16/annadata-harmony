@@ -1,4 +1,5 @@
 
+import React, { useEffect, useRef } from "react";
 import { 
   Leaf, 
   TrendingUp, 
@@ -7,7 +8,6 @@ import {
   Truck, 
   Smartphone 
 } from "lucide-react";
-import { useEffect, useRef } from "react";
 import { LazyMotion, domAnimation, m } from "framer-motion";
 
 const features = [
@@ -43,7 +43,7 @@ const features = [
   },
 ];
 
-const Features = () => {
+const Features: React.FC = () => {
   const featuresRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -88,7 +88,7 @@ const Features = () => {
           >
             {features.map((feature, index) => (
               <m.div
-                key={index}
+                key={`feature-${index}`}
                 className="feature-card glass-card p-6 transition-all duration-300 hover:shadow-xl opacity-0"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
