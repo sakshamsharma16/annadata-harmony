@@ -14,7 +14,7 @@ interface Window {
     }) => void;
   };
   
-  // Add Google Maps API type definition
+  // Add Google Maps API type definition with all required properties
   google?: {
     maps: {
       Map: any;

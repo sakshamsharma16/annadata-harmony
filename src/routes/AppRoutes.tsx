@@ -23,10 +23,10 @@ const VendorDashboard = lazy(() => import("../pages/dashboards/VendorDashboard")
 const ConsumerDashboard = lazy(() => import("../pages/dashboards/ConsumerDashboard"));
 const AdminDashboard = lazy(() => import("../pages/admin/AdminDashboard"));
 const ManageProducts = lazy(() => import("../pages/farmer/ManageProducts"));
-const Marketplace = lazy(() => import("../pages/vendor/Marketplace"));
 const NearbyVendors = lazy(() => import("../pages/consumer/NearbyVendors"));
 const MarketAnalytics = lazy(() => import("../pages/dashboards/MarketAnalytics"));
 const CropHealthDashboard = lazy(() => import("../pages/agriculture/CropHealthDashboard"));
+const MarketAnalysis = lazy(() => import("../components/market/MarketAnalysis"));
 
 const AppRoutes: React.FC = () => {
   return (
@@ -126,12 +126,6 @@ const AppRoutes: React.FC = () => {
         </Suspense>
       } />
       
-      <Route path="/vendor/marketplace" element={
-        <Suspense fallback={<LoadingSpinner />}>
-          <Marketplace />
-        </Suspense>
-      } />
-      
       <Route path="/consumer/nearby-vendors" element={
         <Suspense fallback={<LoadingSpinner />}>
           <NearbyVendors />
@@ -147,6 +141,13 @@ const AppRoutes: React.FC = () => {
       <Route path="/crop-health" element={
         <Suspense fallback={<LoadingSpinner />}>
           <CropHealthDashboard />
+        </Suspense>
+      } />
+
+      {/* New Market Analysis Routes */}
+      <Route path="/market-prices" element={
+        <Suspense fallback={<LoadingSpinner />}>
+          <MarketAnalysis />
         </Suspense>
       } />
       

@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -66,44 +66,68 @@ const EnhancedLocationMap = ({
   showLegend = false
 }: EnhancedLocationMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<any>(null);
+  const mapInstanceRef = useRef<any>(null);
   const [mapMarkers, setMapMarkers] = useState<any[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  
+  // Memoize markers to prevent unnecessary re-renders
+  const memoizedMarkers = useMemo(() => markers, [JSON.stringify(markers)]);
 
   useEffect(() => {
-    // Load Google Maps API script
-    if (!document.getElementById('google-maps-script')) {
-      const script = document.createElement('script');
-      script.id = 'google-maps-script';
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY'}&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = initializeMap;
-      script.onerror = () => {
-        setLoadError('Failed to load Google Maps API. Check your API key and internet connection.');
-        setLoading(false);
-      };
-      document.head.appendChild(script);
-    } else if (window.google && window.google.maps) {
-      initializeMap();
-    }
+    // Load Google Maps API script with better error handling and caching
+    const loadGoogleMaps = () => {
+      if (window.google && window.google.maps) {
+        // If already loaded, initialize the map
+        initializeMap();
+        return;
+      }
 
+      if (!document.getElementById('google-maps-script')) {
+        const script = document.createElement('script');
+        script.id = 'google-maps-script';
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY'}&libraries=places&callback=initGoogleMaps`;
+        script.async = true;
+        script.defer = true;
+        
+        // Create a global callback function for the script
+        window.initGoogleMaps = function() {
+          initializeMap();
+        };
+        
+        script.onerror = () => {
+          setLoadError('Failed to load Google Maps API. Check your API key and internet connection.');
+          setLoading(false);
+        };
+        
+        document.head.appendChild(script);
+      }
+    };
+    
+    // Use a timeout to prevent blocking the main thread during initial render
+    const timer = setTimeout(loadGoogleMaps, 100);
+    
     return () => {
+      clearTimeout(timer);
+      // Clean up global callback if needed
+      if (window.initGoogleMaps) {
+        delete window.initGoogleMaps;
+      }
       // Clean up markers
-      mapMarkers.forEach(marker => {
-        if (marker) marker.setMap(null);
-      });
+      if (mapMarkers.length) {
+        mapMarkers.forEach(marker => {
+          if (marker) marker.setMap(null);
+        });
+      }
     };
   }, []);
 
   useEffect(() => {
-    // Update markers when props change
-    if (map) {
+    // Update markers when props change and map is loaded
+    if (mapInstanceRef.current) {
       updateMarkers();
     }
-  }, [markers, map]);
+  }, [memoizedMarkers]);
 
   const initializeMap = () => {
     try {
@@ -116,13 +140,17 @@ const EnhancedLocationMap = ({
         fullscreenControl: true,
         streetViewControl: true,
         zoomControl: true,
+        // Add optimizations for better performance
+        gestureHandling: 'cooperative',
+        maxZoom: 18,
+        minZoom: 3
       };
 
       const newMap = new window.google.maps.Map(mapRef.current, mapOptions);
-      setMap(newMap);
+      mapInstanceRef.current = newMap;
 
       // Add markers
-      updateMarkers(newMap);
+      updateMarkers();
 
       // Add geolocation button and functionality
       addGeolocationControl(newMap);
@@ -140,7 +168,8 @@ const EnhancedLocationMap = ({
     }
   };
 
-  const updateMarkers = (targetMap = map) => {
+  const updateMarkers = () => {
+    const targetMap = mapInstanceRef.current;
     if (!targetMap || !window.google || !window.google.maps) return;
 
     // Clear existing markers
@@ -148,8 +177,8 @@ const EnhancedLocationMap = ({
       if (marker) marker.setMap(null);
     });
 
-    // Add new markers
-    const newMarkers = markers.map(marker => {
+    // Add new markers with optimization
+    const newMarkers = memoizedMarkers.map(marker => {
       const mapMarker = new window.google.maps.Marker({
         position: marker.position,
         map: targetMap,
@@ -244,7 +273,7 @@ const EnhancedLocationMap = ({
             });
             setLoading(false);
           },
-          { enableHighAccuracy: true }
+          { enableHighAccuracy: true, timeout: 5000, maximumAge: 10000 }
         );
       } else {
         toast({
@@ -389,18 +418,6 @@ const EnhancedLocationMap = ({
         className="bg-gray-100"
       />
       
-      {showSearchBar && (
-        <div className="hidden">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search for a location"
-            className="map-search-input"
-          />
-        </div>
-      )}
-      
       {showLegend && (
         <div className="absolute bottom-4 right-4 bg-white p-2 rounded-md shadow-md text-xs">
           <div className="flex items-center mb-1">
@@ -416,5 +433,12 @@ const EnhancedLocationMap = ({
     </div>
   );
 };
+
+// Add this missing property to the window object
+declare global {
+  interface Window {
+    initGoogleMaps?: () => void;
+  }
+}
 
 export default EnhancedLocationMap;

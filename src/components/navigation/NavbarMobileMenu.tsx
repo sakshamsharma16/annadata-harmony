@@ -16,8 +16,14 @@ import {
   MapPin,
   ChevronRight,
   BarChart3,
-  LogOut
+  LogOut,
+  LineChart
 } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface NavbarMobileMenuProps {
   isAuthenticated: boolean;
@@ -26,6 +32,8 @@ interface NavbarMobileMenuProps {
 }
 
 const NavbarMobileMenu = ({ isAuthenticated, userRole, dashboardLink }: NavbarMobileMenuProps) => {
+  const [marketDataOpen, setMarketDataOpen] = useState(false);
+  
   return (
     <div className="md:hidden">
       <Sheet>
@@ -85,6 +93,35 @@ const NavbarMobileMenu = ({ isAuthenticated, userRole, dashboardLink }: NavbarMo
                 <span>Home</span>
               </Link>
               
+              {/* Market Data Section - Collapsible */}
+              <Collapsible 
+                open={marketDataOpen}
+                onOpenChange={setMarketDataOpen}
+                className="border rounded-md"
+              >
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-gray-100">
+                  <div className="flex items-center">
+                    <LineChart className="mr-2 h-5 w-5 text-blue-600" />
+                    <span>Market Data</span>
+                  </div>
+                  <ChevronRight className={`h-4 w-4 transition-transform duration-200 ${marketDataOpen ? 'rotate-90' : ''}`} />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <Link to="/market-prices" className="flex items-center rounded-md p-2 hover:bg-gray-100 pl-8">
+                    <span>Current Prices</span>
+                  </Link>
+                  <Link to="/market-prices?tab=insights" className="flex items-center rounded-md p-2 hover:bg-gray-100 pl-8">
+                    <span>Market Insights</span>
+                  </Link>
+                  <Link to="/market-prices?tab=mandi" className="flex items-center rounded-md p-2 hover:bg-gray-100 pl-8">
+                    <span>Mandi Prices</span>
+                  </Link>
+                  <Link to="/market-analytics" className="flex items-center rounded-md p-2 hover:bg-gray-100 pl-8">
+                    <span>Profit Analysis</span>
+                  </Link>
+                </CollapsibleContent>
+              </Collapsible>
+              
               <div className="pt-2 pb-1">
                 <p className="text-sm font-medium text-muted-foreground px-2">For Farmers</p>
               </div>
@@ -106,11 +143,6 @@ const NavbarMobileMenu = ({ isAuthenticated, userRole, dashboardLink }: NavbarMo
               <Link to="/dashboard/vendor" className="flex items-center rounded-md p-2 hover:bg-gray-100 pl-4">
                 <Warehouse className="mr-2 h-5 w-5 text-[#FF9933]" />
                 <span>Vendor Dashboard</span>
-              </Link>
-              
-              <Link to="/vendor/marketplace" className="flex items-center rounded-md p-2 hover:bg-gray-100 pl-4">
-                <ShoppingCart className="mr-2 h-5 w-5" />
-                <span>Marketplace</span>
               </Link>
               
               <div className="pt-2 pb-1">

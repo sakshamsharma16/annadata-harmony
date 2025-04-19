@@ -5,7 +5,8 @@ import {
   Leaf, 
   Warehouse, 
   Users, 
-  BarChart3
+  BarChart3,
+  LineChart
 } from "lucide-react";
 
 const NavbarDesktopMenu = () => {
@@ -78,14 +79,6 @@ const NavbarDesktopMenu = () => {
                   </NavigationMenuLink>
                 </li>
                 <li>
-                  <Link to="/vendor/marketplace" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                    <div className="text-sm font-medium leading-none">Marketplace</div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                      Discover and source fresh produce directly from farmers
-                    </p>
-                  </Link>
-                </li>
-                <li>
                   <Link to="/vendor/orders" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                     <div className="text-sm font-medium leading-none">Orders & Delivery</div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -151,9 +144,48 @@ const NavbarDesktopMenu = () => {
           </NavigationMenuItem>
           
           <NavigationMenuItem>
-            <Link to="/market-prices" className={navigationMenuTriggerStyle()}>
-              Market Prices
-            </Link>
+            <NavigationMenuTrigger>
+              <div className="flex items-center gap-1">
+                <LineChart className="h-4 w-4" />
+                <span>Market Data</span>
+              </div>
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid gap-3 p-6 w-[400px]">
+                <li>
+                  <Link to="/market-prices" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                    <div className="text-sm font-medium leading-none">Current Market Prices</div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                      Latest prices of agricultural commodities
+                    </p>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/market-prices?tab=insights" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                    <div className="text-sm font-medium leading-none">Market Insights</div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                      Detailed analysis and trends for agricultural commodities
+                    </p>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/market-prices?tab=mandi" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                    <div className="text-sm font-medium leading-none">Mandi Prices</div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                      Price information from mandis across India
+                    </p>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/market-analytics" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                    <div className="text-sm font-medium leading-none">Profit Analysis</div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                      Tools to analyze potential profit margins
+                    </p>
+                  </Link>
+                </li>
+              </ul>
+            </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>

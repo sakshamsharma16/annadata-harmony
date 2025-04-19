@@ -7,10 +7,10 @@ import EnhancedVendorNudges from "@/components/consumer/EnhancedVendorNudges";
 import OrderHistory from "@/components/consumer/OrderHistory";
 import ProductShop from "@/components/consumer/ProductShop";
 import { useConsumerCart } from "@/hooks/use-consumer-cart";
-import EnhancedLocationMap from "@/components/maps/EnhancedLocationMap";
+import EnhancedLocationMap, { MarkerData } from "@/components/maps/EnhancedLocationMap";
 
-// Sample data for mock vendors
-const nearbyVendors = [
+// Sample data for mock vendors - fixed to match the MarkerData interface
+const nearbyVendors: MarkerData[] = [
   { 
     position: { lat: 28.6229, lng: 77.2080 },
     title: "Fresh Farms Vendor", 
