@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 import AppNavbar from "../components/AppNavbar";
+import SEOHandler from "../components/SEOHandler";
 
 // Import pages
 import Index from "../pages/Index";
@@ -31,6 +32,7 @@ const MarketAnalysis = lazy(() => import("../components/market/MarketAnalysis"))
 const AppRoutes: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHandler />
       <AppNavbar />
       <main className="flex-1">
         <Routes>
