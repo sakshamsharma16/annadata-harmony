@@ -82,6 +82,113 @@ const removeLoadingIndicator = () => {
 // Show loading indicator
 showLoadingIndicator();
 
+// Setup PWA assets
+const setupPwa = () => {
+  // Add PWA manifest link if not already present
+  if (!document.querySelector('link[rel="manifest"]')) {
+    const manifestLink = document.createElement('link');
+    manifestLink.rel = 'manifest';
+    manifestLink.href = '/manifest.json';
+    document.head.appendChild(manifestLink);
+  }
+};
+
+// Setup service worker
+const registerServiceWorker = async () => {
+  if ('serviceWorker' in navigator) {
+    try {
+      const registration = await navigator.serviceWorker.register('/service-worker.js', {
+        scope: '/'
+      });
+      
+      // Check if service worker needs updating
+      if (registration.installing) {
+        console.log('Service worker installing');
+      } else if (registration.waiting) {
+        console.log('Service worker installed but waiting');
+        // Notify user about update
+        showUpdateNotification();
+      } else if (registration.active) {
+        console.log('Service worker active');
+      }
+      
+      // Handle updates
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New service worker available
+              showUpdateNotification();
+            }
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Service worker registration failed:', error);
+    }
+  }
+};
+
+// Show update notification
+const showUpdateNotification = () => {
+  // Only show if not already showing
+  if (document.getElementById('sw-update-notification')) return;
+  
+  const notificationEl = document.createElement('div');
+  notificationEl.id = 'sw-update-notification';
+  notificationEl.innerHTML = `
+    <style>
+      #sw-update-notification {
+        position: fixed;
+        bottom: 16px;
+        left: 16px;
+        right: 16px;
+        background: #138808;
+        color: white;
+        padding: 16px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 9999;
+        animation: slideUp 0.3s ease-out;
+      }
+      #sw-update-notification button {
+        background: white;
+        color: #138808;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      @keyframes slideUp {
+        from { transform: translateY(100px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+    </style>
+    <div>A new version of Annadata is available!</div>
+    <button id="sw-update-button">Update Now</button>
+  `;
+  document.body.appendChild(notificationEl);
+  
+  // Add event listener to update button
+  document.getElementById('sw-update-button')?.addEventListener('click', () => {
+    // Send message to service worker to skip waiting
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
+    }
+    
+    // Remove notification
+    notificationEl.remove();
+    
+    // Reload page
+    window.location.reload();
+  });
+};
+
 // Setup caching
 const setupAppCache = () => {
   if ('caches' in window) {
@@ -100,30 +207,78 @@ const setupAppCache = () => {
   }
 };
 
-setupAppCache();
+// Setup performance monitoring
+const setupPerformanceMonitoring = () => {
+  if ('performance' in window && 'getEntriesByType' in performance) {
+    // Monitor page load performance
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const perfData = performance.getEntriesByType('navigation')[0];
+        const lcpElement = performance.getEntriesByType('element')[0];
+        const paintEntries = performance.getEntriesByType('paint');
+        
+        const metrics = {
+          // Navigation Timing API
+          loadTime: perfData.duration,
+          domContentLoaded: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
+          firstByte: perfData.responseStart - perfData.requestStart,
+          
+          // Paint Timing API
+          firstPaint: paintEntries.find(entry => entry.name === 'first-paint')?.startTime,
+          firstContentfulPaint: paintEntries.find(entry => entry.name === 'first-contentful-paint')?.startTime,
+          
+          // Largest Contentful Paint
+          largestContentfulPaint: lcpElement?.renderTime || lcpElement?.loadTime
+        };
+        
+        console.log('Performance metrics:', metrics);
+        
+        // Send metrics to analytics (can be implemented when analytics is set up)
+        // sendToAnalytics(metrics);
+      }, 0);
+    });
+  }
+};
 
-// Create React root and render app
-const root = createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// Initialize app
+const initApp = async () => {
+  setupPwa();
+  await registerServiceWorker();
+  setupAppCache();
+  setupPerformanceMonitoring();
+  
+  // Create React root and render app
+  const root = createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+  
+  // Remove loading indicator after the app has rendered
+  setTimeout(() => {
+    removeLoadingIndicator();
+  }, 500);
+};
 
-// Remove loading indicator after the app has rendered
-setTimeout(() => {
-  removeLoadingIndicator();
-}, 300);
+// Start initialization
+initApp().catch(error => {
+  console.error('Application initialization failed:', error);
+  // Show error in loading indicator
+  const loadingTextEl = document.querySelector('.loading-text');
+  if (loadingTextEl) {
+    loadingTextEl.textContent = 'Failed to load application. Please refresh the page.';
+    loadingTextEl.style.color = 'red';
+  }
+});
 
-// Register service worker if available
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(registration => {
-        console.log('ServiceWorker registration successful');
-      })
-      .catch(error => {
-        console.log('ServiceWorker registration failed:', error);
-      });
-  });
-}
+// Add event listeners for online/offline status
+window.addEventListener('online', () => {
+  document.body.classList.remove('offline');
+  console.log('Application is online');
+});
+
+window.addEventListener('offline', () => {
+  document.body.classList.add('offline');
+  console.log('Application is offline');
+});

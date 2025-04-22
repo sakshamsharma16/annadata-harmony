@@ -3,23 +3,102 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
     <title>ANNADATA - Empowering Farmers, Enriching Communities</title>
     <meta name="description" content="ANNADATA - A revolutionary platform connecting farmers, vendors, and consumers" />
+    <meta name="keywords" content="agriculture, farming, marketplace, organic produce, Indian farmers" />
+    
+    <!-- Security headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://*.gstatic.com https://*.googleapis.com https://*.lovable.app https://*.lovable.dev https://cdn.gpteng.co; style-src 'self' 'unsafe-inline' https://*.googleapis.com; img-src 'self' data: https://* http://*; font-src 'self' https://*.gstatic.com https://*.googleapis.com; connect-src 'self' https://* wss://*; frame-src 'self' https://*.lovable.app https://*.lovable.dev;" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), interest-cohort=()" />
+    
+    <!-- PWA related tags -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#138808" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app" content="yes" />
+    <meta name="application-name" content="Annadata" />
+    <meta name="apple-mobile-web-app-title" content="Annadata" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="msapplication-TileColor" content="#138808" />
+    <meta name="msapplication-navbutton-color" content="#138808" />
+    <meta name="msapplication-starturl" content="/" />
+    
+    <!-- Icons and splash screens -->
+    <link rel="icon" type="image/png" sizes="196x196" href="/icons/favicon-196.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-icon-180.png" />
+    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2048-2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1668-2388.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1536-2048.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1125-2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/splash/apple-splash-828-1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
     
     <!-- Preload critical resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    </noscript>
     
-    <!-- Add theme color for mobile browsers -->
-    <meta name="theme-color" content="#138808">
+    <!-- Critical CSS inline -->
+    <style>
+      /* Critical CSS for initial render */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html, body {
+        height: 100%;
+        font-family: 'Poppins', sans-serif;
+      }
+      #root {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .offline body {
+        position: relative;
+      }
+      .offline body::before {
+        content: "You are currently offline. Some features may be limited.";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: #ff9933;
+        color: white;
+        text-align: center;
+        padding: 4px;
+        font-size: 14px;
+        z-index: 9999;
+      }
+    </style>
     
     <!-- Lovable script tag for Pick and Edit functionality -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
   </head>
   <body>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:p-4 focus:bg-white focus:z-50 focus:top-0 focus:left-0">
+      Skip to main content
+    </a>
+    
     <div id="root"></div>
+    
+    <!-- No JS fallback -->
+    <noscript>
+      <div style="padding: 2rem; text-align: center; font-family: sans-serif;">
+        <h1 style="color: #138808; margin-bottom: 1rem;">ANNADATA</h1>
+        <p>Please enable JavaScript to use this application.</p>
+      </div>
+    </noscript>
+    
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

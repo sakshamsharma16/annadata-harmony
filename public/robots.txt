@@ -1,0 +1,14 @@
+
+# Allow all web crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and private paths
+Disallow: /admin
+Disallow: /dashboard/admin
+Disallow: /api/
+Disallow: /private/
+Disallow: /*?*
+
+# Specify sitemap location
+Sitemap: https://annadata.com/sitemap.xml

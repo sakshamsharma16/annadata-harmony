@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline | Annadata</title>
+  <meta name="theme-color" content="#138808">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+      background-color: #F2FCE2;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      text-align: center;
+    }
+    
+    header {
+      padding: 2rem 1rem;
+      background-color: #FFFFFF;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #138808;
+    }
+    
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    
+    .offline-icon {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 2rem;
+      color: #FF9933;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #138808;
+    }
+    
+    p {
+      margin-bottom: 2rem;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background-color: #138808;
+      color: white;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 9999px;
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+    
+    .btn:hover {
+      background-color: #0c6b06;
+    }
+    
+    footer {
+      padding: 2rem;
+      background-color: #FFFFFF;
+      font-size: 0.875rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">ANNADATA</div>
+  </header>
+  
+  <main>
+    <svg class="offline-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414" />
+    </svg>
+    
+    <h1>You're currently offline</h1>
+    <p>
+      The Annadata platform requires an internet connection to function properly. 
+      Please check your connection and try again. Some features may be available offline.
+    </p>
+    
+    <button class="btn" onclick="window.location.reload()">Try Again</button>
+  </main>
+  
+  <footer>
+    &copy; 2025 Annadata - Connecting Farmers, Vendors, and Consumers
+  </footer>
+
+  <script>
+    // Listen for online status changes
+    window.addEventListener('online', () => {
+      window.location.reload();
+    });
+    
+    // Check if any cached pages are available
+    if ('caches' in window) {
+      caches.open('annadata-static-cache-v1').then(cache => {
+        cache.keys().then(keys => {
+          if (keys.length > 0) {
+            // We have some cached content
+            document.querySelector('p').innerHTML += '<br><br>You can access some previously visited pages while offline.';
+          }
+        });
+      });
+    }
+  </script>
+</body>
+</html>

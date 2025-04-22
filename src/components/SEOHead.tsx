@@ -9,6 +9,8 @@ interface SEOHeadProps {
   ogUrl?: string;
   ogType?: string;
   twitterCard?: string;
+  canonicalUrl?: string;
+  lang?: string;
 }
 
 const SEOHead = ({ 
@@ -19,11 +21,14 @@ const SEOHead = ({
   ogUrl = 'https://annadata.com',
   ogType = 'website',
   twitterCard = 'summary_large_image',
+  canonicalUrl,
+  lang = 'en',
 }: SEOHeadProps) => {
   const fullTitle = `${title} | Annadata`;
+  const finalCanonicalUrl = canonicalUrl || ogUrl;
 
   return (
-    <Helmet>
+    <Helmet htmlAttributes={{ lang }}>
       {/* Basic Meta Tags */}
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
@@ -31,6 +36,9 @@ const SEOHead = ({
       <meta name="robots" content="index, follow" />
       <meta name="theme-color" content="#138808" />
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+      
+      {/* Canonical URL */}
+      <link rel="canonical" href={finalCanonicalUrl} />
       
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={ogType} />
@@ -46,6 +54,17 @@ const SEOHead = ({
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
       
+      {/* PWA related tags */}
+      <meta name="mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      <meta name="apple-mobile-web-app-title" content="Annadata" />
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      
+      {/* Performance and security related tags */}
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="referrer" content="strict-origin-when-cross-origin" />
+      
       {/* Structured data for SEO */}
       <script type="application/ld+json">
         {JSON.stringify({
@@ -54,16 +73,20 @@ const SEOHead = ({
           "name": "Annadata",
           "url": "https://annadata.com",
           "logo": "https://annadata.com/logo.png",
+          "sameAs": [
+            "https://www.facebook.com/annadata",
+            "https://twitter.com/annadata",
+            "https://www.instagram.com/annadata"
+          ],
           "contactPoint": {
             "@type": "ContactPoint",
             "telephone": "+91-98765-43210",
             "contactType": "customer service"
           },
-          "sameAs": [
-            "https://www.facebook.com/annadata",
-            "https://twitter.com/annadata",
-            "https://www.instagram.com/annadata"
-          ]
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "India"
+          }
         })}
       </script>
     </Helmet>
