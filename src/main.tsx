@@ -213,22 +213,33 @@ const setupPerformanceMonitoring = () => {
     // Monitor page load performance
     window.addEventListener('load', () => {
       setTimeout(() => {
-        const perfData = performance.getEntriesByType('navigation')[0];
-        const lcpElement = performance.getEntriesByType('element')[0];
+        // Cast to specific performance entry types to access properties
+        const navEntries = performance.getEntriesByType('navigation');
+        const perfData = navEntries[0] as PerformanceNavigationTiming;
+        
+        const elementEntries = performance.getEntriesByType('element');
+        const lcpElement = elementEntries[0]; // This may be undefined if no LCP element is tracked
+        
         const paintEntries = performance.getEntriesByType('paint');
         
         const metrics = {
-          // Navigation Timing API
-          loadTime: perfData.duration,
-          domContentLoaded: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
-          firstByte: perfData.responseStart - perfData.requestStart,
+          // Navigation Timing API - using proper type
+          loadTime: perfData ? perfData.duration : undefined,
+          domContentLoaded: perfData ? 
+            perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart : 
+            undefined,
+          firstByte: perfData ? 
+            perfData.responseStart - perfData.requestStart : 
+            undefined,
           
           // Paint Timing API
           firstPaint: paintEntries.find(entry => entry.name === 'first-paint')?.startTime,
           firstContentfulPaint: paintEntries.find(entry => entry.name === 'first-contentful-paint')?.startTime,
           
-          // Largest Contentful Paint
-          largestContentfulPaint: lcpElement?.renderTime || lcpElement?.loadTime
+          // Largest Contentful Paint with proper type checking
+          largestContentfulPaint: lcpElement ? 
+            (lcpElement as any).renderTime || (lcpElement as any).loadTime : 
+            undefined
         };
         
         console.log('Performance metrics:', metrics);
@@ -267,8 +278,8 @@ initApp().catch(error => {
   // Show error in loading indicator
   const loadingTextEl = document.querySelector('.loading-text');
   if (loadingTextEl) {
-    loadingTextEl.textContent = 'Failed to load application. Please refresh the page.';
-    loadingTextEl.style.color = 'red';
+    (loadingTextEl as HTMLElement).textContent = 'Failed to load application. Please refresh the page.';
+    (loadingTextEl as HTMLElement).style.color = 'red';
   }
 });
 
