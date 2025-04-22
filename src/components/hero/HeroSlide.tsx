@@ -1,6 +1,7 @@
 
 import { memo } from "react";
 import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface HeroSlideProps {
   slide: {
@@ -18,21 +19,21 @@ const HeroSlide = memo(({ slide, isActive }: HeroSlideProps) => {
   
   return (
     <div className="transition-all duration-500 opacity-100 transform-none relative">
-      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight animate-fade-up">
+      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight animate-fade-up font-display text-balance">
         {slide.title}
       </h1>
-      <p className="text-lg sm:text-xl text-gray-700 lg:max-w-xl mt-4 animate-fade-up" style={{ animationDelay: "0.2s" }}>
+      <p className="text-lg sm:text-xl text-gray-700 lg:max-w-xl mt-4 animate-fade-up text-balance" style={{ animationDelay: "0.2s" }}>
         {slide.description}
       </p>
       <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-6 animate-fade-up" style={{ animationDelay: "0.3s" }}>
-        <button className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
+        <Button variant="green" size="pill-lg" rounded="full" className="flex items-center justify-center gap-2 w-full sm:w-auto">
           Join as Farmer
           <ArrowRight className="w-5 h-5" />
-        </button>
-        <button className="btn-secondary flex items-center justify-center gap-2 w-full sm:w-auto">
+        </Button>
+        <Button variant="orange" size="pill-lg" rounded="full" className="flex items-center justify-center gap-2 w-full sm:w-auto">
           Join as Consumer
           <ArrowRight className="w-5 h-5" />
-        </button>
+        </Button>
       </div>
     </div>
   );
