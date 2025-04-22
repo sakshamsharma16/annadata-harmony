@@ -43,7 +43,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
             </p>
             <div className="flex flex-wrap items-center gap-4 pt-4">
               <Link to={primaryButtonLink}>
-                <Button size="pill-lg" variant="primary" rounded="full" animation="float" className="text-base">
+                <Button size="pill-lg" variant="green" rounded="full" animation="float" className="text-base">
                   {primaryButtonText}
                   <ChevronRight className="ml-1 h-5 w-5" />
                 </Button>
