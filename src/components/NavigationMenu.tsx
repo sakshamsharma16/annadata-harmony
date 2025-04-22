@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { useNavigationState } from '@/hooks/use-navigation-state';
 import { useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -10,13 +11,17 @@ const NavigationMenu = () => {
   const { 
     isMenuOpen, 
     setIsMenuOpen, 
-    isScrolled, 
-    activeDropdown, 
-    toggleDropdown, 
+    isScrolled,
     closeMenu 
   } = useNavigationState();
+  const [activeDropdown, setActiveDropdown] = useState("");
 
   const isActive = (path: string) => location.pathname === path;
+  
+  // Add toggleDropdown function locally since it was removed from the hook
+  const toggleDropdown = (name: string) => {
+    setActiveDropdown(activeDropdown === name ? "" : name);
+  };
 
   return (
     <nav className={cn(
