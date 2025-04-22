@@ -1,5 +1,5 @@
 
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -12,8 +12,8 @@ interface AppProvidersProps {
 }
 
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
-  // Create QueryClient instance inside the component
-  const queryClient = new QueryClient({
+  // Create QueryClient instance using useState to ensure consistent rendering lifecycle
+  const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
         staleTime: 60 * 1000,
@@ -22,7 +22,7 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
         retry: 1,
       },
     },
-  });
+  }));
 
   return (
     <HelmetProvider>
