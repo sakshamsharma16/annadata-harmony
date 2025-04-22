@@ -11,19 +11,19 @@ interface AppProvidersProps {
   children: ReactNode;
 }
 
-// Create QueryClient instance with proper configuration
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000,
-      gcTime: 5 * 60 * 1000,
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
-
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
+  // Create QueryClient instance inside the component
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000,
+        gcTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        retry: 1,
+      },
+    },
+  });
+
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
