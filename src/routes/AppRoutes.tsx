@@ -1,5 +1,6 @@
+
 import React, { Suspense, lazy } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 import AppNavbar from "../components/AppNavbar";
 import SEOHandler from "../components/SEOHandler";

@@ -5,7 +5,6 @@ import { useLocation } from 'react-router-dom';
 export const useNavigationState = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState("");
   const location = useLocation();
 
   useEffect(() => {
@@ -21,21 +20,14 @@ export const useNavigationState = () => {
     setIsMenuOpen(false);
   }, [location]);
 
-  const toggleDropdown = (name: string) => {
-    setActiveDropdown(activeDropdown === name ? "" : name);
-  };
-
   const closeMenu = () => {
     setIsMenuOpen(false);
-    setActiveDropdown("");
   };
 
   return {
     isMenuOpen,
     setIsMenuOpen,
     isScrolled,
-    activeDropdown,
-    toggleDropdown,
     closeMenu
   };
 };

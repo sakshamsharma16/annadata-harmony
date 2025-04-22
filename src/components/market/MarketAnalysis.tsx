@@ -1,12 +1,26 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MarketPrices from "../MarketPrices";
 import MarketInsights from "./MarketInsights";
 import MandiPrices from "./MandiPrices";
 
 const MarketAnalysis = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("overview");
+  
+  useEffect(() => {
+    // Get tab from URL query params if present
+    const searchParams = new URLSearchParams(location.search);
+    const tabParam = searchParams.get('tab');
+    
+    if (tabParam) {
+      if (["overview", "insights", "mandi"].includes(tabParam)) {
+        setActiveTab(tabParam);
+      }
+    }
+  }, [location]);
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -17,7 +31,7 @@ const MarketAnalysis = () => {
         </p>
       </div>
 
-      <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-8">
           <TabsTrigger value="overview">Current Prices</TabsTrigger>
           <TabsTrigger value="insights">Market Insights</TabsTrigger>
