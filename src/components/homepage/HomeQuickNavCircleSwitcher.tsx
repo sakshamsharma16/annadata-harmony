@@ -2,80 +2,126 @@
 import React from "react";
 import { Cpu, Sparkles, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const options = [
   {
     label: "AI & Tech",
-    icon: <Cpu className="w-7 h-7 text-green-700" />,
+    icon: <Cpu className="w-8 h-8 text-green-700 drop-shadow-glow" />,
     to: "/aiandtech",
     bg: "from-[#c2ffd2] to-[#e6ffe6]",
-    ring: "ring-green-700/20",
-    shadow: "shadow-green-200 hover:shadow-green-300",
+    ring: "ring-green-700/25",
+    shadow: "shadow-green-300 hover:shadow-green-500",
+    glow: "shadow-[0_0_24px_2px_rgba(34,197,94,0.11)]",
   },
   {
     label: "Partnerships",
-    icon: <Sparkles className="w-7 h-7 text-orange-500" />,
+    icon: <Sparkles className="w-8 h-8 text-orange-500 drop-shadow-glow" />,
     to: "/partnerships",
     bg: "from-[#ffe8c4] to-[#fff6e6]",
-    ring: "ring-orange-500/20",
+    ring: "ring-orange-500/25",
     shadow: "shadow-orange-200 hover:shadow-orange-300",
+    glow: "shadow-[0_0_24px_2px_rgba(251,146,60,0.13)]",
   },
   {
     label: "Testimonials",
-    icon: <Star className="w-7 h-7 text-yellow-500" />,
+    icon: <Star className="w-8 h-8 text-yellow-500 drop-shadow-glow" />,
     to: "/testimonials",
     bg: "from-[#fff8c2] to-[#fffae6]",
-    ring: "ring-yellow-500/20",
-    shadow: "shadow-yellow-200 hover:shadow-yellow-300",
+    ring: "ring-yellow-500/25",
+    shadow: "shadow-yellow-300 hover:shadow-yellow-400",
+    glow: "shadow-[0_0_24px_2px_rgba(251,191,36,0.15)]",
   }
 ];
 
-// Fix: Explicitly type spring transition using "as const" to satisfy framer-motion
 const spring = {
   type: "spring" as const,
-  stiffness: 600,
-  damping: 30,
+  stiffness: 500,
+  damping: 22,
+  mass: 1.1,
 };
 
 const stagger = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.14 }
+    transition: { staggerChildren: 0.16 }
   }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, scale: 0.7, y: 34 },
+  visible: { opacity: 1, scale: 1, y: 0, transition: spring },
 };
 
 const HomeQuickNavCircleSwitcher: React.FC = () => {
   const navigate = useNavigate();
+
   return (
-    <section className="w-full flex justify-center mb-12">
+    <section className="w-full flex justify-center mb-14 mt-4 animate-fade-in">
       <motion.div
-        className="flex items-center gap-7"
+        className="flex items-center gap-9"
         variants={stagger}
         initial="hidden"
         animate="visible"
       >
         {options.map((opt, i) => (
           <motion.button
-            type="button"
             key={opt.label}
-            variants={{
-              hidden: { opacity: 0, scale: 0.7, y: 36 },
-              visible: { opacity: 1, scale: 1, y: 0, transition: spring },
+            type="button"
+            className={`
+              group relative focus:outline-none 
+              ring-2 ${opt.ring} ${opt.shadow} ${opt.glow}
+              bg-gradient-to-br ${opt.bg}
+              rounded-full w-28 h-28 md:w-32 md:h-32
+              flex flex-col items-center justify-center
+              transition-[box-shadow,transform] duration-200
+              hover:scale-110 active:scale-98
+              focus-visible:ring-4 focus-visible:ring-offset-2
+              border-2 border-white/80
+              outline-none
+            `}
+            variants={itemVariants}
+            whileHover={{
+              scale: 1.11,
+              boxShadow: "0 0 32px #e8fce6, 0 8px 20px rgba(0,0,0,0.10)"
             }}
-            className={`group relative ring-2 ${opt.ring} ${opt.shadow} bg-gradient-to-br ${opt.bg} rounded-full w-24 h-24 flex flex-col items-center justify-center transition-all duration-200 focus-visible:ring-4 hover:scale-110 active:scale-100 focus:outline-none border-2 border-white/70`}
+            whileTap={{
+              scale: 0.97,
+              boxShadow: "0 0 16px #d1fae5, 0 6px 16px rgba(0,0,0,0.10)"
+            }}
             onClick={() => navigate(opt.to)}
             aria-label={opt.label}
             tabIndex={0}
+            title={opt.label}
+            initial="hidden"
+            animate="visible"
+            transition={spring}
           >
-            <span className="mb-2">{opt.icon}</span>
-            <span className="font-bold text-green-900 text-sm opacity-90">{opt.label}</span>
+            <span className="mb-2 animate-fade-in pointer-events-none">
+              {opt.icon}
+            </span>
+            <span className="font-bold text-green-900 text-base md:text-lg opacity-90 select-none pointer-events-none">
+              {opt.label}
+            </span>
+            {/* Shine animation effect */}
             <motion.span
-              className="absolute inset-0 z-[-1] rounded-full bg-gradient-to-br from-white/50 to-transparent pointer-events-none"
-              initial={{ opacity: 0 }}
-              whileHover={{ opacity: 1, scale: 1.07 }}
-              transition={{ duration: 0.28 }}
+              className="absolute inset-0 z-0 rounded-full pointer-events-none"
+              style={{ background: "radial-gradient(ellipse at 60% 15%,rgba(255,255,255,0.44) 0%,rgba(255,255,255,0.15) 45%,rgba(0,0,0,0.02) 98%)" }}
+              initial={{ opacity: 0.5, scale: 0.98 }}
+              whileHover={{ opacity: 1, scale: 1.07, transition: { duration: 0.22 } }}
+              transition={{ duration: 0.36, ease: "easeInOut" }}
             />
+            {/* Circular ring pulse */}
+            <AnimatePresence>
+              <motion.span
+                layoutId={`circle-pulse-${opt.label}`}
+                className="absolute inset-0 rounded-full border-2 border-white/60 z-10 pointer-events-none group-hover:animate-pulse"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1.11 }}
+                exit={{ opacity: 0, scale: 1.22 }}
+                transition={{ duration: 0.44, delay: 0.04 * i }}
+              />
+            </AnimatePresence>
           </motion.button>
         ))}
       </motion.div>
