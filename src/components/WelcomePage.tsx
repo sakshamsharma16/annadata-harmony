@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { CircleUserRound, Leaf } from "lucide-react";
@@ -7,6 +6,7 @@ import HeroBanner from './homepage/HeroBanner';
 import UserRolesSection from './homepage/UserRolesSection';
 import HowItWorksSection from './homepage/HowItWorksSection';
 import FeaturesSection from './homepage/FeaturesSection';
+import SmartDashboardHighlights from './homepage/SmartDashboardHighlights';
 
 const WelcomePage = () => {
   return (
@@ -48,6 +48,9 @@ const WelcomePage = () => {
 
       {/* Features Highlight */}
       <FeaturesSection />
+
+      {/* Smart Farmer Dashboard Highlights */}
+      <SmartDashboardHighlights />
       
       {/* Need Help Button */}
       <div className="fixed bottom-8 right-8">
