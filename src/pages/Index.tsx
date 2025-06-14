@@ -1,4 +1,3 @@
-
 import { lazy, Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
 import Hero from "@/components/Hero";
@@ -25,9 +24,23 @@ const SectionLoading = () => (
   </div>
 );
 
+// Import new components!
+import CropHealthSimulatorModal from "@/components/homepage/CropHealthSimulatorModal";
+import BlogKnowledgeCentre from "@/components/homepage/BlogKnowledgeCentre";
+import LanguageSelector from "@/components/LanguageSelector";
+
 const Index = () => {
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Topbar - LanguageSelector with microcopy for inclusivity */}
+      <div className="w-full flex justify-end items-center gap-2 py-3 px-6 bg-gradient-to-r from-green-50/80 to-white sticky top-0 z-30">
+        <span className="flex items-center gap-2 font-medium text-green-700 text-sm">
+          🌐 <LanguageSelector />
+          <span className="ml-2 text-xs bg-white border border-green-200 rounded-full px-2 py-0.5 text-green-600">
+            Easily switch language
+          </span>
+        </span>
+      </div>
       <Hero />
       <section className="py-20 px-4 md:px-8 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto max-w-6xl">
@@ -40,6 +53,11 @@ const Index = () => {
           </div>
           <UserRoleCards />
           <AdminPortalLink />
+          {/* --- DEMO INTERACTIVE BUTTON --- */}
+          <div className="text-center">
+            <CropHealthSimulatorModal />
+            <span className="block text-xs text-gray-400 mt-2">Interactive tools coming soon • Visual demo</span>
+          </div>
         </div>
       </section>
       <Suspense fallback={<SectionLoading />}>
@@ -61,6 +79,8 @@ const Index = () => {
       <Suspense fallback={<SectionLoading />}>
         <Reviews />
       </Suspense>
+      {/* --- KNOWLEDGE/BLOG SECTION --- */}
+      <BlogKnowledgeCentre />
       <Suspense fallback={<SectionLoading />}>
         <Contact />
       </Suspense>
