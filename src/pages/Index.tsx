@@ -26,6 +26,8 @@ const SectionLoading = () => (
 
 // Import new components!
 import CropHealthSimulatorModal from "@/components/homepage/CropHealthSimulatorModal";
+import FarmerIncomeCalculatorModal from "@/components/homepage/FarmerIncomeCalculatorModal";
+import CartRouteVisualizerModal from "@/components/homepage/CartRouteVisualizerModal";
 import BlogKnowledgeCentre from "@/components/homepage/BlogKnowledgeCentre";
 import LanguageSelector from "@/components/LanguageSelector";
 
@@ -53,11 +55,13 @@ const Index = () => {
           </div>
           <UserRoleCards />
           <AdminPortalLink />
-          {/* --- DEMO INTERACTIVE BUTTON --- */}
-          <div className="text-center">
+          {/* --- DEMO INTERACTIVE BUTTONS --- */}
+          <div className="flex flex-col items-center gap-4 mt-4 md:flex-row md:justify-center md:gap-6">
             <CropHealthSimulatorModal />
-            <span className="block text-xs text-gray-400 mt-2">Interactive tools coming soon • Visual demo</span>
+            <FarmerIncomeCalculatorModal />
+            <CartRouteVisualizerModal />
           </div>
+          <span className="block text-xs text-gray-400 mt-2 text-center">Interactive tools • Visual demos</span>
         </div>
       </section>
       <Suspense fallback={<SectionLoading />}>
