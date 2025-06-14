@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Users, Leaf, ShoppingCart, Truck, LineChart, Shield, Globe, MessageCircle, BookOpen, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import Hero from "@/components/Hero";
+import SmartDashboardHighlights from "@/components/homepage/SmartDashboardHighlights";
 
 // Lazy load non-critical components
 const Features = lazy(() => import("@/components/Features"));
@@ -164,6 +165,10 @@ const Index = () => {
       <Suspense fallback={<SectionLoading />}>
         <Features />
       </Suspense>
+      
+      <div className="animate-fade-in">
+        <SmartDashboardHighlights />
+      </div>
       
       <section className="py-20 px-4 md:px-8 bg-gradient-to-b from-white to-gray-50">
         <div className="container mx-auto max-w-6xl">
