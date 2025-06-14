@@ -36,7 +36,7 @@ const NavbarDesktopMenu = () => {
           <NavigationMenuItem>
             <NavigationMenuTrigger>For Vendors</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2 bg-sky-200">
+              <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2 bg-transparent">
                 <li className="row-span-3">
                   <Link to="/dashboard/vendor" className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-amber-50 to-amber-100 p-6 no-underline outline-none focus:shadow-md">
                     <Warehouse className="h-6 w-6 text-[#FF9933]" />
