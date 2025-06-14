@@ -16,13 +16,11 @@ const Contact = lazy(() => import("@/components/Contact"));
 const Footer = lazy(() => import("@/components/Footer"));
 
 // Simple loading component
-const SectionLoading = () => (
-  <div className="py-16">
+const SectionLoading = () => <div className="py-16">
     <div className="container mx-auto px-4">
       <div className="h-60 bg-gray-100 animate-pulse rounded-lg"></div>
     </div>
-  </div>
-);
+  </div>;
 
 // Import new components!
 import CropHealthSimulatorModal from "@/components/homepage/CropHealthSimulatorModal";
@@ -30,18 +28,11 @@ import FarmerIncomeCalculatorModal from "@/components/homepage/FarmerIncomeCalcu
 import CartRouteVisualizerModal from "@/components/homepage/CartRouteVisualizerModal";
 import BlogKnowledgeCentre from "@/components/homepage/BlogKnowledgeCentre";
 import LanguageSelector from "@/components/LanguageSelector";
-
 const Index = () => {
-  return (
-    <div className="flex flex-col min-h-screen">
+  return <div className="flex flex-col min-h-screen">
       {/* Topbar - LanguageSelector with microcopy for inclusivity */}
       <div className="w-full flex justify-end items-center gap-2 py-3 px-6 bg-gradient-to-r from-green-50/80 to-white sticky top-0 z-30">
-        <span className="flex items-center gap-2 font-medium text-green-700 text-sm">
-          🌐 <LanguageSelector />
-          <span className="ml-2 text-xs bg-white border border-green-200 rounded-full px-2 py-0.5 text-green-600">
-            Easily switch language
-          </span>
-        </span>
+        
       </div>
       <Hero />
       <section className="py-20 px-4 md:px-8 bg-gradient-to-b from-gray-50 to-white">
@@ -91,8 +82,6 @@ const Index = () => {
       <Suspense fallback={<SectionLoading />}>
         <Footer />
       </Suspense>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
