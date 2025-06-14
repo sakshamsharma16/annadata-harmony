@@ -4,11 +4,12 @@ import { Cpu, Sparkles, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
+// --- Enhanced visual options with corrected links ---
 const options = [
   {
     label: "AI & Tech",
     icon: <Cpu className="w-8 h-8 text-green-700 drop-shadow-glow" />,
-    to: "/aiandtech",
+    to: "/ai-and-tech", // CORRECTED PATH
     bg: "from-[#c2ffd2] to-[#e6ffe6]",
     ring: "ring-green-700/25",
     shadow: "shadow-green-300 hover:shadow-green-500",
@@ -38,9 +39,10 @@ const spring = {
   type: "spring" as const,
   stiffness: 500,
   damping: 22,
-  mass: 1.1,
+  mass: 1.15,
 };
 
+// Enhanced variants for better entrance and interaction
 const stagger = {
   hidden: {},
   visible: {
@@ -49,8 +51,8 @@ const stagger = {
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, scale: 0.7, y: 34 },
-  visible: { opacity: 1, scale: 1, y: 0, transition: spring },
+  hidden: { opacity: 0, scale: 0.7, y: 44, rotate: -12 },
+  visible: { opacity: 1, scale: 1, y: 0, rotate: 0, transition: spring },
 };
 
 const HomeQuickNavCircleSwitcher: React.FC = () => {
@@ -79,15 +81,18 @@ const HomeQuickNavCircleSwitcher: React.FC = () => {
               focus-visible:ring-4 focus-visible:ring-offset-2
               border-2 border-white/80
               outline-none
+              shadow-lg
             `}
             variants={itemVariants}
             whileHover={{
-              scale: 1.11,
-              boxShadow: "0 0 32px #e8fce6, 0 8px 20px rgba(0,0,0,0.10)"
+              scale: 1.16,
+              rotate: 2,
+              boxShadow: "0 0 36px 8px #ecfccb,0 8px 32px rgba(76,175,80,.12)"
             }}
             whileTap={{
-              scale: 0.97,
-              boxShadow: "0 0 16px #d1fae5, 0 6px 16px rgba(0,0,0,0.10)"
+              scale: 0.94,
+              rotate: -3,
+              boxShadow: "0 0 18px 5px #bbf7d0,0 6px 20px rgba(76,175,80,.09)"
             }}
             onClick={() => navigate(opt.to)}
             aria-label={opt.label}
@@ -97,27 +102,32 @@ const HomeQuickNavCircleSwitcher: React.FC = () => {
             animate="visible"
             transition={spring}
           >
-            <span className="mb-2 animate-fade-in pointer-events-none">
-              {opt.icon}
-            </span>
-            <span className="font-bold text-green-900 text-base md:text-lg opacity-90 select-none pointer-events-none">
+            {/* Decorative rotating animated ring */}
+            <motion.span
+              className="absolute z-0 inset-0 rounded-full"
+              style={{
+                background: "radial-gradient(ellipse at 55% 18%,rgba(255,255,255,0.38) 0%,rgba(255,255,255,0.13) 50%,rgba(0,0,0,0.02) 100%)"
+              }}
+              animate={{
+                rotate: [0, 16, 0]
+              }}
+              transition={{
+                duration: 4.5 + i,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+            <span className="mb-2 z-10 animate-fade-in pointer-events-none">{opt.icon}</span>
+            <span className="font-bold text-green-900 text-base md:text-lg opacity-90 select-none pointer-events-none z-10 tracking-tight drop-shadow">
               {opt.label}
             </span>
-            {/* Shine animation effect */}
-            <motion.span
-              className="absolute inset-0 z-0 rounded-full pointer-events-none"
-              style={{ background: "radial-gradient(ellipse at 60% 15%,rgba(255,255,255,0.44) 0%,rgba(255,255,255,0.15) 45%,rgba(0,0,0,0.02) 98%)" }}
-              initial={{ opacity: 0.5, scale: 0.98 }}
-              whileHover={{ opacity: 1, scale: 1.07, transition: { duration: 0.22 } }}
-              transition={{ duration: 0.36, ease: "easeInOut" }}
-            />
-            {/* Circular ring pulse */}
+            {/* Subtle pulsing border ring and glow effect */}
             <AnimatePresence>
               <motion.span
                 layoutId={`circle-pulse-${opt.label}`}
                 className="absolute inset-0 rounded-full border-2 border-white/60 z-10 pointer-events-none group-hover:animate-pulse"
                 initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1.11 }}
+                animate={{ opacity: 1, scale: 1.13 }}
                 exit={{ opacity: 0, scale: 1.22 }}
                 transition={{ duration: 0.44, delay: 0.04 * i }}
               />
