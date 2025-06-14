@@ -5,6 +5,7 @@ import SmartDashboardHighlights from "@/components/homepage/SmartDashboardHighli
 import UserRoleCards from "@/components/homepage/UserRoleCards";
 import PlatformFeaturesSection from "@/components/homepage/PlatformFeaturesSection";
 import AdminPortalLink from "@/components/homepage/AdminPortalLink";
+import HomeQuickNavCircleSwitcher from "@/components/homepage/HomeQuickNavCircleSwitcher";
 
 // Lazy load non-critical components
 const Features = lazy(() => import("@/components/Features"));
@@ -28,13 +29,17 @@ import FarmerIncomeCalculatorModal from "@/components/homepage/FarmerIncomeCalcu
 import CartRouteVisualizerModal from "@/components/homepage/CartRouteVisualizerModal";
 import BlogKnowledgeCentre from "@/components/homepage/BlogKnowledgeCentre";
 import LanguageSelector from "@/components/LanguageSelector";
+
 const Index = () => {
-  return <div className="flex flex-col min-h-screen">
+  return (
+    <div className="flex flex-col min-h-screen">
       {/* Topbar - LanguageSelector with microcopy for inclusivity */}
       <div className="w-full flex justify-end items-center gap-2 py-3 px-6 bg-gradient-to-r from-green-50/80 to-white sticky top-0 z-30">
         
       </div>
       <Hero />
+      {/* --- NEW FEATURED QUICK NAV --- */}
+      <HomeQuickNavCircleSwitcher />
       <section className="py-20 px-4 md:px-8 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
@@ -82,6 +87,7 @@ const Index = () => {
       <Suspense fallback={<SectionLoading />}>
         <Footer />
       </Suspense>
-    </div>;
+    </div>
+  );
 };
 export default Index;
