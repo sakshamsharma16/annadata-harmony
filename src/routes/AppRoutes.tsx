@@ -1,4 +1,3 @@
-
 import React, { Suspense, lazy } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -29,6 +28,9 @@ const NearbyVendors = lazy(() => import("../pages/consumer/NearbyVendors"));
 const MarketAnalytics = lazy(() => import("../pages/dashboards/MarketAnalytics"));
 const CropHealthDashboard = lazy(() => import("../pages/agriculture/CropHealthDashboard"));
 const MarketAnalysis = lazy(() => import("../components/market/MarketAnalysis"));
+const AIAndTech = lazy(() => import("../pages/AIAndTech"));
+const Partnerships = lazy(() => import("../pages/Partnerships"));
+const Testimonials = lazy(() => import("../pages/Testimonials"));
 
 const AppRoutes: React.FC = () => {
   return (
@@ -152,6 +154,11 @@ const AppRoutes: React.FC = () => {
               <MarketAnalysis />
             </Suspense>
           } />
+          
+          {/* AI and Tech Routes */}
+          <Route path="/ai-and-tech" element={<AIAndTech />} />
+          <Route path="/partnerships" element={<Partnerships />} />
+          <Route path="/testimonials" element={<Testimonials />} />
           
           {/* 404 Route */}
           <Route path="*" element={
