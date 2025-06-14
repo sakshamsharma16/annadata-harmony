@@ -16,7 +16,7 @@ const NotFound = lazy(() => import("../pages/NotFound"));
 const Services = lazy(() => import("../pages/Services"));
 const Team = lazy(() => import("../pages/Team"));
 const Checkout = lazy(() => import("../pages/checkout/Checkout"));
-const SupabaseTest = lazy(() => import("../pages/SupabaseTest"));
+// Removed SupabaseTest import here
 const Login = lazy(() => import("../pages/auth/Login"));
 const Register = lazy(() => import("../pages/auth/Register"));
 const AdminLogin = lazy(() => import("../pages/auth/AdminLogin"));
@@ -75,11 +75,7 @@ const AppRoutes: React.FC = () => {
             </Suspense>
           } />
           
-          <Route path="/supabase-test" element={
-            <Suspense fallback={<LoadingSpinner />}>
-              <SupabaseTest />
-            </Suspense>
-          } />
+          {/* Removed SupabaseTest route here */}
           
           {/* Auth Routes */}
           <Route path="/login" element={
