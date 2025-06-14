@@ -1,7 +1,8 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Cpu, LineChart, Truck, Database, Cloud } from "lucide-react";
+import { CircleWheelSwitcher } from "@/components/ui/CircleWheelSwitcher";
 
 const techStackDetails = [
   { icon: <Cpu className="text-[#138808] w-6 h-6" />, title: "Teensy 4.1", desc: "Ultra-fast microcontroller powering Krishi Mitra’s hardware features." },
@@ -11,41 +12,80 @@ const techStackDetails = [
   { icon: <Truck className="text-emerald-600 w-6 h-6" />, title: "Route Optimization", desc: "AI-powered delivery planning for faster, fairer, and greener supply chains." }
 ];
 
+const aiFeatures = [
+  {
+    label: "Health",
+    content: (
+      <div>
+        <b>Crop Health Monitoring:</b>
+        <p className="text-gray-600 text-sm mt-1">
+          Computer vision and smart sensors track plant health, detect diseases/pests, giving instant action tips.
+        </p>
+      </div>
+    ),
+  },
+  {
+    label: "Recommend",
+    content: (
+      <div>
+        <b>Recommendation Systems:</b>
+        <p className="text-gray-600 text-sm mt-1">
+          Personalized crop, fertilizer, and irrigation advice based on real soil data, season, and market demand.
+        </p>
+      </div>
+    ),
+  },
+  {
+    label: "Routes",
+    content: (
+      <div>
+        <b>Route Optimization:</b>
+        <p className="text-gray-600 text-sm mt-1">
+          AI plans vendor delivery routes, reducing waste and ensuring faster doorstep delivery.
+        </p>
+      </div>
+    ),
+  },
+];
+
 export default function AIAndTech() {
+  const [activeAI, setActiveAI] = useState(0);
+  const [activeTech, setActiveTech] = useState(0);
+
   return (
     <main className="py-16 px-4 min-h-screen bg-gradient-to-b from-white to-gray-100">
       <div className="max-w-3xl mx-auto">
         <Badge className="mb-2" variant="outline">AI &amp; Technology</Badge>
         <h1 className="text-3xl font-bold mb-4">AI-Powered Systems &amp; Our Technology Edge</h1>
         
+        {/* AI Features Interactive Circle Switcher */}
         <section className="mb-8">
-          <h2 className="text-xl font-semibold mb-2">How Annadata Uses AI &amp; ML</h2>
-          <ul className="list-disc pl-5 text-gray-700 space-y-4">
-            <li>
-              <strong>Crop Health Monitoring:</strong> Computer vision and smart sensors track plant health, detect diseases/pests, and provide instant action tips.
-            </li>
-            <li>
-              <strong>Recommendation Systems:</strong> Personalized crop, fertilizer, and irrigation recommendations based on live soil data, season, and market demand.
-            </li>
-            <li>
-              <strong>Vendor Route Optimization:</strong> AI algorithms plan efficient vendor delivery routes, reducing waste and ensuring quicker doorstep delivery for consumers.
-            </li>
-          </ul>
+          <h2 className="text-xl font-semibold mb-4">How Annadata Uses AI &amp; ML</h2>
+          <CircleWheelSwitcher items={aiFeatures} active={activeAI} setActive={setActiveAI} className="my-4" />
         </section>
 
+        {/* Tech Stack Radial Switcher */}
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-3">Our Tech Stack</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            {techStackDetails.map((t, i) => (
-              <div key={i} className="flex gap-3 items-start bg-white p-4 rounded-lg border hover:shadow transition-all">
-                <div>{t.icon}</div>
-                <div>
-                  <div className="font-bold">{t.title}</div>
-                  <div className="text-gray-600 text-sm">{t.desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <CircleWheelSwitcher
+            items={
+              techStackDetails.map((t) => ({
+                label: t.title,
+                content: (
+                  <div className="flex items-start gap-3">
+                    {t.icon}
+                    <div>
+                      <div className="font-bold">{t.title}</div>
+                      <div className="text-gray-600 text-sm">{t.desc}</div>
+                    </div>
+                  </div>
+                ),
+              }))
+            }
+            active={activeTech}
+            setActive={setActiveTech}
+            className="mb-2"
+          />
         </section>
 
         <p className="mt-8 text-gray-600 text-base">
