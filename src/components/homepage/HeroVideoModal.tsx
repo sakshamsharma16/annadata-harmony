@@ -13,13 +13,13 @@ interface Props {
 const animations = {
   modal: {
     hidden: { opacity: 0, scale: 0.96, y: 18 },
-    visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.32, ease: [0.16, 1, 0.3, 1] } },
-    exit: { opacity: 0, scale: 0.96, y: 24, transition: { duration: 0.22, ease: [0.4,0,1,1] } }
+    visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.32, ease: "easeInOut" as const } },
+    exit: { opacity: 0, scale: 0.96, y: 24, transition: { duration: 0.22, ease: "easeInOut" as const } }
   },
   overlay: {
     hidden: { opacity: 0 },
-    visible: { opacity: 0.9, transition: { duration: 0.22 } },
-    exit: { opacity: 0, transition: { duration: 0.2 } }
+    visible: { opacity: 0.9, transition: { duration: 0.22, ease: "easeInOut" as const } },
+    exit: { opacity: 0, transition: { duration: 0.2, ease: "easeInOut" as const } }
   }
 };
 

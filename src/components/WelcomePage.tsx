@@ -38,14 +38,7 @@ const WelcomePage = () => {
       </header>
 
       {/* Hero Section */}
-      <HeroBanner 
-        title="Connecting <span class='text-[#138808]'>Farmers</span>, <span class='text-[#FF9933]'>Vendors</span>, and <span class='text-[#0000FF]'>Consumers</span>"
-        description="ANNADATA empowers rural Indian farmers by establishing direct connections to vendors and consumers, eliminating middlemen and ensuring fair pricing for everyone in the agricultural ecosystem."
-        primaryButtonText="Explore Market"
-        primaryButtonLink="/market-prices"
-        secondaryButtonText="Learn More"
-        secondaryButtonLink="/about"
-      />
+      <HeroBanner />
 
       {/* User Roles Section */}
       <UserRolesSection />

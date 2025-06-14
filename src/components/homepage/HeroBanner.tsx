@@ -11,14 +11,14 @@ const MISSION_HEADLINE = "Harvesting Progress, Empowering Lives.";
 const MISSION_SUBHEADLINE =
   "Annadata bridges India’s rural farms to every doorstep—connecting farmers and vendors, amplifying prosperity, and bringing fresh produce home.";
 
-// Animations config
+// Animations config -- make plain object for framer-motion
 const fadeInUp = {
   hidden: { opacity: 0, y: 32 },
-  visible: (i: number = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.16, duration: 0.7, type: "spring", stiffness: 48 },
-  }),
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { delay: 0.16, duration: 0.7, ease: "easeInOut" as const },
+  },
 };
 
 interface HeroBannerProps {
@@ -51,30 +51,24 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
         <m.h1
           className="text-balance font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#138808] text-center drop-shadow-sm"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          animate="visible"
           variants={fadeInUp}
-          custom={0}
         >
           {MISSION_HEADLINE}
         </m.h1>
         <m.p
           className="text-xl sm:text-2xl mt-4 text-balance text-gray-700 max-w-xl mx-auto text-center font-medium"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          animate="visible"
           variants={fadeInUp}
-          custom={1}
         >
           {MISSION_SUBHEADLINE}
         </m.p>
         <m.div
           className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-10 w-full"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          animate="visible"
           variants={fadeInUp}
-          custom={2}
         >
           <Button
             size="pill-lg"
@@ -104,10 +98,8 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
         <m.div
           className="mt-6 text-base text-gray-600 text-center max-w-lg mx-auto animate-fade-up"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          animate="visible"
           variants={fadeInUp}
-          custom={3}
         >
           <span>
             <strong>No Middlemen.</strong> Just honest harvests, fair prices, & local success stories.
@@ -118,8 +110,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
       <m.div
         className="hidden lg:flex absolute right-14 top-[12%] h-[400px] w-[400px] items-center justify-center"
         initial={{ opacity: 0, x: 60 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
+        animate={{ opacity: 1, x: 0 }}
         transition={{ type: "spring", duration: 1.2, delay: 0.28 }}
       >
         <img
