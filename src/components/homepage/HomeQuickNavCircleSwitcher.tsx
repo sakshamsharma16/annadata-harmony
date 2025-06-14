@@ -31,8 +31,9 @@ const options = [
   }
 ];
 
+// Fix: Explicitly type spring transition using "as const" to satisfy framer-motion
 const spring = {
-  type: "spring",
+  type: "spring" as const,
   stiffness: 600,
   damping: 30,
 };
