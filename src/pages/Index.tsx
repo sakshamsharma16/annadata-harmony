@@ -30,6 +30,13 @@ import CartRouteVisualizerModal from "@/components/homepage/CartRouteVisualizerM
 import BlogKnowledgeCentre from "@/components/homepage/BlogKnowledgeCentre";
 import LanguageSelector from "@/components/LanguageSelector";
 
+// Import new market components
+import AnimatedHeroInfographic from "@/components/market/AnimatedHeroInfographic";
+import LiveMarketTicker from "@/components/market/LiveMarketTicker";
+import TradingViewChart from "@/components/market/TradingViewChart";
+import CommodityHeatmap from "@/components/market/CommodityHeatmap";
+import CommoditySparklines from "@/components/market/CommoditySparklines";
+
 const Index = () => {
   return (
     <div className="flex flex-col min-h-screen">
@@ -38,6 +45,13 @@ const Index = () => {
         
       </div>
       <Hero />
+      
+      {/* Live Market Ticker */}
+      <LiveMarketTicker />
+      
+      {/* Animated Hero Infographic */}
+      <AnimatedHeroInfographic />
+      
       {/* --- NEW FEATURED QUICK NAV --- */}
       <HomeQuickNavCircleSwitcher />
       <section className="py-20 px-4 md:px-8 bg-gradient-to-b from-gray-50 to-white">
@@ -67,6 +81,18 @@ const Index = () => {
         <SmartDashboardHighlights />
       </div>
       <PlatformFeaturesSection />
+      
+      {/* Market Analysis Section */}
+      <section className="py-16 space-y-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <TradingViewChart />
+            <CommoditySparklines />
+          </div>
+          <CommodityHeatmap />
+        </div>
+      </section>
+      
       <Suspense fallback={<SectionLoading />}>
         <HowItWorks />
       </Suspense>
