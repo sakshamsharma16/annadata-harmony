@@ -156,9 +156,21 @@ const AppRoutes: React.FC = () => {
           } />
           
           {/* AI and Tech Routes */}
-          <Route path="/ai-and-tech" element={<AIAndTech />} />
-          <Route path="/partnerships" element={<Partnerships />} />
-          <Route path="/testimonials" element={<Testimonials />} />
+          <Route path="/ai-and-tech" element={
+            <Suspense fallback={<LoadingSpinner />}>
+              <AIAndTech />
+            </Suspense>
+          } />
+          <Route path="/partnerships" element={
+            <Suspense fallback={<LoadingSpinner />}>
+              <Partnerships />
+            </Suspense>
+          } />
+          <Route path="/testimonials" element={
+            <Suspense fallback={<LoadingSpinner />}>
+              <Testimonials />
+            </Suspense>
+          } />
           
           {/* 404 Route */}
           <Route path="*" element={
