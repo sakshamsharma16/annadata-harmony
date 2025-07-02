@@ -65,52 +65,52 @@ const CommodityHeatmap: React.FC = () => {
 
   return (
     <div className="w-full bg-card rounded-lg p-6 shadow-sm border">
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-        <div>
-          <h3 className="text-2xl font-bold text-foreground">Live Market Heatmap</h3>
-          <p className="text-muted-foreground">Real-time commodity price movements across regions</p>
-        </div>
-        
-        <div className="flex flex-wrap gap-3">
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map(category => (
-                <SelectItem key={category} value={category}>
-                  {category === 'all' ? 'All Categories' : category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+          <div>
+            <h3 className="text-2xl font-bold text-foreground">Live Market Heatmap</h3>
+            <p className="text-muted-foreground">Real-time commodity price movements across regions</p>
+          </div>
           
-          <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Region" />
-            </SelectTrigger>
-            <SelectContent>
-              {regions.map(region => (
-                <SelectItem key={region} value={region}>
-                  {region === 'all' ? 'All Regions' : region}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[100px]">
-              <SelectValue placeholder="Time" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1h">1 Hour</SelectItem>
-              <SelectItem value="1d">1 Day</SelectItem>
-              <SelectItem value="1w">1 Week</SelectItem>
-              <SelectItem value="1m">1 Month</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex flex-wrap gap-3">
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-[140px] bg-background border-border z-50">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-border shadow-lg z-50">
+                {categories.map(category => (
+                  <SelectItem key={category} value={category} className="hover:bg-muted">
+                    {category === 'all' ? 'All Categories' : category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+              <SelectTrigger className="w-[120px] bg-background border-border z-50">
+                <SelectValue placeholder="Region" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-border shadow-lg z-50">
+                {regions.map(region => (
+                  <SelectItem key={region} value={region} className="hover:bg-muted">
+                    {region === 'all' ? 'All Regions' : region}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Select value={timeRange} onValueChange={setTimeRange}>
+              <SelectTrigger className="w-[100px] bg-background border-border z-50">
+                <SelectValue placeholder="Time" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-border shadow-lg z-50">
+                <SelectItem value="1h" className="hover:bg-muted">1 Hour</SelectItem>
+                <SelectItem value="1d" className="hover:bg-muted">1 Day</SelectItem>
+                <SelectItem value="1w" className="hover:bg-muted">1 Week</SelectItem>
+                <SelectItem value="1m" className="hover:bg-muted">1 Month</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-      </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
         {filteredData.map((item, index) => (

@@ -69,7 +69,7 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
   }, [symbol, interval, theme, height]);
 
   return (
-    <div className="w-full bg-card rounded-lg shadow-sm border overflow-hidden">
+    <div className="w-full h-full bg-card rounded-lg shadow-sm border overflow-hidden">
       <ScriptLoader 
         src="https://s3.tradingview.com/tv.js"
         onLoad={() => {
@@ -84,7 +84,7 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
         ref={containerRef}
         id={`tradingview-widget-${Math.random().toString(36).substr(2, 9)}`}
         style={{ height: `${height}px` }}
-        className="w-full"
+        className="w-full bg-background"
       />
       {!(window as any).TradingView && (
         <div className="flex items-center justify-center h-64 bg-muted/20">

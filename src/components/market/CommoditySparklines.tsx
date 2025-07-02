@@ -110,7 +110,7 @@ const CommoditySparklines: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full bg-card rounded-lg p-6 shadow-sm border">
+    <div className="w-full h-full bg-card rounded-lg p-6 shadow-sm border">
       <div className="mb-6">
         <h3 className="text-2xl font-bold text-foreground">Market Trends</h3>
         <p className="text-muted-foreground">30-day price movement sparklines</p>

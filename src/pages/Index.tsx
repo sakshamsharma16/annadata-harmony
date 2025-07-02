@@ -83,13 +83,27 @@ const Index = () => {
       <PlatformFeaturesSection />
       
       {/* Market Analysis Section */}
-      <section className="py-16 space-y-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-            <TradingViewChart />
-            <CommoditySparklines />
+      <section className="py-16 bg-gradient-to-b from-muted/20 to-background">
+        <div className="container mx-auto px-4 space-y-12">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Live Market Intelligence</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Real-time commodity prices, trends, and market insights powered by live mandi data
+            </p>
           </div>
-          <CommodityHeatmap />
+          
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-12">
+            <div className="order-2 xl:order-1">
+              <TradingViewChart />
+            </div>
+            <div className="order-1 xl:order-2">
+              <CommoditySparklines />
+            </div>
+          </div>
+          
+          <div className="w-full">
+            <CommodityHeatmap />
+          </div>
         </div>
       </section>
       
