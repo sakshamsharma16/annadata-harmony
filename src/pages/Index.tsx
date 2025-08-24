@@ -36,6 +36,7 @@ import LiveMarketTicker from "@/components/market/LiveMarketTicker";
 import TradingViewChart from "@/components/market/TradingViewChart";
 import CommodityHeatmap from "@/components/market/CommodityHeatmap";
 import CommoditySparklines from "@/components/market/CommoditySparklines";
+import { VoiceBot } from "@/components/VoiceBot";
 
 const Index = () => {
   return (
@@ -81,6 +82,21 @@ const Index = () => {
         <SmartDashboardHighlights />
       </div>
       <PlatformFeaturesSection />
+      
+      {/* Voice Assistant Section */}
+      <section className="py-16 bg-gradient-to-r from-primary/5 to-secondary/5">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <Badge className="mb-2" variant="outline">AI Assistant</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Ask in Your Language</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Get instant market updates in Hindi or English. Simply speak your questions and get real-time answers about commodity prices and market trends.
+            </p>
+          </div>
+          
+          <VoiceBot />
+        </div>
+      </section>
       
       {/* Market Analysis Section */}
       <section className="py-16 bg-gradient-to-b from-muted/20 to-background">
