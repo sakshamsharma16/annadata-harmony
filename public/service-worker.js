@@ -1,6 +1,6 @@
 // Cache names with versioning for easy updates
-const STATIC_CACHE_NAME = 'annadata-static-cache-v2';
-const DYNAMIC_CACHE_NAME = 'annadata-dynamic-cache-v2';
+const STATIC_CACHE_NAME = 'annadata-static-cache-v3';
+const DYNAMIC_CACHE_NAME = 'annadata-dynamic-cache-v3';
 const IMAGE_CACHE_NAME = 'annadata-image-cache-v1';
 const API_CACHE_NAME = 'annadata-api-cache-v1';
 
@@ -78,9 +78,14 @@ const getCacheStrategy = (request) => {
     return 'network-first';
   }
   
-  // For JS/CSS assets, use stale-while-revalidate
-  if (url.pathname.match(/\.(js|css)$/)) {
-    return 'stale-while-revalidate';
+  // Scripts, styles and dev-server modules always come from the network so an
+  // outdated copy can never reference files that no longer exist.
+  if (request.destination === 'script' || request.destination === 'style' ||
+      request.destination === 'worker' ||
+      url.pathname.match(/\.(js|mjs|css|tsx?|jsx)$/) ||
+      url.pathname.startsWith('/src/') || url.pathname.startsWith('/node_modules/') ||
+      url.pathname.startsWith('/@')) {
+    return 'network-only';
   }
   
   // Default to network-first
@@ -211,6 +216,9 @@ self.addEventListener('fetch', (event) => {
   }
   
   // Apply the selected strategy
+  if (strategy === 'network-only') {
+    return; // let the browser handle it normally
+  }
   if (strategy === 'network-first') {
     event.respondWith(networkFirst(event.request, cacheName));
   } else if (strategy === 'cache-first') {

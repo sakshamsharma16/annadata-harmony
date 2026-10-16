@@ -97,7 +97,34 @@ const setupPwa = () => {
 };
 
 // Setup service worker
+// The offline helper is only useful on the live site. In development and in
+// Lovable previews it can hold on to outdated files, so remove it there.
+const isPreviewOrDev = () => {
+  const host = window.location.hostname;
+  return import.meta.env.DEV ||
+    host === 'localhost' || host === '127.0.0.1' ||
+    host.startsWith('id-preview--') || host.startsWith('preview--') ||
+    host.endsWith('.lovableproject.com');
+};
+
+const removeServiceWorkers = async () => {
+  try {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(regs.map((r) => r.unregister()));
+    if ('caches' in window) {
+      const names = await caches.keys();
+      await Promise.all(names.filter((n) => n.startsWith('annadata-')).map((n) => caches.delete(n)));
+    }
+  } catch {
+    // Ignore storage restrictions.
+  }
+};
+
 const registerServiceWorker = async () => {
+  if ('serviceWorker' in navigator && isPreviewOrDev()) {
+    void removeServiceWorkers();
+    return;
+  }
   if ('serviceWorker' in navigator) {
     try {
       const registration = await navigator.serviceWorker.register('/service-worker.js', {
@@ -239,7 +266,7 @@ const setupPerformanceMonitoring = () => {
 // Initialize app
 const initApp = async () => {
   setupPwa();
-  await registerServiceWorker();
+  void registerServiceWorker();
   setupPerformanceMonitoring();
   
   // Create React root and render app

@@ -1,12 +1,13 @@
 
-import { lazy, Suspense } from "react";
+import { lazyWithRetry } from "@/utils/lazyWithRetry";
+import { Suspense } from "react";
 import { featuredProducts } from "./featured/ProductsData";
 import FilterControls from "./featured/FilterControls";
 import { useProductFiltering } from "./featured/useProductFiltering";
 import { useCart } from "./featured/useCart";
 
 // Lazy load the product grid component
-const ProductGrid = lazy(() => import("./featured/ProductGrid"));
+const ProductGrid = lazyWithRetry(() => import("./featured/ProductGrid"));
 
 // Simple loading placeholder
 const GridLoading = () => (
