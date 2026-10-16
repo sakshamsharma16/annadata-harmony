@@ -1,3 +1,4 @@
+import { lazyWithRetry } from "@/utils/lazyWithRetry";
 import { lazy, Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
 import Hero from "@/components/Hero";
@@ -8,13 +9,13 @@ import AdminPortalLink from "@/components/homepage/AdminPortalLink";
 import HomeQuickNavCircleSwitcher from "@/components/homepage/HomeQuickNavCircleSwitcher";
 
 // Lazy load non-critical components
-const Features = lazy(() => import("@/components/Features"));
-const HowItWorks = lazy(() => import("@/components/HowItWorks"));
-const FeaturedProducts = lazy(() => import("@/components/FeaturedProducts"));
-const MarketPrices = lazy(() => import("@/components/MarketPrices"));
-const Reviews = lazy(() => import("@/components/Reviews"));
-const Contact = lazy(() => import("@/components/Contact"));
-const Footer = lazy(() => import("@/components/Footer"));
+const Features = lazyWithRetry(() => import("@/components/Features"));
+const HowItWorks = lazyWithRetry(() => import("@/components/HowItWorks"));
+const FeaturedProducts = lazyWithRetry(() => import("@/components/FeaturedProducts"));
+const MarketPrices = lazyWithRetry(() => import("@/components/MarketPrices"));
+const Reviews = lazyWithRetry(() => import("@/components/Reviews"));
+const Contact = lazyWithRetry(() => import("@/components/Contact"));
+const Footer = lazyWithRetry(() => import("@/components/Footer"));
 
 // Simple loading component
 const SectionLoading = () => <div className="py-16">

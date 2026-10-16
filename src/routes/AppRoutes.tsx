@@ -1,3 +1,4 @@
+import { lazyWithRetry } from "@/utils/lazyWithRetry";
 import React, { Suspense, lazy } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -8,29 +9,29 @@ import SEOHandler from "../components/SEOHandler";
 import Index from "../pages/Index";
 
 // Lazy load less critical routes
-const About = lazy(() => import("../pages/About"));
-const Contact = lazy(() => import("../pages/Contact"));
-const FAQ = lazy(() => import("../pages/FAQ"));
-const NotFound = lazy(() => import("../pages/NotFound"));
-const Services = lazy(() => import("../pages/Services"));
-const Team = lazy(() => import("../pages/Team"));
-const Checkout = lazy(() => import("../pages/checkout/Checkout"));
+const About = lazyWithRetry(() => import("../pages/About"));
+const Contact = lazyWithRetry(() => import("../pages/Contact"));
+const FAQ = lazyWithRetry(() => import("../pages/FAQ"));
+const NotFound = lazyWithRetry(() => import("../pages/NotFound"));
+const Services = lazyWithRetry(() => import("../pages/Services"));
+const Team = lazyWithRetry(() => import("../pages/Team"));
+const Checkout = lazyWithRetry(() => import("../pages/checkout/Checkout"));
 // Removed SupabaseTest import here
-const Login = lazy(() => import("../pages/auth/Login"));
-const Register = lazy(() => import("../pages/auth/Register"));
-const AdminLogin = lazy(() => import("../pages/auth/AdminLogin"));
-const FarmerDashboard = lazy(() => import("../pages/dashboards/FarmerDashboard"));
-const VendorDashboard = lazy(() => import("../pages/dashboards/VendorDashboard"));
-const ConsumerDashboard = lazy(() => import("../pages/dashboards/ConsumerDashboard"));
-const AdminDashboard = lazy(() => import("../pages/admin/AdminDashboard"));
-const ManageProducts = lazy(() => import("../pages/farmer/ManageProducts"));
-const NearbyVendors = lazy(() => import("../pages/consumer/NearbyVendors"));
-const MarketAnalytics = lazy(() => import("../pages/dashboards/MarketAnalytics"));
-const CropHealthDashboard = lazy(() => import("../pages/agriculture/CropHealthDashboard"));
-const MarketAnalysis = lazy(() => import("../components/market/MarketAnalysis"));
-const AIAndTech = lazy(() => import("../pages/AIAndTech"));
-const Partnerships = lazy(() => import("../pages/Partnerships"));
-const Testimonials = lazy(() => import("../pages/Testimonials"));
+const Login = lazyWithRetry(() => import("../pages/auth/Login"));
+const Register = lazyWithRetry(() => import("../pages/auth/Register"));
+const AdminLogin = lazyWithRetry(() => import("../pages/auth/AdminLogin"));
+const FarmerDashboard = lazyWithRetry(() => import("../pages/dashboards/FarmerDashboard"));
+const VendorDashboard = lazyWithRetry(() => import("../pages/dashboards/VendorDashboard"));
+const ConsumerDashboard = lazyWithRetry(() => import("../pages/dashboards/ConsumerDashboard"));
+const AdminDashboard = lazyWithRetry(() => import("../pages/admin/AdminDashboard"));
+const ManageProducts = lazyWithRetry(() => import("../pages/farmer/ManageProducts"));
+const NearbyVendors = lazyWithRetry(() => import("../pages/consumer/NearbyVendors"));
+const MarketAnalytics = lazyWithRetry(() => import("../pages/dashboards/MarketAnalytics"));
+const CropHealthDashboard = lazyWithRetry(() => import("../pages/agriculture/CropHealthDashboard"));
+const MarketAnalysis = lazyWithRetry(() => import("../components/market/MarketAnalysis"));
+const AIAndTech = lazyWithRetry(() => import("../pages/AIAndTech"));
+const Partnerships = lazyWithRetry(() => import("../pages/Partnerships"));
+const Testimonials = lazyWithRetry(() => import("../pages/Testimonials"));
 
 const AppRoutes: React.FC = () => {
   return (
