@@ -1,6 +1,6 @@
 
 import { lazyWithRetry } from "@/utils/lazyWithRetry";
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { featuredProducts } from "./featured/ProductsData";
 import FilterControls from "./featured/FilterControls";
 import { useProductFiltering } from "./featured/useProductFiltering";

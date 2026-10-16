@@ -1,5 +1,5 @@
 import { lazyWithRetry } from "@/utils/lazyWithRetry";
-import React, { Suspense, lazy } from "react";
+import React, { Suspense } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 import AppNavbar from "../components/AppNavbar";

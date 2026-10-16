@@ -1,5 +1,5 @@
 import { lazyWithRetry } from "@/utils/lazyWithRetry";
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
 import Hero from "@/components/Hero";
 import SmartDashboardHighlights from "@/components/homepage/SmartDashboardHighlights";
