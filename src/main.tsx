@@ -3,6 +3,9 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
+import { setupModuleLoadRecovery } from './utils/moduleLoadRecovery';
+
+setupModuleLoadRecovery();
 
 // Define the root element to use for mounting the app
 const rootElement = document.getElementById('root');
@@ -189,24 +192,6 @@ const showUpdateNotification = () => {
   });
 };
 
-// Setup caching
-const setupAppCache = () => {
-  if ('caches' in window) {
-    caches.open('annadata-app-cache-v1').then(cache => {
-      const urlsToCache = [
-        '/',
-        '/index.html',
-        '/src/index.css',
-        '/src/App.tsx',
-        '/src/main.tsx'
-      ];
-      return cache.addAll(urlsToCache);
-    }).catch(error => {
-      console.warn('Caching failed:', error);
-    });
-  }
-};
-
 // Setup performance monitoring
 const setupPerformanceMonitoring = () => {
   if ('performance' in window && 'getEntriesByType' in performance) {
@@ -255,7 +240,6 @@ const setupPerformanceMonitoring = () => {
 const initApp = async () => {
   setupPwa();
   await registerServiceWorker();
-  setupAppCache();
   setupPerformanceMonitoring();
   
   // Create React root and render app

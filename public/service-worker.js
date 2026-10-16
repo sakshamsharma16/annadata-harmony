@@ -1,14 +1,11 @@
 // Cache names with versioning for easy updates
-const STATIC_CACHE_NAME = 'annadata-static-cache-v1';
-const DYNAMIC_CACHE_NAME = 'annadata-dynamic-cache-v1';
+const STATIC_CACHE_NAME = 'annadata-static-cache-v2';
+const DYNAMIC_CACHE_NAME = 'annadata-dynamic-cache-v2';
 const IMAGE_CACHE_NAME = 'annadata-image-cache-v1';
 const API_CACHE_NAME = 'annadata-api-cache-v1';
 
 // Resources that should be pre-cached
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/src/index.css',
   '/manifest.json',
   '/favicon.ico',
   '/offline.html', // Fallback page for offline experience
@@ -46,7 +43,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map(cacheName => {
           // Delete outdated caches
-          if (
+          if (cacheName.startsWith('annadata-') &&
             cacheName !== STATIC_CACHE_NAME && 
             cacheName !== DYNAMIC_CACHE_NAME &&
             cacheName !== IMAGE_CACHE_NAME &&
@@ -94,19 +91,25 @@ const getCacheStrategy = (request) => {
 const networkFirst = async (request, cacheName) => {
   try {
     // Try network first
-    const networkResponse = await fetch(request);
+    const networkResponse = await fetch(request, request.mode === 'navigate'
+      ? { cache: 'no-store' }
+      : undefined);
     
     // If successful, clone and cache the response
     if (networkResponse && networkResponse.status === 200) {
-      const cache = await caches.open(cacheName);
-      cache.put(request, networkResponse.clone());
+      if (request.mode !== 'navigate') {
+        const cache = await caches.open(cacheName);
+        await cache.put(request, networkResponse.clone());
+      }
       return networkResponse;
     }
     
     throw new Error('Network response not ok');
   } catch (error) {
     // If network fails, try cache
-    const cachedResponse = await caches.match(request);
+    const cachedResponse = request.mode === 'navigate'
+      ? undefined
+      : await caches.match(request);
     
     if (cachedResponse) {
       return cachedResponse;
@@ -193,7 +196,7 @@ const staleWhileRevalidate = async (request, cacheName) => {
 self.addEventListener('fetch', (event) => {
   // Skip non-GET requests or browser extensions
   if (event.request.method !== 'GET' || 
-      !event.request.url.startsWith('http')) {
+      new URL(event.request.url).origin !== self.location.origin) {
     return;
   }
   
